@@ -3,12 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>pms-mlx</artifactId>
+
 	<parent>
 		<groupId>net.pms</groupId>
 		<artifactId>pms-global</artifactId>
 		<version>1.52.1_mlx_v0.8-SNAPSHOT</version>
 	</parent>
+
+	<artifactId>pms-mlx</artifactId>
 
 	<properties>
 		<finalName>PS3 Media Server MLX</finalName>
@@ -28,6 +30,197 @@
 
 		<maven.nsis.project.template>${project.basedir}/src/main/external-resources/nsis/project.jelly</maven.nsis.project.template>
 	</properties>
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>forms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.beanshell</groupId>
+			<artifactId>bsh-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<exclusions>
+				<!-- no need for commons-logging, as jcl-over-slf4j provides the impl -->
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<exclusions>
+				<!-- no need for commons-logging, as jcl-over-slf4j provides the impl -->
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.sanselan</groupId>
+			<artifactId>sanselan</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<!-- originally, hamcrest-all 1.2RC2 for the artifact change, see: https://code.google.com/p/hamcrest/issues/detail?id=12#c54 
+			TODO: verify if needed -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-integration</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.java.dev.rome</groupId>
+			<artifactId>rome</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jvnet.winp</groupId>
+			<artifactId>winp</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>jaudiotagger</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://www.jgoodies.com/downloads/libraries.html -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>binding</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://www.jgoodies.com/downloads/libraries.html -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>common</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://www.jgoodies.com/downloads/libraries.html -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>looks</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://github.com/edmund-wagner/junrar -->
+		<dependency>
+			<groupId>de.innosystec</groupId>
+			<artifactId>java-unrar</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: https://code.google.com/p/cuelib/ -->
+		<dependency>
+			<groupId>jwbroek.cuelib</groupId>
+			<artifactId>cuelib</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://sourceforge.net/projects/mediachest/ -->
+		<dependency>
+			<groupId>mediautil</groupId>
+			<artifactId>mediautil</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://jtmdb.sourceforge.net/ -->
+		<dependency>
+			<groupId>net.sf</groupId>
+			<artifactId>jtmdb</artifactId>
+		</dependency>
+
+		<!-- XXX: not Mavenized: http://flib.sourceforge.net/JCalendar/doc/index.html -->
+		<dependency>
+			<groupId>org.freixas</groupId>
+			<artifactId>jcalendar</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<defaultGoal>assembly:assembly</defaultGoal>
@@ -119,12 +312,8 @@
 			</plugin>
 
 			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
 			</plugin>
 
 			<plugin>
@@ -155,29 +344,22 @@
 			</plugin>
 
 			<!-- Plugin to assemble a jar with dependencies -->
+      
+
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>make-jar-with-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>${project.basedir}/src/main/assembly/jar-with-dependencies.xml</descriptor>
-							</descriptors>
-							<archive>
-								<manifest>
-									<mainClass>net.pms.PMS</mainClass>
-								</manifest>
-							</archive>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+            <archive>
+              <manifest>
+                <mainClass>net.pms.PMS</mainClass>
+              </manifest>
+            </archive>
+        </configuration>
+     </plugin>
 
 			<!-- This plugin will take care of installing the external dependencies 
 				that do not exist in a public Maven repository. That is why we store some 
