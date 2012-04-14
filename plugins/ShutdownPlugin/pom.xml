@@ -16,7 +16,6 @@
         This plugin adds menu options to shut down the computer where PMS runs.
     </description>
 
-	
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms-plugins</artifactId>
@@ -62,6 +61,30 @@
 	</dependencies>
 
     <build>
+    	<resources>
+    		<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>project.properties</include>
+				</includes>
+
+				<!-- Filter to replace Maven properties -->
+				<filtering>true</filtering>
+			</resource>
+    		<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>*</include>
+				</includes>
+				<excludes>
+					<exclude>project.properties</exclude>
+				</excludes>
+
+				<!-- Do not filter to prevent corruption of binaries -->
+				<filtering>false</filtering>
+			</resource>
+    	</resources>
+
 		<plugins>
 			<!-- Not entirely sure the following two plugins are needed
 			<plugin>

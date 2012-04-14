@@ -20,14 +20,17 @@ package net.pms.plugin.shutdown;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.tree.MutableTreeNode;
 
-import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
-import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.io.Gob;
+import net.pms.medialibrary.external.DlnaTreeFolderPlugin;
 import net.pms.util.ProcessUtil;
 
 import org.slf4j.Logger;
@@ -38,7 +41,7 @@ import com.sun.jna.Platform;
 /**
  * This class implements a computer shutdown plugin for PS3 Media Server.
  */
-public class ShutdownPlugin implements AdditionalFolderAtRoot {
+public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	/**
 	 * Logger for writing messages to the log file.
 	 */
@@ -50,19 +53,30 @@ public class ShutdownPlugin implements AdditionalFolderAtRoot {
 	private static final ResourceBundle MESSAGES = ResourceBundle.getBundle("messages");
 
 	/**
+	 * Resource bundle that holds the project properties.
+	 */
+	private static final ResourceBundle PROPERTIES = ResourceBundle.getBundle("project");
+
+	/**
 	 * Constructor for the plugin.
 	 */
 	public ShutdownPlugin() {
-		LOG.info("Initializing shutdown plugin");
+		LOG.trace("Initializing shutdown plugin");
 	}
 
 	/**
-	 * Returns the Computer Shutdown folder and its contents.
-	 * 
-	 * @return The folder
+	 * {@inheritDoc}
 	 */
 	@Override
-	public DLNAResource getChild() {
+	public void shutdown() {
+		LOG.trace("Shutting down shutdown plugin");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DLNAResource getDLNAResource() {
 		// Create computer shutdown folder.
 		DLNAResource shutdownFolder = new VirtualFolder(MESSAGES.getString("menu.foldername"), null);
 
@@ -73,31 +87,6 @@ public class ShutdownPlugin implements AdditionalFolderAtRoot {
 		shutdownFolder.addChild(getRestartAction());
 
 		return shutdownFolder;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JComponent config() {
-		// No configuration needed
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String name() {
-		return "Shutdown Plugin";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void shutdown() {
-		LOG.trace("Shutting down shutdown plugin");
 	}
 
 	/**
@@ -115,7 +104,7 @@ public class ShutdownPlugin implements AdditionalFolderAtRoot {
 				ProcessBuilder pb;
 				CommandUtils utils;
 
-		    	LOG.trace("Attempting to shut down the computer.");
+		    	LOG.info("Attempting to shut down the computer.");
 
 		        if (Platform.isWindows()) {
 		        	utils = new WindowsCommandUtils();
@@ -168,7 +157,7 @@ public class ShutdownPlugin implements AdditionalFolderAtRoot {
 				ProcessBuilder pb;
 				CommandUtils utils;
 
-		    	LOG.trace("Attempting to restart the computer.");
+		    	LOG.info("Attempting to restart the computer.");
 
 		        if (Platform.isWindows()) {
 		        	utils = new WindowsCommandUtils();
@@ -202,5 +191,97 @@ public class ShutdownPlugin implements AdditionalFolderAtRoot {
 		};
 
 		return action;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDescription() {
+		return MESSAGES.getString("plugin.description");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JComponent getGlobalConfigurationPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getName() {
+		return MESSAGES.getString("plugin.name");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getVersion() {
+		return Integer.parseInt(PROPERTIES.getString("plugin.version"));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JPanel getConfigurationPanel() {
+		// Nothing to configure
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Icon getIcon() {
+		ImageIcon res = new ImageIcon(getClass().getResource("/shutdown_icon.png"));
+		return res;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public MutableTreeNode getTreeNode() {
+		// No mutable tree node
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isAvailable() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void loadConfiguration(String arg0) throws IOException {
+		// Do nothing
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void saveConfiguration(String arg0) throws IOException {
+		// Do nothing
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setDisplayName(String arg0) {
+		// Do nothing
 	}
 }
