@@ -27,7 +27,7 @@ public interface PmsPluginBase {
 	 * 
 	 * @return version of the plugin
 	 */
-	public String getVersion();
+	public int getVersion();
 
 	/**
 	 * Gets the description that will be shown in pms for the plugin. It should
