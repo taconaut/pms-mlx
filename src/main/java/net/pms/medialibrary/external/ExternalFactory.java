@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import net.pms.PMS;
+
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.pms.PMS;
 
 public class ExternalFactory {
 	private static final Logger log = LoggerFactory.getLogger(ExternalFactory.class);
@@ -39,7 +40,7 @@ public class ExternalFactory {
 		//only allow a single instance for a plugin implementation to be added
 		for(DlnaTreeFolderPlugin l : specialFolders){
 			try {
-				if(l.getClass().equals(folder.getClass()) && l.getVersion() >= folder.getVersion()){
+				if(l.getClass().equals(folder.getClass()) && compareVersion(l.getVersion(), folder.getVersion()) > 0){
 					add = false;
 					break;
 				}
@@ -63,7 +64,7 @@ public class ExternalFactory {
 		//only allow a single instance for a plugin implementation to be added
 		for(FileImportPlugin l : movieInfoPlugins){
 			try {
-				if(l.getClass().equals(entry.getClass()) && l.getVersion() >= entry.getVersion()){
+				if(l.getClass().equals(entry.getClass()) && compareVersion(l.getVersion(), entry.getVersion()) > 0){
 					add = false;
 					break;
 				}
@@ -87,7 +88,7 @@ public class ExternalFactory {
 		//only allow a single instance for a plugin implementation to be added
 		for(FileDetailPlugin l : fileEntries){
 			try {
-				if(l.getClass().equals(entry.getClass()) && l.getVersion() >= entry.getVersion()){
+				if(l.getClass().equals(entry.getClass()) && compareVersion(l.getVersion(), entry.getVersion()) > 0){
 					add = false;
 					break;
 				}
@@ -242,5 +243,22 @@ public class ExternalFactory {
 			log.error("Failed to load MovieInfoPlugin named " + className, ex);
 		}
 		return res;
+	}
+
+	/**
+	 * Compare two version strings and return the result. E.g.
+	 * <code>compareVersion("1.6.1", "1.12-SNAPSHOT")</code> returns a number
+	 * less than 0. 
+	 *
+	 * @param version1 First version string to compare.
+	 * @param version2 Seconds version string to compare.
+	 * @return A number less than 0, equal to 0 or greater than 0, depending on
+	 * 		the comparison outcome.
+	 */
+	public static int compareVersion(String version1, String version2) {
+		DefaultArtifactVersion v1 = new DefaultArtifactVersion(version1);
+		DefaultArtifactVersion v2 = new DefaultArtifactVersion(version2);
+
+		return v1.compareTo(v2);
 	}
 }
