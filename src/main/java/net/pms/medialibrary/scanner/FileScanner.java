@@ -19,16 +19,15 @@
 package net.pms.medialibrary.scanner;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import net.pms.Messages;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
@@ -42,11 +41,13 @@ import net.pms.medialibrary.commons.interfaces.IFileScannerEventListener;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileScanner implements Runnable{
 	public static FileScanner instance;
 
 	private static final Logger log = LoggerFactory.getLogger(FileScanner.class);
-	private static int nbScans = 0;
 	
 	private Queue<DOManagedFile> directoryPaths;
 	private Thread scanThread;
@@ -59,16 +60,27 @@ public class FileScanner implements Runnable{
 	private List<IFileScannerEventListener> fileScannerEventListeners;
 	
 	public int updateIntervalDays = 5000;
+
+	private ExecutorService executorService;
 	
 	private FileScanner() throws InitialisationException{
 		directoryPaths = new ConcurrentLinkedQueue<DOManagedFile>();
-		scanThread = new Thread(this);
 		nbScannedItems = 0;
 		nbItemsToScan = 0;
 		dataCollector = FullDataCollector.getInstance();
 		mediaLibraryStorage = MediaLibraryStorage.getInstance();
 		fileScannerEventListeners = new CopyOnWriteArrayList<IFileScannerEventListener>();
 		scanThreadPause = new Object();
+		executorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			
+			@Override
+			public Thread newThread(Runnable target) {
+				Thread t = new Thread(target);
+				t.setName("Scanner");
+				t.setDaemon(true);
+				return t;
+			}
+		});
 	}
 	
 	private synchronized void enqueueManagedFile(DOManagedFile mf){
@@ -118,10 +130,7 @@ public class FileScanner implements Runnable{
 						synchronized (scanState) {
 							if (scanState != ScanState.STARTING && scanState != ScanState.RUNNING) {
 								changeScanState(ScanState.STARTING);
-								scanThread = new Thread(this);
-								scanThread.setName("scan" + nbScans++);
-								scanThread.start();
-							
+								executorService.submit(this);							
 							}
 						}
 					} else if (currentFile.isDirectory() && mFolder.isSubFoldersEnabled()) {
