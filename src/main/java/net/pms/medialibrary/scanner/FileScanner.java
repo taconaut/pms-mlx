@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class FileScanner implements Runnable{
 		nbItemsToScan = 0;
 		dataCollector = FullDataCollector.getInstance();
 		mediaLibraryStorage = MediaLibraryStorage.getInstance();
-		fileScannerEventListeners = new ArrayList<IFileScannerEventListener>();
+		fileScannerEventListeners = new CopyOnWriteArrayList<IFileScannerEventListener>();
 		scanThreadPause = new Object();
 	}
 	
