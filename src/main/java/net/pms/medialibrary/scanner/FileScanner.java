@@ -150,7 +150,7 @@ public class FileScanner implements Runnable{
 					+ scanState); 
 		}
 		synchronized (scanThreadPause) {
-			scanThreadPause.notify();
+			scanThreadPause.notifyAll();
         }
 		if(log.isDebugEnabled()) log.debug("Pausing set. Waiting for scan thread to pause.");
 	}
@@ -188,7 +188,9 @@ public class FileScanner implements Runnable{
 							net.pms.PMS.get().getFrame().setStatusLine("Scan paused");
 							changeScanState(ScanState.PAUSED);
 							synchronized (scanThreadPause) {
-								scanThreadPause.wait();
+								while (scanState == ScanState.PAUSING || scanState == ScanState.PAUSED) {
+									scanThreadPause.wait();
+								}
 							}
 							net.pms.PMS.get().getFrame().setStatusLine("Restarted scan");
 							
