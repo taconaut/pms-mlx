@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import net.pms.Messages;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
@@ -50,7 +51,6 @@ public class FileScanner implements Runnable{
 	private static final Logger log = LoggerFactory.getLogger(FileScanner.class);
 	
 	private Queue<DOManagedFile> directoryPaths;
-	private Thread scanThread;
 	private ScanState scanState = ScanState.IDLE;
 	private int nbScannedItems;
 	private int nbItemsToScan;
@@ -174,7 +174,8 @@ public class FileScanner implements Runnable{
 			scanThreadPause.notifyAll();
         }
 		try{
-			scanThread.join();
+			executorService.shutdown();
+			executorService.awaitTermination(30, TimeUnit.SECONDS);
 			if(log.isDebugEnabled()) log.debug("Stopped! Scan thread terminated properly.");		
 		}catch(InterruptedException ex){
 			if(log.isDebugEnabled()) log.debug("Stopped! Terminated by a InterruptedException.");								
