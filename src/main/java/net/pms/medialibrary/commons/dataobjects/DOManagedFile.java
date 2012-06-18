@@ -42,7 +42,7 @@ public class DOManagedFile {
 		this(other.isWatchEnabled(), path, other.isVideoEnabled(), other
 				.isAudioEnabled(), other.isPicturesEnabled(), other
 				.isSubFoldersEnabled(), other.isFileImportEnabled(),
-				new DOFileImportTemplate());
+				other.getFileImportTemplate());
 	}
 
 	public DOManagedFile(final boolean watchEnabled, final String path, final boolean videoEnabled, final boolean audioEnabled, final boolean picturesEnabled, final boolean subFoldersEnabled, final boolean fileImportEnabled, final DOFileImportTemplate importConfig) {

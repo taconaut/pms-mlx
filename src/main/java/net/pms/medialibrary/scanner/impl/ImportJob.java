@@ -6,14 +6,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import javax.inject.Inject;
+
 import net.pms.job.AbstractJob;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 
+import com.google.inject.assistedinject.Assisted;
+
+/**
+ * Simple import job for new files.
+ * 
+ * @author leonard84
+ * 
+ */
 public class ImportJob extends AbstractJob {
 
 	private final Queue<DOManagedFile> importQueue = new ArrayDeque<DOManagedFile>();
 
-	public ImportJob(final DOManagedFile start) {
+	@Inject
+	private ImportJob(@Assisted final DOManagedFile start) {
 		importQueue.add(start);
 	}
 
