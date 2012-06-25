@@ -1,26 +1,12 @@
 package net.pms.medialibrary.scanner.impl;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 
 import javax.inject.Inject;
 
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.RealFile;
-import net.pms.formats.FLAC;
-import net.pms.formats.GIF;
-import net.pms.formats.ISO;
-import net.pms.formats.JPG;
-import net.pms.formats.M4A;
-import net.pms.formats.MKV;
-import net.pms.formats.MP3;
-import net.pms.formats.MPG;
-import net.pms.formats.OGG;
-import net.pms.formats.PNG;
-import net.pms.formats.RAW;
-import net.pms.formats.TIF;
 import net.pms.medialibrary.commons.dataobjects.DOAudioFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOImageFileInfo;
@@ -29,6 +15,7 @@ import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.scanner.FileInfoCollector;
 import net.pms.medialibrary.scanner.FileScannerDlnaResource;
+import net.pms.medialibrary.scanner.MediaInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +27,10 @@ public class DefaultFileInfoCollector implements FileInfoCollector {
 	private static final Logger log = LoggerFactory
 			.getLogger(DefaultFileInfoCollector.class);
 
-	private HashSet<String> audioFileExtensions = new HashSet<String>();
-	private HashSet<String> videoFileExtensions = new HashSet<String>();
-	private HashSet<String> imageFileExtensions = new HashSet<String>();
 	private final FileScannerDlnaResource dummyParent = new FileScannerDlnaResource();
 
 	@Inject
-	DefaultFileInfoCollector() {
-		populateExtensions();
-	}
+	private MediaInfo mediaInfo;
 
 	@Override
 	public Optional<DOFileInfo> analyze(final DOManagedFile mf) {
@@ -60,7 +42,7 @@ public class DefaultFileInfoCollector implements FileInfoCollector {
 
 		Optional<DOFileInfo> retVal = Optional.absent();
 
-		final FileType ft = getMediaType(f);
+		final FileType ft = mediaInfo.analyzeMediaType(f);
 		switch (ft) {
 		case VIDEO:
 			retVal = analyzeVideo(mf, f);
@@ -192,52 +174,6 @@ public class DefaultFileInfoCollector implements FileInfoCollector {
 		} catch (final Exception ex) {
 			log.error("Failed to parse file info", ex);
 		}
-	}
-
-	private FileType getMediaType(final String fileName) {
-		FileType retVal = FileType.UNKNOWN;
-
-		final String extension = fileName.substring(
-				fileName.lastIndexOf('.') + 1).toLowerCase();
-		if (this.videoFileExtensions.contains(extension)) {
-			retVal = FileType.VIDEO;
-		} else if (this.audioFileExtensions.contains(extension)) {
-			retVal = FileType.AUDIO;
-		} else if (this.imageFileExtensions.contains(extension)) {
-			retVal = FileType.PICTURES;
-		}
-
-		return retVal;
-	}
-
-	private FileType getMediaType(final File file) {
-		FileType retVal = FileType.UNKNOWN;
-
-		if (file.isFile()) {
-			retVal = getMediaType(file.getName());
-		}
-
-		return retVal;
-	}
-
-	private void populateExtensions() {
-		this.audioFileExtensions = new HashSet<String>();
-		this.audioFileExtensions.addAll(Arrays.asList(new M4A().getId()));
-		this.audioFileExtensions.addAll(Arrays.asList(new MP3().getId()));
-		this.audioFileExtensions.addAll(Arrays.asList(new OGG().getId()));
-		this.audioFileExtensions.addAll(Arrays.asList(new FLAC().getId()));
-
-		this.videoFileExtensions = new HashSet<String>();
-		this.videoFileExtensions.addAll(Arrays.asList(new MKV().getId()));
-		this.videoFileExtensions.addAll(Arrays.asList(new ISO().getId()));
-		this.videoFileExtensions.addAll(Arrays.asList(new MPG().getId()));
-
-		this.imageFileExtensions = new HashSet<String>();
-		this.imageFileExtensions.addAll(Arrays.asList(new JPG().getId()));
-		this.imageFileExtensions.addAll(Arrays.asList(new PNG().getId()));
-		this.imageFileExtensions.addAll(Arrays.asList(new GIF().getId()));
-		this.imageFileExtensions.addAll(Arrays.asList(new TIF().getId()));
-		this.imageFileExtensions.addAll(Arrays.asList(new RAW().getId()));
 	}
 
 }
