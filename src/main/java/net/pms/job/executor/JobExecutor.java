@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 
 @Singleton
 class JobExecutor implements JobExecutorService {
@@ -26,7 +26,7 @@ class JobExecutor implements JobExecutorService {
 			.getLogger(JobExecutorService.class);
 
 	@Inject
-	private ListeningExecutorService executorService;
+	private ListeningScheduledExecutorService executorService;
 
 	private final List<Job> running = new CopyOnWriteArrayList<Job>();
 	private final List<Job> paused = new CopyOnWriteArrayList<Job>();

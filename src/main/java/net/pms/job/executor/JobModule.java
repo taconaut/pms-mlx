@@ -2,9 +2,11 @@ package net.pms.job.executor;
 
 import java.util.concurrent.Executors;
 
+import javax.inject.Singleton;
+
 import net.pms.job.JobExecutorService;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
@@ -19,9 +21,14 @@ public class JobModule extends AbstractModule {
 	}
 
 	@Provides
-	ListeningExecutorService provideListeningExecutorService() {
+	@Singleton
+	ListeningScheduledExecutorService provideListeningExecutorService() {
+
+		final int minThreads = Math.min(4, Runtime.getRuntime()
+				.availableProcessors());
 		return MoreExecutors.listeningDecorator(Executors
-				.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true)
+				.newScheduledThreadPool(minThreads, new ThreadFactoryBuilder()
+						.setDaemon(true)
 						.build()));
 	}
 
