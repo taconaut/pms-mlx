@@ -21,6 +21,9 @@ package net.pms.medialibrary.library;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import net.pms.di.InjectionHelper;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.DOScanReport;
 import net.pms.medialibrary.commons.enumarations.FileType;
@@ -31,17 +34,20 @@ import net.pms.medialibrary.commons.interfaces.ILibraryManager;
 import net.pms.medialibrary.commons.interfaces.ILibraryManagerEventListener;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.scanner.FileScanner;
+import net.pms.medialibrary.scanner.ImportScannerService;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 
 public class LibraryManager implements ILibraryManager {
 	
 	private static LibraryManager instance;
+	@Inject ImportScannerService importScannerService;
 
 	private IMediaLibraryStorage mediaLibraryStorage;
 	private FileScanner fileScanner;
 	private List<ILibraryManagerEventListener> libraryManagerEventListeners;
 	
 	private LibraryManager() throws InitialisationException{
+		InjectionHelper.injectMembers(this);
 		this.mediaLibraryStorage = MediaLibraryStorage.getInstance();
 		this.fileScanner = FileScanner.getInstance();
 		this.libraryManagerEventListeners = new ArrayList<ILibraryManagerEventListener>();
@@ -135,7 +141,7 @@ public class LibraryManager implements ILibraryManager {
 
 	@Override
     public void scanFolder(DOManagedFile mFolder) {
-	    this.fileScanner.scan(mFolder);
+	    importScannerService.scan(mFolder);
     }
 
 	@Override
