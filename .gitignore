@@ -10,3 +10,5 @@ MediaInfo64.dll
 target
 .idea/
 pms.iml
+core/fonts
+core/src/main/external-resources/plugins/*.jar
