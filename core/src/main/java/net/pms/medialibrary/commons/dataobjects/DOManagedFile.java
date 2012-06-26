@@ -18,6 +18,8 @@
  */
 package net.pms.medialibrary.commons.dataobjects;
 
+import java.io.File;
+
 public class DOManagedFile {
 	private boolean watchEnabled;
 	private String  path;
@@ -32,7 +34,18 @@ public class DOManagedFile {
 		this(false, "", false, false, false, false, false, new DOFileImportTemplate());
 	}
 
-	public DOManagedFile(boolean watchEnabled, String path, boolean videoEnabled, boolean audioEnabled, boolean picturesEnabled, boolean subFoldersEnabled, boolean fileImportEnabled, DOFileImportTemplate importConfig) {
+	public DOManagedFile(final DOManagedFile other, final File path) {
+		this(other, path.getAbsolutePath());
+	}
+
+	public DOManagedFile(final DOManagedFile other, final String path) {
+		this(other.isWatchEnabled(), path, other.isVideoEnabled(), other
+				.isAudioEnabled(), other.isPicturesEnabled(), other
+				.isSubFoldersEnabled(), other.isFileImportEnabled(),
+				other.getFileImportTemplate());
+	}
+
+	public DOManagedFile(final boolean watchEnabled, final String path, final boolean videoEnabled, final boolean audioEnabled, final boolean picturesEnabled, final boolean subFoldersEnabled, final boolean fileImportEnabled, final DOFileImportTemplate importConfig) {
 		setWatchEnabled(watchEnabled);
 		setPath(path);
 		setVideoEnabled(videoEnabled);
@@ -43,7 +56,7 @@ public class DOManagedFile {
 		setFileImportEnabled(fileImportEnabled);
 	}
 
-	public void setWatchEnabled(boolean watchEnabled) {
+	public void setWatchEnabled(final boolean watchEnabled) {
 		this.watchEnabled = watchEnabled;
 	}
 
@@ -51,7 +64,7 @@ public class DOManagedFile {
 		return watchEnabled;
 	}
 
-	public void setPath(String folderPath) {
+	public void setPath(final String folderPath) {
 		this.path = folderPath;
 	}
 
@@ -59,7 +72,7 @@ public class DOManagedFile {
 		return path;
 	}
 
-	public void setVideoEnabled(boolean videoEnabled) {
+	public void setVideoEnabled(final boolean videoEnabled) {
 		this.videoEnabled = videoEnabled;
 	}
 
@@ -67,7 +80,7 @@ public class DOManagedFile {
 		return videoEnabled;
 	}
 
-	public void setAudioEnabled(boolean audioEnabled) {
+	public void setAudioEnabled(final boolean audioEnabled) {
 		this.audioEnabled = audioEnabled;
 	}
 
@@ -75,7 +88,7 @@ public class DOManagedFile {
 		return audioEnabled;
 	}
 
-	public void setPicturesEnabled(boolean picturesEnabled) {
+	public void setPicturesEnabled(final boolean picturesEnabled) {
 		this.picturesEnabled = picturesEnabled;
 	}
 
@@ -83,7 +96,7 @@ public class DOManagedFile {
 		return picturesEnabled;
 	}
 
-	public void setSubFoldersEnabled(boolean subFoldersEnabled) {
+	public void setSubFoldersEnabled(final boolean subFoldersEnabled) {
 		this.subFoldersEnabled = subFoldersEnabled;
 	}
 
@@ -92,15 +105,17 @@ public class DOManagedFile {
 	}
 
 	public DOFileImportTemplate getFileImportTemplate() {
-		if(importConfig == null) importConfig = new DOFileImportTemplate();
+		if(importConfig == null) {
+			importConfig = new DOFileImportTemplate();
+		}
 		return importConfig;
 	}
 
-	public void setFileImportTemplate(DOFileImportTemplate importConfig) {
+	public void setFileImportTemplate(final DOFileImportTemplate importConfig) {
 		this.importConfig = importConfig;
 	}
 
-	public void setFileImportEnabled(boolean enabled) {
+	public void setFileImportEnabled(final boolean enabled) {
 		fileImportEnabled = enabled;
 	}
 
@@ -109,26 +124,26 @@ public class DOManagedFile {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof DOManagedFile)) { 
-			return false; 
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof DOManagedFile)) {
+			return false;
 		}
 
-		DOManagedFile compObj = (DOManagedFile) obj;
-		if (isWatchEnabled() == compObj.isWatchEnabled() 
-				&& getPath().equals(compObj.getPath()) 
+		final DOManagedFile compObj = (DOManagedFile) obj;
+		if (isWatchEnabled() == compObj.isWatchEnabled()
+				&& getPath().equals(compObj.getPath())
 				&& isAudioEnabled() == compObj.isAudioEnabled()
-		        && isPicturesEnabled() == compObj.isPicturesEnabled() 
-		        && isVideoEnabled() == compObj.isVideoEnabled()
-		        && isSubFoldersEnabled() == compObj.isSubFoldersEnabled()
-		        //&& isFileImportEnabled() == compObj.isFileImportEnabled() //don't use this attribute as it isn't part of the primary key in the db
-		        ) { 
-			return true; 
+				&& isPicturesEnabled() == compObj.isPicturesEnabled()
+				&& isVideoEnabled() == compObj.isVideoEnabled()
+				&& isSubFoldersEnabled() == compObj.isSubFoldersEnabled()
+				//&& isFileImportEnabled() == compObj.isFileImportEnabled() //don't use this attribute as it isn't part of the primary key in the db
+				) {
+			return true;
 		}
 
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode(){
 		int hashCode = 24 + (isWatchEnabled() ? 1 : 2);
@@ -140,10 +155,10 @@ public class DOManagedFile {
 		//hashCode *= 24 + (isFileImportEnabled() ? 13 : 14); //don't use this attribute as it isn't part of the primary key in the db
 		return hashCode;
 	}
-	
+
 	@Override
 	public String toString(){
-		return String.format("folder=%s, watch=%s, subfolders=%s, video=%s, audio=%s, pictures=%s, fileImport=%s, fileImportTemplate=%s", 
+		return String.format("folder=%s, watch=%s, subfolders=%s, video=%s, audio=%s, pictures=%s, fileImport=%s, fileImportTemplate=%s",
 				getPath(), isWatchEnabled(), isSubFoldersEnabled(), isVideoEnabled(), isAudioEnabled(), isPicturesEnabled(), isFileImportEnabled(), getFileImportTemplate().getId());
 	}
 }
