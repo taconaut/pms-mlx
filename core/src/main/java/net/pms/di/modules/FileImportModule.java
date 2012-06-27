@@ -1,4 +1,4 @@
-package net.pms.modules;
+package net.pms.di.modules;
 
 import net.pms.job.Job;
 import net.pms.medialibrary.scanner.ImportScannerService;

@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 
 @Singleton
-class JobExecutor implements JobExecutorService {
+public class JobExecutor implements JobExecutorService {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(JobExecutorService.class);
