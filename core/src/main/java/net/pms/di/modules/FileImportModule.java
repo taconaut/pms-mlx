@@ -1,8 +1,10 @@
 package net.pms.di.modules;
 
 import net.pms.job.Job;
+import net.pms.medialibrary.scanner.FileInfoCollector;
 import net.pms.medialibrary.scanner.ImportScannerService;
 import net.pms.medialibrary.scanner.MediaInfo;
+import net.pms.medialibrary.scanner.impl.DefaultFileInfoCollector;
 import net.pms.medialibrary.scanner.impl.DispatchingImportScannerService;
 import net.pms.medialibrary.scanner.impl.ImportJob;
 import net.pms.medialibrary.scanner.impl.ImportJobFactory;
@@ -23,6 +25,8 @@ public class FileImportModule extends AbstractModule {
 
 		bind(ImportScannerService.class).to(
 				DispatchingImportScannerService.class);
+
+		bind(FileInfoCollector.class).to(DefaultFileInfoCollector.class);
 	}
 
 }
