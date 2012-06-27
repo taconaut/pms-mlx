@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<!--
 		This is a plugin for the PS3 Media Server.
@@ -10,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-shutdown-plugin</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>PMS Shutdown Plugin</name>
 	<description>This plugin adds menu options to shut down the computer where PMS runs.</description>
@@ -26,7 +25,7 @@
 		<dependency>
 			<groupId>github.com.taconaut</groupId>
 			<artifactId>pms-core</artifactId>
-			<version>1.54.1-mlx_0.9-SNAPSHOT</version>
+			<version>1.54.1-mlx_0.9</version>
 		</dependency>
 	</dependencies>
 
@@ -52,9 +51,7 @@
 						<configuration>
 							<target>
 								<!-- Lose the version string while copying -->
-								<copy
-									file="${project.basedir}/target/${project.build.finalName}.${project.packaging}"
-									tofile="${project.basedir}/../../core/src/main/external-resources/plugins/${project.artifactId}.${project.packaging}" overwrite="true" />
+								<copy file="${project.basedir}/target/${project.build.finalName}.${project.packaging}" tofile="${project.basedir}/../../core/src/main/external-resources/plugins/${project.artifactId}.${project.packaging}" overwrite="true" />
 							</target>
 						</configuration>
 					</execution>
