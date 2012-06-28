@@ -50,19 +50,23 @@ public class ImportJob extends AbstractJob {
 		final File dir = new File(parent.getPath());
 
 		final List<DOManagedFile> filesToAdd = new ArrayList<DOManagedFile>();
-
-		for (final File f : dir.listFiles()) {
-			if (f.isHidden()) {
-				continue;
-			}
-
-			if (f.isDirectory()) {
-				if (parent.isSubFoldersEnabled()) {
-					importQueue.add(new DOManagedFile(parent, f));
+		if (dir.isDirectory()) {
+			for (final File f : dir.listFiles()) {
+				if (f.isHidden()) {
+					continue;
 				}
-			} else if (f.isFile()) {
-				filesToAdd.add(new DOManagedFile(parent, f));
+
+				if (f.isDirectory()) {
+					if (parent.isSubFoldersEnabled()) {
+						importQueue.add(new DOManagedFile(parent, f));
+					}
+				} else if (f.isFile()) {
+					filesToAdd.add(new DOManagedFile(parent, f));
+				}
 			}
+		} else {
+			// if we just want to import a single file
+			filesToAdd.add(parent);
 		}
 
 		// This could be handed off to a separate Job
@@ -80,6 +84,5 @@ public class ImportJob extends AbstractJob {
 				}
 			}
 		}
-
 	}
 }
