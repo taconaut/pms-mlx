@@ -70,7 +70,7 @@ public class ImportJob extends AbstractJob {
 			final Date lastUpdated = mediaLibraryStorage
 					.getFileInfoLastUpdated(doManagedFile.getPath());
 
-			if (lastUpdated == null) {
+			if (lastUpdated == null || lastUpdated.getTime() == 0) {
 
 				final Optional<DOFileInfo> fileInfo = fileInfoCollector
 						.analyze(doManagedFile);
