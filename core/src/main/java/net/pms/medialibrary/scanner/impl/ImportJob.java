@@ -40,33 +40,33 @@ public class ImportJob extends AbstractJob {
 
 	@Override
 	protected void performUnitOfWork() throws InterruptedException {
-		final DOManagedFile parent = importQueue.poll();
+		final DOManagedFile current = importQueue.poll();
 
-		if (parent == null) {
+		if (current == null) {
 			finished();
 			return;
 		}
 
-		final File dir = new File(parent.getPath());
+		final File currentFile = new File(current.getPath());
 
 		final List<DOManagedFile> filesToAdd = new ArrayList<DOManagedFile>();
-		if (dir.isDirectory()) {
-			for (final File f : dir.listFiles()) {
+		if (currentFile.isDirectory()) {
+			for (final File f : currentFile.listFiles()) {
 				if (f.isHidden()) {
 					continue;
 				}
 
 				if (f.isDirectory()) {
-					if (parent.isSubFoldersEnabled()) {
-						importQueue.add(new DOManagedFile(parent, f));
+					if (current.isSubFoldersEnabled()) {
+						importQueue.add(new DOManagedFile(current, f));
 					}
 				} else if (f.isFile()) {
-					filesToAdd.add(new DOManagedFile(parent, f));
+					filesToAdd.add(new DOManagedFile(current, f));
 				}
 			}
 		} else {
 			// if we just want to import a single file
-			filesToAdd.add(parent);
+			filesToAdd.add(current);
 		}
 
 		// This could be handed off to a separate Job
