@@ -18,23 +18,30 @@
  */
 package net.pms.formats;
 
-import net.pms.PMS;
-import net.pms.encoders.*;
-
 import java.util.ArrayList;
+
+import net.pms.PMS;
+import net.pms.api.PmsCore;
+import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.encoders.FFMpegVideo;
+import net.pms.encoders.MEncoderAviSynth;
+import net.pms.encoders.MEncoderVideo;
+import net.pms.encoders.Player;
+import net.pms.encoders.TSMuxerVideo;
 
 public class MPG extends Format {
 	@Override
 	public ArrayList<Class<? extends Player>> getProfiles() {
-		PMS r = PMS.get();
-		PMS r1 = PMS.get();
-		PMS r2 = PMS.get();
+		PmsCore r = PMS.get();
+		PmsCore r1 = PMS.get();
+		PmsCore r2 = PMS.get();
 		if (PMS.getConfiguration().getEnginesAsList(r.getRegistry()) == null || PMS.getConfiguration().getEnginesAsList(r1.getRegistry()).isEmpty() || PMS.getConfiguration().getEnginesAsList(r2.getRegistry()).contains("none"))
 		{
 			return null;
 		}
 		ArrayList<Class<? extends Player>> a = new ArrayList<Class<? extends Player>>();
-		PMS r3 = PMS.get();
+		PmsCore r3 = PMS.get();
 		for (String engine : PMS.getConfiguration().getEnginesAsList(r3.getRegistry())) {
 			if (engine.equals(MEncoderVideo.ID)) {
 				a.add(MEncoderVideo.class);

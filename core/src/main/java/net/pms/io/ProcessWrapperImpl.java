@@ -130,7 +130,7 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 				pb.directory(params.workDir);
 			}
 			process = pb.start();
-			PMS.get().currentProcesses.add(process);
+			PMS.get().getCurrentProcesses().add(process);
 			stderrConsumer = keepStderr
 				? new OutputTextConsumer(process.getErrorStream(), true)
 				: new OutputTextLogger(process.getErrorStream());
@@ -206,7 +206,7 @@ public class ProcessWrapperImpl extends Thread implements ProcessWrapper {
 					}
 				}
 			}
-			PMS.get().currentProcesses.remove(process);
+			PMS.get().getCurrentProcesses().remove(process);
 		}
 	}
 

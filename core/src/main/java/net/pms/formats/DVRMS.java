@@ -18,17 +18,20 @@
  */
 package net.pms.formats;
 
+import java.util.ArrayList;
+
 import net.pms.PMS;
+import net.pms.api.PmsCore;
+import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.DLNAMediaInfo;
 import net.pms.encoders.FFMpegDVRMSRemux;
 import net.pms.encoders.Player;
-
-import java.util.ArrayList;
 
 public class DVRMS extends Format {
 	@Override
 	public ArrayList<Class<? extends Player>> getProfiles() {
 		ArrayList<Class<? extends Player>> a = new ArrayList<Class<? extends Player>>();
-		PMS r = PMS.get();
+		PmsCore r = PMS.get();
 		for (String engine : PMS.getConfiguration().getEnginesAsList(r.getRegistry())) {
 			/*if (engine.equals(MEncoderVideo.ID))
 			a.add(MEncoderVideo.class);*/

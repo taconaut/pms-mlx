@@ -19,7 +19,8 @@
 package net.pms.encoders;
 
 import com.sun.jna.Platform;
-import net.pms.configuration.PmsConfiguration;
+
+import net.pms.api.PmsConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.formats.Format;

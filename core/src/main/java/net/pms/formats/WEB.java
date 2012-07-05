@@ -18,12 +18,18 @@
  */
 package net.pms.formats;
 
+import java.util.ArrayList;
+
 import net.pms.PMS;
+import net.pms.api.PmsCore;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
-import net.pms.encoders.*;
-
-import java.util.ArrayList;
+import net.pms.encoders.MEncoderWebVideo;
+import net.pms.encoders.MPlayerWebAudio;
+import net.pms.encoders.MPlayerWebVideoDump;
+import net.pms.encoders.Player;
+import net.pms.encoders.VideoLanAudioStreaming;
+import net.pms.encoders.VideoLanVideoStreaming;
 
 public class WEB extends Format {
 	/**
@@ -45,7 +51,7 @@ public class WEB extends Format {
 	public ArrayList<Class<? extends Player>> getProfiles() {
 		ArrayList<Class<? extends Player>> a = new ArrayList<Class<? extends Player>>();
 		if (type == AUDIO) {
-			PMS r = PMS.get();
+			PmsCore r = PMS.get();
 			for (String engine : PMS.getConfiguration().getEnginesAsList(r.getRegistry())) {
 				if (engine.equals(MPlayerWebAudio.ID)) {
 					a.add(MPlayerWebAudio.class);
@@ -54,7 +60,7 @@ public class WEB extends Format {
 				}
 			}
 		} else {
-			PMS r = PMS.get();
+			PmsCore r = PMS.get();
 			for (String engine : PMS.getConfiguration().getEnginesAsList(r.getRegistry())) {
 				if (engine.equals(MEncoderWebVideo.ID)) {
 					a.add(MEncoderWebVideo.class);

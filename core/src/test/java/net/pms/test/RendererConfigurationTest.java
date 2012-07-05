@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
+import net.pms.configuration.PmsConfigurationImpl;
 import net.pms.configuration.RendererConfiguration;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -119,7 +120,7 @@ public class RendererConfigurationTest {
 		PmsConfiguration pmsConf = null;
 
 		try {
-			pmsConf = new PmsConfiguration(false);
+			pmsConf = new PmsConfigurationImpl(false);
 		} catch (IOException e) {
 			// This should be impossible since no configuration file will be loaded.
 		} catch (ConfigurationException e) {
@@ -147,7 +148,7 @@ public class RendererConfigurationTest {
 		PmsConfiguration pmsConf = null;
 
 		try {
-			pmsConf = new PmsConfiguration(false);
+			pmsConf = new PmsConfigurationImpl(false);
 		} catch (IOException e) {
 			// This should be impossible since no configuration file will be loaded.
 		} catch (ConfigurationException e) {
@@ -175,7 +176,7 @@ public class RendererConfigurationTest {
 		PmsConfiguration pmsConf = null;
 
 		try {
-			pmsConf = new PmsConfiguration(false);
+			pmsConf = new PmsConfigurationImpl(false);
 		} catch (IOException e) {
 			// This should be impossible since no configuration file will be loaded.
 		} catch (ConfigurationException e) {

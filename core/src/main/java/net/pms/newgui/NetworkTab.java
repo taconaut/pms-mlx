@@ -45,7 +45,7 @@ import javax.swing.SwingUtilities;
 
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
 import net.pms.util.KeyedComboBoxModel;
 
 import org.apache.commons.lang.StringUtils;
