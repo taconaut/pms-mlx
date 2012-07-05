@@ -22,7 +22,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.pms.Messages;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.util.FormLayoutUtil;
 import org.slf4j.Logger;

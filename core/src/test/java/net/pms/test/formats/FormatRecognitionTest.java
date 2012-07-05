@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
+import net.pms.configuration.PmsConfigurationImpl;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaAudio;
 import net.pms.dlna.DLNAMediaInfo;
@@ -72,7 +73,7 @@ public class FormatRecognitionTest {
 		PmsConfiguration pmsConf = null;
 
 		try {
-			pmsConf = new PmsConfiguration(false);
+			pmsConf = new PmsConfigurationImpl(false);
 		} catch (IOException e) {
 			// This should be impossible since no configuration file will be loaded.
 		} catch (ConfigurationException e) {
@@ -381,7 +382,7 @@ public class FormatRecognitionTest {
 		try {
 			// Initialize PMS configuration like at initialization time, this
 			// is relevant for RendererConfiguration.isCompatible().
-			PMS.setConfiguration(new PmsConfiguration());
+			PMS.setConfiguration(new PmsConfigurationImpl());
 			configurationLoaded = true;
 		} catch (ConfigurationException e) {
 			e.printStackTrace();

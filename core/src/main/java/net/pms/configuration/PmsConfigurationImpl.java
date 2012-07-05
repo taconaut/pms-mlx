@@ -20,6 +20,7 @@ package net.pms.configuration;
 
 import com.sun.jna.Platform;
 import net.pms.Messages;
+import net.pms.api.PmsConfiguration;
 import net.pms.io.SystemUtils;
 import net.pms.util.PropertiesUtil;
 import org.apache.commons.configuration.Configuration;
@@ -45,8 +46,8 @@ import java.util.*;
  * return a default value. Setters only store a value, they do not permanently save it to
  * file.
  */
-public class PmsConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PmsConfiguration.class);
+public class PmsConfigurationImpl implements PmsConfiguration {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PmsConfigurationImpl.class);
 	private static final int DEFAULT_PROXY_SERVER_PORT = -1;
 	private static final int DEFAULT_SERVER_PORT = 5001;
 
@@ -189,38 +190,22 @@ public class PmsConfiguration {
 	private final TempFolder tempFolder;
 	private final ProgramPathDisabler programPaths;
 
-	private final IpFilter filter = new IpFilter();
-
 	/**
 	 * The set of the keys defining when the HTTP server has to restarted due to a configuration change
 	 */
-	public static final Set<String> NEED_RELOAD_FLAGS = new HashSet<String>(
-		Arrays.asList(
-			KEY_ALTERNATE_THUMB_FOLDER,
-			KEY_NETWORK_INTERFACE,
-			KEY_IP_FILTER,
-			KEY_SORT_METHOD,
-			KEY_HIDE_EMPTY_FOLDERS,
-			KEY_HIDE_TRANSCODE_FOLDER,
-			KEY_HIDE_MEDIA_LIBRARY_FOLDER,
-			KEY_OPEN_ARCHIVES,
-			KEY_USE_CACHE,
-			KEY_HIDE_ENGINENAMES,
-			KEY_ITUNES_ENABLED,
-			KEY_IPHOTO_ENABLED,
-			KEY_APERTURE_ENABLED,
-			KEY_ENGINES,
-			KEY_FOLDERS,
-			KEY_HIDE_VIDEO_SETTINGS,
-			KEY_AUDIO_THUMBNAILS_METHOD,
-			KEY_NOTRANSCODE,
-			KEY_FORCETRANSCODE,
-			KEY_SERVER_PORT,
-			KEY_SERVER_HOSTNAME,
-			KEY_CHAPTER_SUPPORT,
-			KEY_HIDE_EXTENSIONS
-		)
-	);
+	private static final Set<String> NEED_RELOAD_FLAGS = new HashSet<String>(
+			Arrays.asList(KEY_ALTERNATE_THUMB_FOLDER, KEY_NETWORK_INTERFACE,
+					KEY_IP_FILTER, KEY_SORT_METHOD, KEY_HIDE_EMPTY_FOLDERS,
+					KEY_HIDE_TRANSCODE_FOLDER, KEY_HIDE_MEDIA_LIBRARY_FOLDER,
+					KEY_OPEN_ARCHIVES, KEY_USE_CACHE, KEY_HIDE_ENGINENAMES,
+					KEY_ITUNES_ENABLED, KEY_IPHOTO_ENABLED,
+					KEY_APERTURE_ENABLED, KEY_ENGINES, KEY_FOLDERS,
+					KEY_HIDE_VIDEO_SETTINGS, KEY_AUDIO_THUMBNAILS_METHOD,
+					KEY_NOTRANSCODE, KEY_FORCETRANSCODE, KEY_SERVER_PORT,
+					KEY_SERVER_HOSTNAME, KEY_CHAPTER_SUPPORT,
+					KEY_HIDE_EXTENSIONS));
+
+	private final IpFilter filter = new IpFilter();
 
 	/*
 		The following code enables a single setting - PMS_PROFILE - to be used to
@@ -349,7 +334,7 @@ public class PmsConfiguration {
 	 * @throws org.apache.commons.configuration.ConfigurationException
 	 * @throws java.io.IOException
 	 */
-	public PmsConfiguration() throws ConfigurationException, IOException {
+	public PmsConfigurationImpl() throws ConfigurationException, IOException {
 		this(true);
 	}
 
@@ -362,7 +347,7 @@ public class PmsConfiguration {
 	 * @throws org.apache.commons.configuration.ConfigurationException
 	 * @throws java.io.IOException
 	 */
-	public PmsConfiguration(boolean loadFile) throws ConfigurationException, IOException {
+	public PmsConfigurationImpl(boolean loadFile) throws ConfigurationException, IOException {
 		configuration = new PropertiesConfiguration();
 		configuration.setListDelimiter((char) 0);
 
@@ -415,126 +400,178 @@ public class PmsConfiguration {
 			new PlatformSpecificDefaultPathsFactory().get())));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public File getTempFolder() throws IOException {
 		return tempFolder.getTempFolder();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getVlcPath() {
 		return programPaths.getVlcPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void disableVlc() {
 		programPaths.disableVlc();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getEac3toPath() {
 		return programPaths.getEac3toPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMencoderPath() {
 		return programPaths.getMencoderPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getMencoderMaxThreads() {
 		return Math.min(getInt(KEY_MENCODER_MAX_THREADS, getNumberOfCpuCores()), MENCODER_MAX_THREADS);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getDCRawPath() {
 		return programPaths.getDCRaw();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void disableMEncoder() {
 		programPaths.disableMencoder();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFfmpegPath() {
 		return programPaths.getFfmpegPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void disableFfmpeg() {
 		programPaths.disableFfmpeg();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMplayerPath() {
 		return programPaths.getMplayerPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void disableMplayer() {
 		programPaths.disableMplayer();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getTsmuxerPath() {
 		return programPaths.getTsmuxerPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFlacPath() {
 		return programPaths.getFlacPath();
 	}
 
 	/**
-	 * If the framerate is not recognized correctly and the video runs too fast or too
-	 * slow, tsMuxeR can be forced to parse the fps from FFmpeg. Default value is true.
-	 * @return True if tsMuxeR should parse fps from FFmpeg.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isTsmuxerForceFps() {
 		return configuration.getBoolean(KEY_TSMUXER_FORCEFPS, true);
 	}
 
 	/**
-	 * Force tsMuxeR to mux all audio tracks.
-	 * TODO: Remove this redundant code.
-	 * @return True
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isTsmuxerPreremuxAc3() {
 		return true;
 	}
 
 	/**
-	 * The AC3 audio bitrate determines the quality of digital audio sound. An AV-receiver
-	 * or amplifier has to be capable of playing this quality. Default value is 640.
-	 * @return The AC3 audio bitrate.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getAudioBitrate() {
 		return getInt(KEY_AUDIO_BITRATE, 640);
 	}
 
 	/**
-	 * Force tsMuxeR to mux all audio tracks.
-	 * TODO: Remove this redundant code; getter always returns true.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setTsmuxerPreremuxAc3(boolean value) {
 		configuration.setProperty(KEY_TSMUXER_PREREMIX_AC3, value);
 	}
 
 	/**
-	 * If the framerate is not recognized correctly and the video runs too fast or too
-	 * slow, tsMuxeR can be forced to parse the fps from FFmpeg.
-	 * @param value Set to true if tsMuxeR should parse fps from FFmpeg.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setTsmuxerForceFps(boolean value) {
 		configuration.setProperty(KEY_TSMUXER_FORCEFPS, value);
 	}
 
 	/**
-	 * The server port where PMS listens for TCP/IP traffic. Default value is 5001.
-	 * @return The port number.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getServerPort() {
 		return getInt(KEY_SERVER_PORT, DEFAULT_SERVER_PORT);
 	}
 
 	/**
-	 * Set the server port where PMS must listen for TCP/IP traffic.
-	 * @param value The TCP/IP port number.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setServerPort(int value) {
 		configuration.setProperty(KEY_SERVER_PORT, value);
 	}
 
 	/**
-	 * The hostname of the server.
-	 * @return The hostname if it is defined, otherwise <code>null</code>.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getServerHostname() {
 		String value = getString(KEY_SERVER_HOSTNAME, "");
 		if (StringUtils.isNotBlank(value)) {
@@ -545,27 +582,25 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Set the hostname of the server.
-	 * @param value The hostname.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setHostname(String value) {
 		configuration.setProperty(KEY_SERVER_HOSTNAME, value);
 	}
 
 	/**
-	 * The TCP/IP port number for a proxy server. Default value is -1.
-	 * TODO: Is this still used?
-	 * @return The proxy port number.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getProxyServerPort() {
 		return getInt(KEY_PROXY_SERVER_PORT, DEFAULT_PROXY_SERVER_PORT);
 	}
 
 	/**
-	 * Get the code of the preferred language for the PMS user interface. Default
-	 * is based on the locale.
-	 * @return The ISO 639 language code.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getLanguage() {
 		String def = Locale.getDefault().getLanguage();
 		if (def == null) {
@@ -656,288 +691,258 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns the preferred minimum size for the transcoding memory buffer in megabytes.
-	 * Default value is 12.
-	 * @return The minimum memory buffer size.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMinMemoryBufferSize() {
 		return getInt(KEY_MIN_MEMORY_BUFFER_SIZE, 12);
 	}
 
 	/**
-	 * Returns the preferred maximum size for the transcoding memory buffer in megabytes.
-	 * The value returned has a top limit of {@link #MAX_MAX_MEMORY_BUFFER_SIZE}. Default
-	 * value is 400.
-	 *
-	 * @return The maximum memory buffer size.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMaxMemoryBufferSize() {
 		return Math.max(0, Math.min(MAX_MAX_MEMORY_BUFFER_SIZE, getInt(KEY_MAX_MEMORY_BUFFER_SIZE, 400)));
 	}
 
 	/**
-	 * Returns the top limit that can be set for the maximum memory buffer size.
-	 * @return The top limit.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMaxMemoryBufferSizeStr() {
 		return String.valueOf(MAX_MAX_MEMORY_BUFFER_SIZE);
 	}
 
 	/**
-	 * Set the preferred maximum for the transcoding memory buffer in megabytes. The top
-	 * limit for the value is {@link #MAX_MAX_MEMORY_BUFFER_SIZE}.
-	 *
-	 * @param value The maximum buffer size.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMaxMemoryBufferSize(int value) {
 		configuration.setProperty(KEY_MAX_MEMORY_BUFFER_SIZE, Math.max(0, Math.min(MAX_MAX_MEMORY_BUFFER_SIZE, value)));
 	}
 
 	/**
-	 * Returns the font scale used for ASS subtitling. Default value is 1.0.
-	 * @return The ASS font scale.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAssScale() {
 		return getString(KEY_MENCODER_ASS_SCALE, "1.0");
 	}
 
 	/**
-	 * Some versions of mencoder produce garbled audio because the "ac3" codec is used
-	 * instead of the "ac3_fixed" codec. Returns true if "ac3_fixed" should be used.
-	 * Default is false.
-	 * See https://code.google.com/p/ps3mediaserver/issues/detail?id=1092#c1
-	 * @return True if "ac3_fixed" should be used. 
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderAc3Fixed() {
 		return configuration.getBoolean(KEY_MENCODER_AC3_FIXED, false);
 	}
 
 	/**
-	 * Returns the margin used for ASS subtitling. Default value is 10.
-	 * @return The ASS margin.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAssMargin() {
 		return getString(KEY_MENCODER_ASS_MARGIN, "10");
 	}
 
 	/**
-	 * Returns the outline parameter used for ASS subtitling. Default value is 1.
-	 * @return The ASS outline parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAssOutline() {
 		return getString(KEY_MENCODER_ASS_OUTLINE, "1");
 	}
 
 	/**
-	 * Returns the shadow parameter used for ASS subtitling. Default value is 1.
-	 * @return The ASS shadow parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAssShadow() {
 		return getString(KEY_MENCODER_ASS_SHADOW, "1");
 	}
 
 	/**
-	 * Returns the subfont text scale parameter used for subtitling without ASS.
-	 * Default value is 3.
-	 * @return The subfont text scale parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderNoAssScale() {
 		return getString(KEY_MENCODER_NOASS_SCALE, "3");
 	}
 
 	/**
-	 * Returns the subpos parameter used for subtitling without ASS.
-	 * Default value is 2.
-	 * @return The subpos parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderNoAssSubPos() {
 		return getString(KEY_MENCODER_NOASS_SUBPOS, "2");
 	}
 
 	/**
-	 * Returns the subfont blur parameter used for subtitling without ASS.
-	 * Default value is 1.
-	 * @return The subfont blur parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderNoAssBlur() {
 		return getString(KEY_MENCODER_NOASS_BLUR, "1");
 	}
 
 	/**
-	 * Returns the subfont outline parameter used for subtitling without ASS.
-	 * Default value is 1.
-	 * @return The subfont outline parameter.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderNoAssOutline() {
 		return getString(KEY_MENCODER_NOASS_OUTLINE, "1");
 	}
 
 	/**
-	 * Set the subfont outline parameter used for subtitling without ASS.
-	 * @param value The subfont outline parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderNoAssOutline(String value) {
 		configuration.setProperty(KEY_MENCODER_NOASS_OUTLINE, value);
 	}
 
 	/**
-	 * Some versions of mencoder produce garbled audio because the "ac3" codec is used
-	 * instead of the "ac3_fixed" codec.
-	 * See https://code.google.com/p/ps3mediaserver/issues/detail?id=1092#c1
-	 * @param value Set to true if "ac3_fixed" should be used.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAc3Fixed(boolean value) {
 		configuration.setProperty(KEY_MENCODER_AC3_FIXED, value);
 	}
 
 	/**
-	 * Set the margin used for ASS subtitling.
-	 * @param value The ASS margin value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAssMargin(String value) {
 		configuration.setProperty(KEY_MENCODER_ASS_MARGIN, value);
 	}
 
 	/**
-	 * Set the outline parameter used for ASS subtitling.
-	 * @param value The ASS outline parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAssOutline(String value) {
 		configuration.setProperty(KEY_MENCODER_ASS_OUTLINE, value);
 	}
 
 	/**
-	 * Set the shadow parameter used for ASS subtitling.
-	 * @param value The ASS shadow parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAssShadow(String value) {
 		configuration.setProperty(KEY_MENCODER_ASS_SHADOW, value);
 	}
 
 	/**
-	 * Set the font scale used for ASS subtitling.
-	 * @param value The ASS font scale value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAssScale(String value) {
 		configuration.setProperty(KEY_MENCODER_ASS_SCALE, value);
 	}
 
 	/**
-	 * Set the subfont text scale parameter used for subtitling without ASS.
-	 * @param value The subfont text scale parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderNoAssScale(String value) {
 		configuration.setProperty(KEY_MENCODER_NOASS_SCALE, value);
 	}
 
 	/**
-	 * Set the subfont blur parameter used for subtitling without ASS.
-	 * @param value The subfont blur parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderNoAssBlur(String value) {
 		configuration.setProperty(KEY_MENCODER_NOASS_BLUR, value);
 	}
 
 	/**
-	 * Set the subpos parameter used for subtitling without ASS.
-	 * @param value The subpos parameter value to set.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderNoAssSubPos(String value) {
 		configuration.setProperty(KEY_MENCODER_NOASS_SUBPOS, value);
 	}
 
 	/**
-	 * Set the maximum number of concurrent mencoder threads.
-	 * XXX Currently unused.
-	 * @param value The maximum number of concurrent threads.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderMaxThreads(int value) {
 		configuration.setProperty(KEY_MENCODER_MAX_THREADS, value);
 	}
 
 	/**
-	 * Set the preferred language for the PMS user interface.
-	 * @param value The ISO 639 language code.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setLanguage(String value) {
 		configuration.setProperty(KEY_LANGUAGE, value);
 		Locale.setDefault(new Locale(getLanguage()));
 	}
 
 	/**
-	 * Returns the number of seconds from the start of a video file (the seek
-	 * position) where the thumbnail image for the movie should be extracted
-	 * from. Default is 1 second.
-	 * @return The seek position in seconds.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getThumbnailSeekPos() {
 		return getInt(KEY_THUMBNAIL_SEEK_POS, 1);
 	}
 
 	/**
-	 * Sets the number of seconds from the start of a video file (the seek
-	 * position) where the thumbnail image for the movie should be extracted
-	 * from.
-	 * @param value The seek position in seconds.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setThumbnailSeekPos(int value) {
 		configuration.setProperty(KEY_THUMBNAIL_SEEK_POS, value);
 	}
 
 	/**
-	 * Older versions of mencoder do not support ASS/SSA subtitles on all
-	 * platforms. Returns true if mencoder supports them. Default is true
-	 * on Windows and OS X, false otherwise.
-	 * See https://code.google.com/p/ps3mediaserver/issues/detail?id=1097
-	 * @return True if mencoder supports ASS/SSA subtitles.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderAss() {
 		return getBoolean(KEY_MENCODER_ASS, Platform.isWindows() || Platform.isMac());
 	}
 
 	/**
-	 * Returns whether or not subtitles should be disabled when using MEncoder
-	 * as transcoding engine. Default is false, meaning subtitles should not
-	 * be disabled.
-	 * @return True if subtitles should be disabled, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderDisableSubs() {
 		return getBoolean(KEY_MENCODER_DISABLE_SUBS, false);
 	}
 
 	/**
-	 * Returns whether or not the Pulse Code Modulation audio format should be
-	 * forced when using MEncoder as transcoding engine. The default is false.
-	 * @return True if PCM should be forced, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderUsePcm() {
 		return getBoolean(KEY_MENCODER_USE_PCM, false);
 	}
 
 	/**
-	 * Returns whether or not the Pulse Code Modulation audio format should be
-	 * used only for HQ audio codecs. The default is false.
-	 * @return True if PCM should be used only for HQ audio codecs, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderUsePcmForHQAudioOnly() {
 		return getBoolean(KEY_MENCODER_USE_PCM_FOR_HQ_AUDIO_ONLY, false);
 	}
 
 	/**
-	 * Returns the name of a TrueType font to use for MEncoder subtitles.
-	 * Default is <code>""</code>.
-	 * @return The font name.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderFont() {
 		return getString(KEY_MENCODER_FONT, "");
 	}
 
 	/**
-	 * Returns the audio language priority for MEncoder as a comma separated
-	 * string. For example: <code>"eng,fre,jpn,ger,und"</code>, where "und"
-	 * stands for "undefined".
-	 * @return The audio language priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAudioLanguages() {
 		return getString(KEY_MENCODER_AUDIO_LANGS, getDefaultLanguages());
 	}
@@ -956,141 +961,113 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns the subtitle language priority for MEncoder as a comma
-	 * separated string. For example: <code>"eng,fre,jpn,ger,und"</code>,
-	 * where "und" stands for "undefined".
-	 * @return The subtitle language priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderSubLanguages() {
 		return getString(KEY_MENCODER_SUB_LANGS, getDefaultLanguages());
 	}
 
 	/**
-	 * Returns the ISO 639 language code for the subtitle language that should
-	 * be forced upon MEncoder. 
-	 * @return The subtitle language code.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderForcedSubLanguage() {
 		return getString(KEY_MENCODER_FORCED_SUB_LANG, getLanguage());
 	}
 
 	/**
-	 * Returns the tag string that identifies the subtitle language that
-	 * should be forced upon MEncoder.
-	 * @return The tag string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderForcedSubTags() {
   		return getString(KEY_MENCODER_FORCED_SUB_TAGS, "forced");
   	}
 
 	/**
-	 * Returns a string of audio language and subtitle language pairs
-	 * ordered by priority for MEncoder to try to match. Audio language
-	 * and subtitle language should be comma separated as a pair,
-	 * individual pairs should be semicolon separated. "*" can be used to
-	 * match any language. Subtitle language can be defined as "off". For
-	 * example: <code>"en,off;jpn,eng;*,eng;*;*"</code>.
-	 * Default value is <code>""</code>.
-	 * @return The audio and subtitle languages priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderAudioSubLanguages() {
 		return getString(KEY_MENCODER_AUDIO_SUB_LANGS, "");
 	}
 
 	/**
-	 * Returns whether or not MEncoder should use FriBiDi mode, which
-	 * is needed to display subtitles in languages that read from right to
-	 * left, like Arabic, Farsi, Hebrew, Urdu, etc. Default value is false.
-	 * @return True if FriBiDi mode should be used, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderSubFribidi() {
 		return getBoolean(KEY_MENCODER_SUB_FRIBIDI, false);
 	}
 
 	/**
-	 * Returns the character encoding (or code page) that MEncoder should use
-	 * for displaying subtitles. Default is "cp1252".
-	 * @return The character encoding.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderSubCp() {
 		return getString(KEY_MENCODER_SUB_CP, "cp1252");
 	}
 
 	/**
-	 * Returns whether or not MEncoder should use fontconfig for displaying
-	 * subtitles. Default is false.
-	 * @return True if fontconfig should be used, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderFontConfig() {
 		return getBoolean(KEY_MENCODER_FONT_CONFIG, true);
 	}
 
 	/**
-	 * Set to true if MEncoder should be forced to use the framerate that is
-	 * parsed by FFmpeg.
-	 * @param value Set to true if the framerate should be forced, false
-	 * 			otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderForceFps(boolean value) {
 		configuration.setProperty(KEY_MENCODER_FORCE_FPS, value);
 	}
 
 	/**
-	 * Returns true if MEncoder should be forced to use the framerate that is
-	 * parsed by FFmpeg.
-	 * @return True if the framerate should be forced, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderForceFps() {
 		return getBoolean(KEY_MENCODER_FORCE_FPS, false);
 	}
 
 	/**
-	 * Sets the audio language priority for MEncoder as a comma separated
-	 * string. For example: <code>"eng,fre,jpn,ger,und"</code>, where "und"
-	 * stands for "undefined".
-	 * @param value The audio language priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAudioLanguages(String value) {
 		configuration.setProperty(KEY_MENCODER_AUDIO_LANGS, value);
 	}
 
 	/**
-	 * Sets the subtitle language priority for MEncoder as a comma
-	 * separated string. For example: <code>"eng,fre,jpn,ger,und"</code>,
-	 * where "und" stands for "undefined".
-	 * @param value The subtitle language priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderSubLanguages(String value) {
 		configuration.setProperty(KEY_MENCODER_SUB_LANGS, value);
 	}
 
 	/**
-	 * Sets the ISO 639 language code for the subtitle language that should
-	 * be forced upon MEncoder. 
-	 * @param value The subtitle language code.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderForcedSubLanguage(String value) {
 		configuration.setProperty(KEY_MENCODER_FORCED_SUB_LANG, value);
 	}
 
 	/**
-	 * Sets the tag string that identifies the subtitle language that
-	 * should be forced upon MEncoder.
-	 * @param value The tag string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderForcedSubTags(String value) {
 		configuration.setProperty(KEY_MENCODER_FORCED_SUB_TAGS, value);
 	}
 
 	/**
-	 * Sets a string of audio language and subtitle language pairs
-	 * ordered by priority for MEncoder to try to match. Audio language
-	 * and subtitle language should be comma separated as a pair,
-	 * individual pairs should be semicolon separated. "*" can be used to
-	 * match any language. Subtitle language can be defined as "off". For
-	 * example: <code>"en,off;jpn,eng;*,eng;*;*"</code>.
-	 * @param value The audio and subtitle languages priority string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAudioSubLanguages(String value) {
 		configuration.setProperty(KEY_MENCODER_AUDIO_SUB_LANGS, value);
 	}
@@ -1107,9 +1084,9 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns custom commandline options to pass on to MEncoder.
-	 * @return The custom options string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMencoderCustomOptions() {
 		return getString(KEY_MENCODER_CUSTOM_OPTIONS, "");
 	}
@@ -1126,232 +1103,193 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Sets custom commandline options to pass on to MEncoder.
-	 * @param value The custom options string.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderCustomOptions(String value) {
 		configuration.setProperty(KEY_MENCODER_CUSTOM_OPTIONS, value);
 	}
 
 	/**
-	 * Sets the character encoding (or code page) that MEncoder should use
-	 * for displaying subtitles. Default is "cp1252".
-	 * @param value The character encoding.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderSubCp(String value) {
 		configuration.setProperty(KEY_MENCODER_SUB_CP, value);
 	}
 
 	/**
-	 * Sets whether or not MEncoder should use FriBiDi mode, which
-	 * is needed to display subtitles in languages that read from right to
-	 * left, like Arabic, Farsi, Hebrew, Urdu, etc. Default value is false.
-	 * @param value Set to true if FriBiDi mode should be used.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderSubFribidi(boolean value) {
 		configuration.setProperty(KEY_MENCODER_SUB_FRIBIDI, value);
 	}
 
 	/**
-	 * Sets the name of a TrueType font to use for MEncoder subtitles.
-	 * @param value The font name.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderFont(String value) {
 		configuration.setProperty(KEY_MENCODER_FONT, value);
 	}
 
 	/**
-	 * Older versions of mencoder do not support ASS/SSA subtitles on all
-	 * platforms. Set to true if mencoder supports them. Default should be
-	 * true on Windows and OS X, false otherwise.
-	 * See https://code.google.com/p/ps3mediaserver/issues/detail?id=1097
-	 * @param value Set to true if mencoder supports ASS/SSA subtitles.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderAss(boolean value) {
 		configuration.setProperty(KEY_MENCODER_ASS, value);
 	}
 
 	/**
-	 * Sets whether or not MEncoder should use fontconfig for displaying
-	 * subtitles.
-	 * @param value Set to true if fontconfig should be used.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderFontConfig(boolean value) {
 		configuration.setProperty(KEY_MENCODER_FONT_CONFIG, value);
 	}
 
 	/**
-	 * Set whether or not subtitles should be disabled when using MEncoder
-	 * as transcoding engine.
-	 * @param value Set to true if subtitles should be disabled.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderDisableSubs(boolean value) {
 		configuration.setProperty(KEY_MENCODER_DISABLE_SUBS, value);
 	}
 
 	/**
-	 * Sets whether or not the Pulse Code Modulation audio format should be
-	 * forced when using MEncoder as transcoding engine.
-	 * @param value Set to true if PCM should be forced.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderUsePcm(boolean value) {
 		configuration.setProperty(KEY_MENCODER_USE_PCM, value);
 	}
 
 	/**
-	 * Sets whether or not the Pulse Code Modulation audio format should be
-	 * used only for HQ audio codecs.
-	 * @param value Set to true if PCM should be used only for HQ audio.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderUsePcmForHQAudioOnly(boolean value) {
 		configuration.setProperty(KEY_MENCODER_USE_PCM_FOR_HQ_AUDIO_ONLY, value);
 	}
 
 	/**
-	 * Returns true if archives (e.g. .zip or .rar) should be browsable by
-	 * PMS, false otherwise.
-	 * @return True if archives should be browsable.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isArchiveBrowsing() {
 		return getBoolean(KEY_OPEN_ARCHIVES, false);
 	}
 
 	/**
-	 * Set to true if archives (e.g. .zip or .rar) should be browsable by
-	 * PMS, false otherwise.
-	 * @param value Set to true if archives should be browsable.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setArchiveBrowsing(boolean value) {
 		configuration.setProperty(KEY_OPEN_ARCHIVES, value);
 	}
 
 	/**
-	 * Returns true if MEncoder should use the deinterlace filter, false
-	 * otherwise.
-	 * @return True if the deinterlace filter should be used.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderYadif() {
 		return getBoolean(KEY_MENCODER_YADIF, false);
 	}
 
 	/**
-	 * Set to true if MEncoder should use the deinterlace filter, false
-	 * otherwise.
-	 * @param value Set ot true if the deinterlace filter should be used.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderYadif(boolean value) {
 		configuration.setProperty(KEY_MENCODER_YADIF, value);
 	}
 
 	/**
-	 * Returns true if MEncoder should be used to upscale the video to an
-	 * optimal resolution. Default value is false, meaning the renderer will
-	 * upscale the video itself.
-	 *
-	 * @return True if MEncoder should be used, false otherwise. 
-	 * @see {@link #getMencoderScaleX(int)}, {@link #getMencoderScaleY(int)}
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMencoderScaler() {
 		return getBoolean(KEY_MENCODER_SCALER, false);
 	}
 
 	/**
-	 * Set to true if MEncoder should be used to upscale the video to an
-	 * optimal resolution. Set to false to leave upscaling to the renderer.
-	 *
-	 * @param value Set to true if MEncoder should be used to upscale.
-	 * @see {@link #setMencoderScaleX(int)}, {@link #setMencoderScaleY(int)}
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderScaler(boolean value) {
 		configuration.setProperty(KEY_MENCODER_SCALER, value);
 	}
 
 	/**
-	 * Returns the width in pixels to which a video should be scaled when
-	 * {@link #isMencoderScaler()} returns true.
-	 *
-	 * @return The width in pixels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMencoderScaleX() {
 		return getInt(KEY_MENCODER_SCALEX, 0);
 	}
 
 	/**
-	 * Sets the width in pixels to which a video should be scaled when
-	 * {@link #isMencoderScaler()} returns true.
-	 *
-	 * @param value The width in pixels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderScaleX(int value) {
 		configuration.setProperty(KEY_MENCODER_SCALEX, value);
 	}
 
 	/**
-	 * Returns the height in pixels to which a video should be scaled when
-	 * {@link #isMencoderScaler()} returns true.
-	 *
-	 * @return The height in pixels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMencoderScaleY() {
 		return getInt(KEY_MENCODER_SCALEY, 0);
 	}
 
 	/**
-	 * Sets the height in pixels to which a video should be scaled when
-	 * {@link #isMencoderScaler()} returns true.
-	 *
-	 * @param value The height in pixels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMencoderScaleY(int value) {
 		configuration.setProperty(KEY_MENCODER_SCALEY, value);
 	}
 
 	/**
-	 * Returns the number of audio channels that MEncoder should use for
-	 * transcoding. Default value is 6 (for 5.1 audio).
-	 *
-	 * @return The number of audio channels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getAudioChannelCount() {
 		return getInt(KEY_AUDIO_CHANNEL_COUNT, 6);
 	}
 
 	/**
-	 * Sets the number of audio channels that MEncoder should use for
-	 * transcoding.
-	 *
-	 * @param value The number of audio channels.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAudioChannelCount(int value) {
 		configuration.setProperty(KEY_AUDIO_CHANNEL_COUNT, value);
 	}
 
 	/**
-	 * Sets the AC3 audio bitrate, which determines the quality of digital
-	 * audio sound. An AV-receiver or amplifier has to be capable of playing
-	 * this quality.
-	 * 
-	 * @param value The AC3 audio bitrate.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAudioBitrate(int value) {
 		configuration.setProperty(KEY_AUDIO_BITRATE, value);
 	}
 
 	/**
-	 * Returns the maximum video bitrate to be used by MEncoder. The default
-	 * value is 110.
-	 *
-	 * @return The maximum video bitrate.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getMaximumBitrate() {
 		return getString(KEY_MAX_BITRATE, "110");
 	}
 
 	/**
-	 * Sets the maximum video bitrate to be used by MEncoder.
-	 *
-	 * @param value The maximum video bitrate.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMaximumBitrate(String value) {
 		configuration.setProperty(KEY_MAX_BITRATE, value);
 	}
@@ -1372,60 +1310,50 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns true if thumbnail generation is enabled, false otherwise.
-	 *
-	 * @return boolean indicating whether thumbnail generation is enabled.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isThumbnailGenerationEnabled() {
 		return getBoolean(KEY_THUMBNAIL_GENERATION_ENABLED, true);
 	}
 
 	/**
-	 * @deprecated Use {@link #setThumbnailGenerationEnabled(boolean)} instead.
-	 * <p>
-	 * Sets the thumbnail generation option.
-	 * This only determines whether a thumbnailer (e.g. dcraw, MPlayer)
-	 * is used to generate thumbnails. It does not reflect whether
-	 * thumbnails should be displayed or not.
-	 *
-	 * @return boolean indicating whether thumbnail generation is enabled.
+	 * {@inheritDoc}
 	 */
+	@Override
 	@Deprecated
 	public void setThumbnailsEnabled(boolean value) {
 		setThumbnailGenerationEnabled(value);
 	}
 
 	/**
-	 * Sets the thumbnail generation option.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setThumbnailGenerationEnabled(boolean value) {
 		configuration.setProperty(KEY_THUMBNAIL_GENERATION_ENABLED, value);
 	}
 
 	/**
-	 * Returns true if PMS should generate thumbnails for images. Default value
-	 * is true.
-	 *
-	 * @return True if image thumbnails should be generated.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getImageThumbnailsEnabled() {
 		return getBoolean(KEY_IMAGE_THUMBNAILS_ENABLED, true);
 	}
 
 	/**
-	 * Set to true if PMS should generate thumbnails for images.
-	 *
-	 * @param value True if image thumbnails should be generated.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setImageThumbnailsEnabled(boolean value) {
 		configuration.setProperty(KEY_IMAGE_THUMBNAILS_ENABLED, value);
 	}
 
 	/**
-	 * Returns the number of CPU cores that should be used for transcoding.
-	 * 
-	 * @return The number of CPU cores.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getNumberOfCpuCores() {
 		int nbcores = Runtime.getRuntime().availableProcessors();
 		if (nbcores < 1) {
@@ -1435,26 +1363,17 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Sets the number of CPU cores that should be used for transcoding. The
-	 * maximum value depends on the physical available count of "real processor
-	 * cores". That means hyperthreading virtual CPU cores do not count! If you
-	 * are not sure, analyze your CPU with the free tool CPU-z on Windows
-	 * systems. On Linux have a look at the virtual proc-filesystem: in the
-	 * file "/proc/cpuinfo" you will find more details about your CPU. You also
-	 * get much information about CPUs from AMD and Intel from their Wikipedia
-	 * articles.
-	 * <p>
-	 * PMS will detect and set the correct amount of cores as the default value.
-	 *
-	 * @param value The number of CPU cores.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setNumberOfCpuCores(int value) {
 		configuration.setProperty(KEY_NUMBER_OF_CPU_CORES, value);
 	}
 
 	/**
-	 * @deprecated This method is not used anywhere.
+	 * {@inheritDoc}
 	 */
+	@Override
 	@Deprecated
 	public boolean isTurboModeEnabled() {
 		return getBoolean(KEY_TURBO_MODE_ENABLED, false);
@@ -1469,267 +1388,322 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns true if PMS should start minimized, i.e. without its window
-	 * opened. Default value false: to start with a window.
-	 *
-	 * @return True if PMS should start minimized, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isMinimized() {
 		return getBoolean(KEY_MINIMIZED, false);
 	}
 
 	/**
-	 * Set to true if PMS should start minimized, i.e. without its window
-	 * opened.
-	 *
-	 * @param value True if PMS should start minimized, false otherwise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMinimized(boolean value) {
 		configuration.setProperty(KEY_MINIMIZED, value);
 	}
 
 	/**
-	 * Returns true when PMS should check for external subtitle files with the
-	 * same name as the media (*.srt, *.sub, *.ass, etc.). The default value is
-	 * true.
-	 *
-	 * @return True if PMS should check for external subtitle files, false if
-	 * 		they should be ignored.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getUseSubtitles() {
 		return getBoolean(KEY_USE_SUBTITLES, true);
 	}
 
 	/**
-	 * Set to true if PMS should check for external subtitle files with the
-	 * same name as the media (*.srt, *.sub, *.ass etc.).
-	 *
-	 * @param value True if PMS should check for external subtitle files.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setUseSubtitles(boolean value) {
 		configuration.setProperty(KEY_USE_SUBTITLES, value);
 	}
 
 	/**
-	 * Returns true if PMS should hide the "# Videosettings #" folder on the
-	 * DLNA device. The default value is false: PMS will display the folder.
-	 *
-	 * @return True if PMS should hide the folder, false othewise.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getHideVideoSettings() {
 		return getBoolean(KEY_HIDE_VIDEO_SETTINGS, true);
 	}
 
 	/**
-	 * Set to true if PMS should hide the "# Videosettings #" folder on the
-	 * DLNA device, or set to false to make PMS display the folder.
-	 *
-	 * @param value True if PMS should hide the folder.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setHideVideoSettings(boolean value) {
 		configuration.setProperty(KEY_HIDE_VIDEO_SETTINGS, value);
 	}
 
 	/**
-	 * Returns true if PMS should cache scanned media in its internal database,
-	 * speeding up later retrieval. When false is returned, PMS will not use
-	 * cache and media will have to be rescanned.
-	 *
-	 * @return True if PMS should cache media.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getUseCache() {
 		return getBoolean(KEY_USE_CACHE, false);
 	}
 
 	/**
-	 * Set to true if PMS should cache scanned media in its internal database,
-	 * speeding up later retrieval.
-	 *
-	 * @param value True if PMS should cache media.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setUseCache(boolean value) {
 		configuration.setProperty(KEY_USE_CACHE, value);
 	}
 
 	/**
-	 * Set to true if PMS should pass the flag "convertfps=true" to AviSynth.
-	 *
-	 * @param value True if PMS should pass the flag.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAvisynthConvertFps(boolean value) {
 		configuration.setProperty(KEY_AVISYNTH_CONVERT_FPS, value);
 	}
 
 	/**
-	 * Returns true if PMS should pass the flag "convertfps=true" to AviSynth.
-	 *
-	 * @return True if PMS should pass the flag.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getAvisynthConvertFps() {
 		return getBoolean(KEY_AVISYNTH_CONVERT_FPS, false);
 	}
 
 	/**
-	 * Returns the template for the AviSynth script. The script string can
-	 * contain the character "\u0001", which should be treated as the newline
-	 * separator character.
-	 *
-	 * @return The AviSynth script template.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getAvisynthScript() {
 		return getString(KEY_AVISYNTH_SCRIPT, DEFAULT_AVI_SYNTH_SCRIPT);
 	}
 
 	/**
-	 * Sets the template for the AviSynth script. The script string may contain
-	 * the character "\u0001", which will be treated as newline character.
-	 *
-	 * @param value The AviSynth script template.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAvisynthScript(String value) {
 		configuration.setProperty(KEY_AVISYNTH_SCRIPT, value);
 	}
 
 	/**
-	 * Returns additional codec specific configuration options for MEncoder.
-	 *
-	 * @return The configuration options.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getCodecSpecificConfig() {
 		return getString(KEY_CODEC_SPEC_SCRIPT, "");
 	}
 
 	/**
-	 * Sets additional codec specific configuration options for MEncoder.
-	 *
-	 * @param value The additional configuration options.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setCodecSpecificConfig(String value) {
 		configuration.setProperty(KEY_CODEC_SPEC_SCRIPT, value);
 	}
 
 	/**
-	 * Returns the maximum size (in MB) that PMS should use for buffering
-	 * audio.
-	 *
-	 * @return The maximum buffer size.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMaxAudioBuffer() {
 		return getInt(KEY_MAX_AUDIO_BUFFER, 100);
 	}
 
 	/**
-	 * Returns the minimum size (in MB) that PMS should use for the buffer used
-	 * for streaming media.
-	 *
-	 * @return The minimum buffer size.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMinStreamBuffer() {
 		return getInt(KEY_MIN_STREAM_BUFFER, 1);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isFileBuffer() {
 		String bufferType = getString(KEY_BUFFER_TYPE, "").trim();
 		return bufferType.equals(BUFFER_TYPE_FILE);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setFfmpegSettings(String value) {
 		configuration.setProperty(KEY_FFMPEG_SETTINGS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFfmpegSettings() {
 		return getString(KEY_FFMPEG_SETTINGS, "-threads 2 -g 1 -qscale 1 -qmin 2");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMencoderNoOutOfSync() {
 		return getBoolean(KEY_MENCODER_NO_OUT_OF_SYNC, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderNoOutOfSync(boolean value) {
 		configuration.setProperty(KEY_MENCODER_NO_OUT_OF_SYNC, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getTrancodeBlocksMultipleConnections() {
 		return configuration.getBoolean(KEY_TRANSCODE_BLOCKS_MULTIPLE_CONNECTIONS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setTranscodeBlocksMultipleConnections(boolean value) {
 		configuration.setProperty(KEY_TRANSCODE_BLOCKS_MULTIPLE_CONNECTIONS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getTrancodeKeepFirstConnections() {
 		return configuration.getBoolean(KEY_TRANSCODE_KEEP_FIRST_CONNECTION, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setTrancodeKeepFirstConnections(boolean value) {
 		configuration.setProperty(KEY_TRANSCODE_KEEP_FIRST_CONNECTION, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getCharsetEncoding() {
 		return getString(KEY_CHARSET_ENCODING, "850");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setCharsetEncoding(String value) {
 		configuration.setProperty(KEY_CHARSET_ENCODING, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMencoderIntelligentSync() {
 		return getBoolean(KEY_MENCODER_INTELLIGENT_SYNC, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderIntelligentSync(boolean value) {
 		configuration.setProperty(KEY_MENCODER_INTELLIGENT_SYNC, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFfmpegAlternativePath() {
 		return getString(KEY_FFMPEG_ALTERNATIVE_PATH, null);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setFfmpegAlternativePath(String value) {
 		configuration.setProperty(KEY_FFMPEG_ALTERNATIVE_PATH, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getSkipLoopFilterEnabled() {
 		return getBoolean(KEY_SKIP_LOOP_FILTER_ENABLED, false);
 	}
 	
 	/**
-	 * The list of network interfaces that should be skipped when checking
-	 * for an available network interface. Entries should be comma separated
-	 * and typically exclude the number at the end of the interface name.
-	 * <p>
-	 * Default is to skip the interfaces created by Virtualbox, OpenVPN and
-	 * Parallels: "tap,vmnet,vnic".
-	 * @return The string of network interface names to skip.
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<String> getSkipNetworkInterfaces() {
 		return getStringList(KEY_SKIP_NETWORK_INTERFACES, "tap,vmnet,vnic");
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setSkipLoopFilterEnabled(boolean value) {
 		configuration.setProperty(KEY_SKIP_LOOP_FILTER_ENABLED, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMencoderMainSettings() {
 		return getString(KEY_MENCODER_MAIN_SETTINGS, "keyint=5:vqscale=1:vqmin=2");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderMainSettings(String value) {
 		configuration.setProperty(KEY_MENCODER_MAIN_SETTINGS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMencoderVobsubSubtitleQuality() {
 		return getString(KEY_MENCODER_VOBSUB_SUBTITLE_QUALITY, "3");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderVobsubSubtitleQuality(String value) {
 		configuration.setProperty(KEY_MENCODER_VOBSUB_SUBTITLE_QUALITY, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMencoderOverscanCompensationWidth() {
 		return getString(KEY_MENCODER_OVERSCAN_COMPENSATION_WIDTH, "0");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderOverscanCompensationWidth(String value) {
 		if (value.trim().length() == 0) {
 			value = "0";
@@ -1737,10 +1711,18 @@ public class PmsConfiguration {
 		configuration.setProperty(KEY_MENCODER_OVERSCAN_COMPENSATION_WIDTH, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getMencoderOverscanCompensationHeight() {
 		return getString(KEY_MENCODER_OVERSCAN_COMPENSATION_HEIGHT, "0");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderOverscanCompensationHeight(String value) {
 		if (value.trim().length() == 0) {
 			value = "0";
@@ -1748,10 +1730,18 @@ public class PmsConfiguration {
 		configuration.setProperty(KEY_MENCODER_OVERSCAN_COMPENSATION_HEIGHT, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setEnginesAsList(ArrayList<String> enginesAsList) {
 		configuration.setProperty(KEY_ENGINES, listToString(enginesAsList));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<String> getEnginesAsList(SystemUtils registry) {
 		List<String> engines = stringToList(getString(KEY_ENGINES, "mencoder,avsmencoder,tsmuxer,ffmpegaudio,mplayeraudio,tsmuxeraudio,vlcvideo,mencoderwebvideo,mplayervideodump,mplayerwebaudio,vlcaudio,ffmpegdvrmsremux,rawthumbs"));
 		engines = hackAvs(registry, engines);
@@ -1788,421 +1778,709 @@ public class PmsConfiguration {
 		return output;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void save() throws ConfigurationException {
 		configuration.save();
 		LOGGER.info("Configuration saved to: " + PROFILE_PATH);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFolders() {
 		return getString(KEY_FOLDERS, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setFolders(String value) {
 		configuration.setProperty(KEY_FOLDERS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getNetworkInterface() {
 		return getString(KEY_NETWORK_INTERFACE, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setNetworkInterface(String value) {
 		configuration.setProperty(KEY_NETWORK_INTERFACE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isHideEngineNames() {
 		return getBoolean(KEY_HIDE_ENGINENAMES, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHideEngineNames(boolean value) {
 		configuration.setProperty(KEY_HIDE_ENGINENAMES, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isHideExtensions() {
 		return getBoolean(KEY_HIDE_EXTENSIONS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHideExtensions(boolean value) {
 		configuration.setProperty(KEY_HIDE_EXTENSIONS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getShares() {
 		return getString(KEY_SHARES, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setShares(String value) {
 		configuration.setProperty(KEY_SHARES, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getNoTranscode() {
 		return getString(KEY_NOTRANSCODE, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setNoTranscode(String value) {
 		configuration.setProperty(KEY_NOTRANSCODE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getForceTranscode() {
 		return getString(KEY_FORCETRANSCODE, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setForceTranscode(String value) {
 		configuration.setProperty(KEY_FORCETRANSCODE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderMT(boolean value) {
 		configuration.setProperty(KEY_MENCODER_MT, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getMencoderMT() {
 		boolean isMultiCore = getNumberOfCpuCores() > 1;
 		return getBoolean(KEY_MENCODER_MT, isMultiCore);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setRemuxAC3(boolean value) {
 		configuration.setProperty(KEY_MENCODER_REMUX_AC3, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isRemuxAC3() {
 		return getBoolean(KEY_MENCODER_REMUX_AC3, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderRemuxMPEG2(boolean value) {
 		configuration.setProperty(KEY_MENCODER_REMUX_MPEG2, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMencoderRemuxMPEG2() {
 		return getBoolean(KEY_MENCODER_REMUX_MPEG2, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setDisableFakeSize(boolean value) {
 		configuration.setProperty(KEY_DISABLE_FAKESIZE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isDisableFakeSize() {
 		return getBoolean(KEY_DISABLE_FAKESIZE, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderAssDefaultStyle(boolean value) {
 		configuration.setProperty(KEY_MENCODER_ASS_DEFAULTSTYLE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMencoderAssDefaultStyle() {
 		return getBoolean(KEY_MENCODER_ASS_DEFAULTSTYLE, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getMEncoderOverscan() {
 		return getInt(KEY_OVERSCAN, 0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMEncoderOverscan(int value) {
 		configuration.setProperty(KEY_OVERSCAN, value);
 	}
 
 	/**
-	 * Returns sort method to use for ordering lists of files. One of the
-	 * following values is returned:
-	 * <ul>
-	 * <li>0: Locale-sensitive A-Z</li>
-	 * <li>1: Sort by modified date, newest first</li>
-	 * <li>2: Sort by modified date, oldest first</li>
-	 * <li>3: Case-insensitive ASCIIbetical sort</li>
-	 * <li>4: Locale-sensitive natural sort</li>
-	 * </ul>
-	 * Default value is 0.
-	 * @return The sort method
+	 * {@inheritDoc}
 	 */
+	@Override
 	public int getSortMethod() {
 		return getInt(KEY_SORT_METHOD, 0);
 	}
 
 	/**
-	 * Set the sort method to use for ordering lists of files. The following
-	 * values are recognized:
-	 * <ul>
-	 * <li>0: Locale-sensitive A-Z</li>
-	 * <li>1: Sort by modified date, newest first</li>
-	 * <li>2: Sort by modified date, oldest first</li>
-	 * <li>3: Case-insensitive ASCIIbetical sort</li>
-	 * <li>4: Locale-sensitive natural sort</li>
-	 * </ul>
-	 * @param value The sort method to use
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setSortMethod(int value) {
 		configuration.setProperty(KEY_SORT_METHOD, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getAudioThumbnailMethod() {
 		return getInt(KEY_AUDIO_THUMBNAILS_METHOD, 0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setAudioThumbnailMethod(int value) {
 		configuration.setProperty(KEY_AUDIO_THUMBNAILS_METHOD, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getAlternateThumbFolder() {
 		return getString(KEY_ALTERNATE_THUMB_FOLDER, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setAlternateThumbFolder(String value) {
 		configuration.setProperty(KEY_ALTERNATE_THUMB_FOLDER, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getAlternateSubsFolder() {
 		return getString(KEY_ALTERNATE_SUBS_FOLDER, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setAlternateSubsFolder(String value) {
 		configuration.setProperty(KEY_ALTERNATE_SUBS_FOLDER, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setDTSEmbedInPCM(boolean value) {
 		configuration.setProperty(KEY_EMBED_DTS_IN_PCM, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isDTSEmbedInPCM() {
 		return getBoolean(KEY_EMBED_DTS_IN_PCM, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMencoderMuxWhenCompatible(boolean value) {
 		configuration.setProperty(KEY_MENCODER_MUX_COMPATIBLE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMencoderMuxWhenCompatible() {
 		return getBoolean(KEY_MENCODER_MUX_COMPATIBLE, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setMuxAllAudioTracks(boolean value) {
 		configuration.setProperty(KEY_MUX_ALLAUDIOTRACKS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isMuxAllAudioTracks() {
 		return getBoolean(KEY_MUX_ALLAUDIOTRACKS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setUseMplayerForVideoThumbs(boolean value) {
 		configuration.setProperty(KEY_USE_MPLAYER_FOR_THUMBS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isUseMplayerForVideoThumbs() {
 		return getBoolean(KEY_USE_MPLAYER_FOR_THUMBS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getIpFilter() {
 		return getString(KEY_IP_FILTER, "");
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public synchronized IpFilter getIpFiltering() {
 	    filter.setRawFilter(getIpFilter());
 	    return filter;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setIpFilter(String value) {
 		configuration.setProperty(KEY_IP_FILTER, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setPreventsSleep(boolean value) {
 		configuration.setProperty(KEY_PREVENTS_SLEEP, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isPreventsSleep() {
 		return getBoolean(KEY_PREVENTS_SLEEP, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHTTPEngineV2(boolean value) {
 		configuration.setProperty(KEY_HTTP_ENGINE_V2, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isHTTPEngineV2() {
 		return getBoolean(KEY_HTTP_ENGINE_V2, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getIphotoEnabled() {
 		return getBoolean(KEY_IPHOTO_ENABLED, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setIphotoEnabled(boolean value) {
 		configuration.setProperty(KEY_IPHOTO_ENABLED, value);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getApertureEnabled() {
 		return getBoolean(KEY_APERTURE_ENABLED, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setApertureEnabled(boolean value) {
 		configuration.setProperty(KEY_APERTURE_ENABLED, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getItunesEnabled() {
 		return getBoolean(KEY_ITUNES_ENABLED, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setItunesEnabled(boolean value) {
 		configuration.setProperty(KEY_ITUNES_ENABLED, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isHideEmptyFolders() {
-		return getBoolean(PmsConfiguration.KEY_HIDE_EMPTY_FOLDERS, false);
+		return getBoolean(PmsConfigurationImpl.KEY_HIDE_EMPTY_FOLDERS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHideEmptyFolders(final boolean value) {
-		this.configuration.setProperty(PmsConfiguration.KEY_HIDE_EMPTY_FOLDERS, value);
+		this.configuration.setProperty(PmsConfigurationImpl.KEY_HIDE_EMPTY_FOLDERS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isHideMediaLibraryFolder() {
-		return getBoolean(PmsConfiguration.KEY_HIDE_MEDIA_LIBRARY_FOLDER, false);
+		return getBoolean(PmsConfigurationImpl.KEY_HIDE_MEDIA_LIBRARY_FOLDER, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHideMediaLibraryFolder(final boolean value) {
-		this.configuration.setProperty(PmsConfiguration.KEY_HIDE_MEDIA_LIBRARY_FOLDER, value);
+		this.configuration.setProperty(PmsConfigurationImpl.KEY_HIDE_MEDIA_LIBRARY_FOLDER, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean getHideTranscodeEnabled() {
 		return getBoolean(KEY_HIDE_TRANSCODE_FOLDER, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setHideTranscodeEnabled(boolean value) {
 		configuration.setProperty(KEY_HIDE_TRANSCODE_FOLDER, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isDvdIsoThumbnails() {
 		return getBoolean(KEY_DVDISO_THUMBNAILS, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setDvdIsoThumbnails(boolean value) {
 		configuration.setProperty(KEY_DVDISO_THUMBNAILS, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Object getCustomProperty(String property) {
 		return configuration.getProperty(property);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setCustomProperty(String property, Object value) {
 		configuration.setProperty(property, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isChapterSupport() {
 		return getBoolean(KEY_CHAPTER_SUPPORT, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setChapterSupport(boolean value) {
 		configuration.setProperty(KEY_CHAPTER_SUPPORT, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getChapterInterval() {
 		return getInt(KEY_CHAPTER_INTERVAL, 5);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setChapterInterval(int value) {
 		configuration.setProperty(KEY_CHAPTER_INTERVAL, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getSubsColor() {
 		return getInt(KEY_SUBS_COLOR, 0xffffffff);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setSubsColor(int value) {
 		configuration.setProperty(KEY_SUBS_COLOR, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isFix25FPSAvMismatch() {
 		return getBoolean(KEY_FIX_25FPS_AV_MISMATCH, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setFix25FPSAvMismatch(boolean value) {
 		configuration.setProperty(KEY_FIX_25FPS_AV_MISMATCH, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getVideoTranscodeStartDelay() {
 		return getInt(KEY_VIDEOTRANSCODE_START_DELAY, 6);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setVideoTranscodeStartDelay(int value) {
 		configuration.setProperty(KEY_VIDEOTRANSCODE_START_DELAY, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isAudioResample() {
 		return getBoolean(KEY_AUDIO_RESAMPLE, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setAudioResample(boolean value) {
 		configuration.setProperty(KEY_AUDIO_RESAMPLE, value);
 	}
 
 	/**
-	 * Returns the name of the renderer to fall back on when header matching
-	 * fails. PMS will recognize the configured renderer instead of "Unknown
-	 * renderer". Default value is "", which means PMS will return the unknown
-	 * renderer when no match can be made.
-	 *
-	 * @return The name of the renderer PMS should fall back on when header
-	 * 			matching fails.
-	 * @see #isRendererForceDefault()
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getRendererDefault() {
 		return getString(KEY_RENDERER_DEFAULT, "");
 	}
 
 	/**
-	 * Sets the name of the renderer to fall back on when header matching
-	 * fails. PMS will recognize the configured renderer instead of "Unknown
-	 * renderer". Set to "" to make PMS return the unknown renderer when no
-	 * match can be made.
-	 *
-	 * @param value The name of the renderer to fall back on. This has to be
-	 * 				<code>""</code> or a case insensitive match with the name
-	 * 				used in any render configuration file.
-	 * @see #setRendererForceDefault(boolean)
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setRendererDefault(String value) {
 		configuration.setProperty(KEY_RENDERER_DEFAULT, value);
 	}
 
 	/**
-	 * Returns true when PMS should not try to guess connecting renderers
-	 * and instead force picking the defined fallback renderer. Default
-	 * value is false, which means PMS will attempt to recognize connecting
-	 * renderers by their headers.
-	 *
-	 * @return True when the fallback renderer should always be picked.
-	 * @see #getRendererDefault()
+	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isRendererForceDefault() {
 		return getBoolean(KEY_RENDERER_FORCE_DEFAULT, false);
 	}
 
 	/**
-	 * Set to true when PMS should not try to guess connecting renderers
-	 * and instead force picking the defined fallback renderer. Set to false
-	 * to make PMS attempt to recognize connecting renderers by their headers.
-	 *
-	 * @param value Set to true when the fallback renderer should always be
-	 *				picked.
-	 * @see #setRendererDefault(String)
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setRendererForceDefault(boolean value) {
 		configuration.setProperty(KEY_RENDERER_FORCE_DEFAULT, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getVirtualFolders() {
 		return getString(KEY_VIRTUAL_FOLDERS, "");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getProfilePath() {
 		return PROFILE_PATH;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getProfileDirectory() {
 		return PROFILE_DIRECTORY;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getPluginDirectory() {
 		return getString(KEY_PLUGIN_DIRECTORY, PropertiesUtil.getProjectProperties().get("project.plugins.dir"));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setPluginDirectory(String value) {
 		configuration.setProperty(KEY_PLUGIN_DIRECTORY, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getProfileName() {
 		if (HOSTNAME == null) { // calculate this lazily
 			try {
@@ -2216,39 +2494,82 @@ public class PmsConfiguration {
 		return getString(KEY_PROFILE_NAME, HOSTNAME);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isAutoUpdate() {
 		return Build.isUpdatable() && configuration.getBoolean(KEY_AUTO_UPDATE, false);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setAutoUpdate(boolean value) {
 		configuration.setProperty(KEY_AUTO_UPDATE, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getIMConvertPath() {
 		return programPaths.getIMConvertPath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int getUpnpPort() {
 		return getInt(KEY_UPNP_PORT, 1900);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getUuid() {
 		return getString(KEY_UUID, null);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setUuid(String value){
 		configuration.setProperty(KEY_UUID, value);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void addConfigurationListener(ConfigurationListener l) {
 		configuration.addConfigurationListener(l);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void removeConfigurationListener(ConfigurationListener l) {
 		configuration.removeConfigurationListener(l);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean initBufferMax() {
 		return getBoolean(KEY_BUFFER_MAX, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<String> getNeedReloadFlags() {
+		return NEED_RELOAD_FLAGS;
 	}
 }

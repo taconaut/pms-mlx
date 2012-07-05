@@ -56,8 +56,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.api.PmsConfiguration;
 import net.pms.api.PmsCore;
-import net.pms.configuration.PmsConfiguration;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
 import net.pms.util.FormLayoutUtil;

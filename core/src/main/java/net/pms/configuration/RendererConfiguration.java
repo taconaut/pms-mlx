@@ -3,6 +3,7 @@ package net.pms.configuration;
 import com.sun.jna.Platform;
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.api.PmsConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.MediaInfoParser;
 import net.pms.formats.Format;

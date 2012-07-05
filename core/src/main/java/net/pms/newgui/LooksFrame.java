@@ -23,7 +23,8 @@ import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.sun.jna.Platform;
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
+import net.pms.configuration.PmsConfigurationImpl;
 import net.pms.gui.IFrame;
 import net.pms.io.WindowsNamedPipe;
 import net.pms.medialibrary.gui.tab.MediaLibraryTab;
@@ -421,7 +422,7 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	 * to restart the server.<br>
 	 * Currently the icon as well as the tool tip text of the restart button is being 
 	 * changed.<br>
-	 * The actions requiring a server restart are defined by {@link PmsConfiguration#NEED_RELOAD_FLAGS}
+	 * The actions requiring a server restart are defined by {@link PmsConfigurationImpl#NEED_RELOAD_FLAGS}
 	 * 
 	 * @param b true if the server has to be restarted, false otherwise
 	 */

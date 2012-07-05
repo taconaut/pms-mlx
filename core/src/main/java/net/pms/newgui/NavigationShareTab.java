@@ -25,7 +25,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.jna.Platform;
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
 import net.pms.dlna.DLNAMediaDatabase;
 import net.pms.util.FormLayoutUtil;
 import net.pms.util.KeyedComboBoxModel;

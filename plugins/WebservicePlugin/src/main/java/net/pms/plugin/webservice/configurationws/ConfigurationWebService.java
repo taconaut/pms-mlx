@@ -8,7 +8,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
 import net.pms.plugin.webservice.InvalidParameterException;
 import net.pms.plugin.webservice.ServiceBase;
 

@@ -36,9 +36,9 @@ import java.util.logging.LogManager;
 
 import javax.swing.JOptionPane;
 
+import net.pms.api.PmsConfiguration;
 import net.pms.api.PmsCore;
 import net.pms.configuration.Build;
-import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.di.PmsGuice;
 import net.pms.dlna.DLNAMediaDatabase;
@@ -302,7 +302,7 @@ public class PmsCoreImpl implements PmsCore {
 			@Override
 			public void configurationChanged(final ConfigurationEvent event) {
 				if ((!event.isBeforeUpdate())
-						&& PmsConfiguration.NEED_RELOAD_FLAGS.contains(event.getPropertyName())) {
+						&& configuration.getNeedReloadFlags().contains(event.getPropertyName())) {
 					frame.setReloadable(true);
 				}
 			}
@@ -794,7 +794,7 @@ public class PmsCoreImpl implements PmsCore {
 	}
 
 	/**
-	 * Retrieves the {@link net.pms.configuration.PmsConfiguration PmsConfiguration} object
+	 * Retrieves the {@link net.pms.configuration.PmsConfigurationImpl PmsConfiguration} object
 	 * that contains all configured settings for PMS. The object provides getters for all
 	 * configurable PMS settings.
 	 *

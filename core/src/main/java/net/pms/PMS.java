@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
-import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.PmsConfigurationImpl;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.newgui.ProfileChooser;
 
@@ -102,7 +102,7 @@ public class PMS extends PmsCoreImpl {
 		}
 
 		try {
-			setConfiguration(new PmsConfiguration());
+			setConfiguration(new PmsConfigurationImpl());
 
 			assert getConfiguration() != null;
 

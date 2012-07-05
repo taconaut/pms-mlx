@@ -21,7 +21,7 @@ package net.pms.util;
 
 import com.sun.jna.Platform;
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.api.PmsConfiguration;
 import net.pms.dlna.DLNAMediaAudio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

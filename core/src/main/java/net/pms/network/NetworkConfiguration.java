@@ -19,7 +19,7 @@
 package net.pms.network;
 
 import net.pms.PMS;
-import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.PmsConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +139,7 @@ public class NetworkConfiguration {
 	/**
 	 * The list of configured network interface names that should be skipped.
 	 * 
-	 * @see PmsConfiguration#getSkipNetworkInterfaces()
+	 * @see PmsConfigurationImpl#getSkipNetworkInterfaces()
 	 */
 	List<String> skipNetworkInterfaces = PMS.getConfiguration().getSkipNetworkInterfaces();
 
