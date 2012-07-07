@@ -18,11 +18,22 @@
  */
 package net.pms.configuration;
 
-import com.sun.jna.Platform;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import net.pms.Messages;
 import net.pms.api.PmsConfiguration;
 import net.pms.io.SystemUtils;
 import net.pms.util.PropertiesUtil;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConversionException;
@@ -33,11 +44,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
+import com.google.common.collect.ImmutableSet;
+import com.sun.jna.Platform;
 
 /**
  * Container for all configurable PMS settings. Settings are typically defined by three things:
@@ -193,8 +201,8 @@ public class PmsConfigurationImpl implements PmsConfiguration {
 	/**
 	 * The set of the keys defining when the HTTP server has to restarted due to a configuration change
 	 */
-	private static final Set<String> NEED_RELOAD_FLAGS = new HashSet<String>(
-			Arrays.asList(KEY_ALTERNATE_THUMB_FOLDER, KEY_NETWORK_INTERFACE,
+	private static final ImmutableSet<String> NEED_RELOAD_FLAGS = ImmutableSet.of(
+					KEY_ALTERNATE_THUMB_FOLDER, KEY_NETWORK_INTERFACE,
 					KEY_IP_FILTER, KEY_SORT_METHOD, KEY_HIDE_EMPTY_FOLDERS,
 					KEY_HIDE_TRANSCODE_FOLDER, KEY_HIDE_MEDIA_LIBRARY_FOLDER,
 					KEY_OPEN_ARCHIVES, KEY_USE_CACHE, KEY_HIDE_ENGINENAMES,
@@ -203,7 +211,7 @@ public class PmsConfigurationImpl implements PmsConfiguration {
 					KEY_HIDE_VIDEO_SETTINGS, KEY_AUDIO_THUMBNAILS_METHOD,
 					KEY_NOTRANSCODE, KEY_FORCETRANSCODE, KEY_SERVER_PORT,
 					KEY_SERVER_HOSTNAME, KEY_CHAPTER_SUPPORT,
-					KEY_HIDE_EXTENSIONS));
+					KEY_HIDE_EXTENSIONS);
 
 	private final IpFilter filter = new IpFilter();
 
