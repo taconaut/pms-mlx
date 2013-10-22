@@ -23,25 +23,27 @@
 		<!-- NSIS needs a version without "-SNAPSHOT" or "-b1" -->
 		<project.version.short>1.90.2</project.version.short>
 
-		<project.binaries>${project.basedir}/target/bin</project.binaries>
-		<project.external-resources>${project.basedir}/src/main/external-resources</project.external-resources>
-
-		<!-- The PMS core directory is used to aggregate all files -->
 		<project.core.name>PS3 Media Server MLX</project.core.name>
-		<project.core.basedir>${project.basedir}/../core</project.core.basedir>
+		
+		<!-- Resource properties -->
+		<project.binaries>${project.basedir}/target/bin</project.binaries>
+		<project.external-resources.directory>${project.basedir}/src/main/external-resources</project.external-resources.directory>
+		<external-resources.transcode-tools.directory>${project.external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
+		
+		<project.root.basedir>${project.basedir}/..</project.root.basedir>
+		
+		<project.core.basedir>${project.root.basedir}/core</project.core.basedir>
 		<project.core.binaries>${project.core.basedir}/target/bin</project.core.binaries>
-		<project.core.external-resources>${project.core.basedir}/src/main/external-resources</project.core.external-resources>
+		<project.core.external-resources.directory>${project.core.basedir}/src/main/external-resources</project.core.external-resources.directory>
 
-		<maven.nsis.project.template>${project.core.basedir}/src/main/external-resources/nsis/project.jelly</maven.nsis.project.template>
-		<external-resources.directory>${project.basedir}/src/main/external-resources</external-resources.directory>
-		<external-resources.transcode-tools.directory>${external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
+		
 		<transcode-tools.download.url>http://downloads.sourceforge.net/project/ps3mediaserver/transcode-tools</transcode-tools.download.url>
 		<target.transcode-tools.directory>${project.build.directory}/bin</target.transcode-tools.directory>
 		<transcode-tools.linux.filename>transcode-tools-linux-20130701.tar.gz</transcode-tools.linux.filename>
 		<transcode-tools.macosx.filename>transcode-tools-osx-20130719.tar.gz</transcode-tools.macosx.filename>
 		<transcode-tools.windows.x86.filename>transcode-tools-win32-20130817.tar.gz</transcode-tools.windows.x86.filename>
 
-		<external-resources.private-jre.directory>${external-resources.directory}/private-jre</external-resources.private-jre.directory>
+		<external-resources.private-jre.directory>${project.external-resources.directory}/private-jre</external-resources.private-jre.directory>
 		
 		<!-- JRE archives direct download links: http://stackoverflow.com/a/12266049 -->
 		<private-jre.windows.x86.filename>jre-7u25-windows-i586.tar.gz</private-jre.windows.x86.filename>
@@ -74,9 +76,9 @@
 			 the system makensis is explicitly selected via the
 			 system-makensis profile
 		 -->
-		<makensis-bin>${external-resources.directory}/third-party/nsis/makensis.exe</makensis-bin>
+		<makensis-bin>${project.external-resources.directory}/third-party/nsis/makensis.exe</makensis-bin>
 
-		<izpack.version>5.0.0-rc1-SNAPSHOT</izpack.version>
+		<izpack.version>5.0.0-beta11</izpack.version>
 		<izpack.staging>${project.build.directory}/staging</izpack.staging>
 		<izpack.installer.app>${project.build.directory}/${project.name} Setup.app</izpack.installer.app>
 
@@ -468,7 +470,7 @@
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
 									<outputFile>${project.build.directory}/pms.exe</outputFile>
-									<setupScript>${project.external-resources}/nsis/pms.nsi</setupScript>
+									<setupScript>${project.external-resources.directory}/nsis/pms.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -482,7 +484,7 @@
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
 									<outputFile>${project.build.directory}/pms-${project.version}-setup-full-x86.exe</outputFile>
-									<setupScript>${external-resources.directory}/nsis/setup-x86.nsi</setupScript>
+									<setupScript>${project.external-resources.directory}/nsis/setup-x86.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -496,7 +498,7 @@
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
 									<outputFile>${project.build.directory}/pms-${project.version}-setup-full-x64.exe</outputFile>
-									<setupScript>${external-resources.directory}/nsis/setup-x64.nsi</setupScript>
+									<setupScript>${project.external-resources.directory}/nsis/setup-x64.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -510,7 +512,7 @@
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
 									<outputFile>${project.build.directory}/pms-${project.version}-setup-without-jre.exe</outputFile>
-									<setupScript>${external-resources.directory}/nsis/setup-without-jre.nsi</setupScript>
+									<setupScript>${project.external-resources.directory}/nsis/setup-without-jre.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
 								<goals>
@@ -661,7 +663,7 @@
 										<!-- Make all downloaded binaries executable -->
 										<chmod dir="${project.binaries}/osx" perm="a+x" includes="*" />
 
-										<copy file="${project.external-resources}/osx/pms.icns" todir="${project.binaries}" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/pms.icns" todir="${project.binaries}" overwrite="true" />
 									</target>
 								</configuration>
 							</execution>
@@ -743,14 +745,14 @@
 									<zipFile>${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}-app.zip</zipFile>
 									<javaApplicationStub>/System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub</javaApplicationStub>
 									<bundleName>${project.core.name}</bundleName>
-									<iconFile>${project.external-resources}/osx/pms.icns</iconFile>
+									<iconFile>${project.external-resources.directory}/osx/pms.icns</iconFile>
 									<version>${project.version}</version>
 									<jvmVersion>1.6+</jvmVersion>
 
 									<!-- Options to the JVM, will be used as the value of VMOptions in Info.plist. -->
 									<vmOptions>-Xmx1024M -Xss16M -Dsun.java2d.d3d=false -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -jar</vmOptions>
 									<internetEnable>false</internetEnable>
-									<dictionaryFile>${project.external-resources}/osx/Info.plist-template.xml</dictionaryFile>
+									<dictionaryFile>${project.external-resources.directory}/osx/Info.plist-template.xml</dictionaryFile>
 									<additionalClasspath />
 									<additionalResources />
 								</configuration>

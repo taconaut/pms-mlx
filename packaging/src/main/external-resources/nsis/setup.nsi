@@ -30,7 +30,7 @@ SetCompressorDictSize 32
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION CreateDesktopShortcut
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${PROJECT_CORE_BASEDIR}\LICENSE.txt"
+!insertmacro MUI_PAGE_LICENSE "${PROJECT_ROOT_BASEDIR}\LICENSE.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -134,9 +134,9 @@ Section "Program Files"
   File "${PROJECT_BASEDIR}\target\pms.jar"
   File "${PROJECT_BASEDIR}\src\main\external-resources\transcode-tools\win32\MediaInfo.dll"
   File "${PROJECT_BASEDIR}\src\main\external-resources\transcode-tools\win32\MediaInfo64.dll"
-  File "${PROJECT_CORE_BASEDIR}\CHANGELOG"
-  File "${PROJECT_CORE_BASEDIR}\README.md"
-  File "${PROJECT_CORE_BASEDIR}\LICENSE.txt"
+  File "${PROJECT_ROOT_BASEDIR}\CHANGELOG.txt"
+  File "${PROJECT_ROOT_BASEDIR}\README.md"
+  File "${PROJECT_ROOT_BASEDIR}\LICENSE.txt"
   File "${PROJECT_CORE_BASEDIR}\src\main\external-resources\logback.xml"
   File "${PROJECT_CORE_BASEDIR}\src\main\external-resources\icon.ico"
 
