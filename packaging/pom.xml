@@ -46,7 +46,7 @@
 		<external-resources.private-jre.directory>${project.external-resources.directory}/private-jre</external-resources.private-jre.directory>
 		
 		<!-- JRE archives direct download links: http://stackoverflow.com/a/12266049 -->
-		<private-jre.windows.x86.filename>jre-7u45-windows-i586.gz</private-jre.windows.x86.filename>
+		<private-jre.windows.x86.filename>jre-7u45-windows-i586.tar.gz</private-jre.windows.x86.filename>
 		<private-jre.windows.x86.archive-directory-name>jre1.7.0_45</private-jre.windows.x86.archive-directory-name>
 		<private-jre.windows.x86.download-url>http://javadl.sun.com/webapps/download/AutoDL?BundleId=81820</private-jre.windows.x86.download-url>
 		<private-jre.windows.x64.filename>jre-7u45-windows-x64.tar.gz</private-jre.windows.x64.filename>
