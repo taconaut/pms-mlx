@@ -148,6 +148,16 @@
 				<filtering>true</filtering>
 				<targetPath>..</targetPath>
 			</resource>
+
+			<!-- Filter IzPack resources so we can use Maven properties in them -->
+			<resource>
+				<directory>src/main/izpack</directory>
+				<targetPath>${izpack.staging}</targetPath>
+				<filtering>true</filtering>
+				<includes>
+					<include>install.xml</include>
+				</includes>
+			</resource>
 		</resources>
 
 		<plugins>
@@ -226,6 +236,37 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Copy all application jars to the IzPack staging lib directory -->
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-pms-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${izpack.staging}/lib</outputDirectory>
+							<excludeTransitive>false</excludeTransitive>
+							<stripVersion>true</stripVersion>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+
+							<!-- This is a izpack dependency that collides with jmte's "asm" dependency -->
+							<excludeArtifactIds>asm-all</excludeArtifactIds>
+
+							<!-- Exclude tools.jar etc. -->
+							<!-- excludeScope>system</excludeScope -->
+
+							<!-- Exclude the IzPack dependencies -->
+							<excludeGroupIds>org.codehaus.izpack</excludeGroupIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -277,6 +318,19 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[2.1,)</versionRange>
+										<goals>
+											<goal>copy-dependencies</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -296,8 +350,7 @@
 				<!-- if selected, use the system makensis on Linux, Mac OS X &c. -->
 				<makensis-bin>makensis</makensis-bin>
 			</properties>
-		</profile>
-		
+		</profile>		
 		<!--
 			Windows profile: takes care of building the final package for Microsoft Windows
 		-->
@@ -530,7 +583,6 @@
 			</build>
 		</profile>
 
-
 		<!-- Linux profile: takes care of building the final package for Linux -->
 		<profile>
 			<id>linux</id>
@@ -624,7 +676,9 @@
 		</profile>
 
 
-		<!-- Mac OSX profile: takes care of building the final package for Mac OSX -->
+		<!--
+			Mac OS X profile: takes care of building the final package for Mac OS X.
+		-->
 		<profile>
 			<id>osx</id>
 			<activation>
@@ -633,136 +687,200 @@
 					<family>mac</family>
 				</os>
 			</activation>
-			<build>
-				<plugins>
 
-					<!-- Plugin to download binaries before assembly -->
+			<build>
+				<resources>
+					<!-- Copy precompiled OS X binaries. -->
+					<resource>
+						<directory>${external-resources.transcode-tools.directory}/osx/bin</directory>
+						<targetPath>${izpack.staging}/osx</targetPath>
+						<!-- Avoid inadvertently filtering binaries -->
+						<filtering>false</filtering>
+					</resource>
+					<resource>
+						<directory>${external-resources.transcode-tools.directory}/osx</directory>
+						<targetPath>${izpack.staging}/osx</targetPath>
+						<includes>
+							<include>libmediainfo.dylib</include>
+						</includes>
+						<!-- Avoid inadvertently filtering binaries -->
+						<filtering>false</filtering>
+					</resource>
+					<resource>
+						<directory>${external-resources.transcode-tools.directory}/osx</directory>
+						<targetPath>${target.transcode-tools.directory}/osx</targetPath>
+						<!-- Avoid inadvertently filtering binaries -->
+						<filtering>false</filtering>
+					</resource>
+					<resource>
+						<directory>${external-resources.transcode-tools.directory}/osx</directory>
+						<targetPath>${project.build.directory}</targetPath>
+						<includes>
+							<include>libmediainfo.dylib</include>
+						</includes>
+						<!-- Avoid inadvertently filtering binaries -->
+						<filtering>false</filtering>
+					</resource>
+				</resources>
+
+				<plugins>
+					<!-- Download external resources. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>${maven-antrun-plugin-version}</version>
 						<executions>
 							<execution>
-								<id>process-resources-osx</id>
-								<phase>test</phase>
+								<id>download-external-resources-osx</id>
+								<phase>generate-resources</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 
 								<configuration>
 									<target>
-										<!-- Make sure the binaries folder exists -->
-										<mkdir dir="${project.binaries}" />
-										<mkdir dir="${project.binaries}/osx" />
+										<!-- Make sure the download folder exists. -->
+										<mkdir dir="${external-resources.transcode-tools.directory}/osx" />
+										<mkdir dir="${izpack.staging}/osx" />
+										<mkdir dir="${private-jre.macosx.directory}" />
 
-										<!-- Download binaries -->
-										<get src="${project.binaries-base}/osx/dcraw" dest="${project.binaries}/osx/dcraw" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/ffmpeg" dest="${project.binaries}/osx/ffmpeg" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/flac" dest="${project.binaries}/osx/flac" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/libmediainfo.dylib" dest="${project.binaries}/libmediainfo.dylib" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/mencoder" dest="${project.binaries}/osx/mencoder" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/mplayer" dest="${project.binaries}/osx/mplayer" usetimestamp="true" />
-										<get src="${project.binaries-base}/osx/tsMuxeR" dest="${project.binaries}/osx/tsMuxeR" usetimestamp="true" />
+										<!-- Download and unpack binaries -->
+										<get src="${transcode-tools.download.url}/osx/${transcode-tools.macosx.filename}"
+												dest="${external-resources.transcode-tools.directory}/${transcode-tools.macosx.filename}"
+												usetimestamp="true" />
 
+										<untar src="${external-resources.transcode-tools.directory}/${transcode-tools.macosx.filename}"
+												dest="${external-resources.transcode-tools.directory}/osx"
+												compression="gzip"
+												stripAbsolutePathSpec="true"
+												overwrite="true"
+												failOnEmptyArchive="true">
+										</untar>
+
+										<!-- Download JRE -->
+										<get src="${private-jre.macosx.download-url}" dest="${private-jre.macosx.directory}/${private-jre.macosx.filename}" skipexisting="true" />
+		
 										<!-- Make all downloaded binaries executable -->
-										<chmod dir="${project.binaries}/osx" perm="a+x" includes="*" />
+										<chmod dir="${external-resources.transcode-tools.directory}/osx" perm="a+x" includes="*" excludes="libmediainfo.dylib" />
 
-										<copy file="${project.external-resources.directory}/osx/pms.icns" todir="${project.binaries}" overwrite="true" />
+										<!-- Copy files to IzPack staging directory -->		
+										<copy file="src/main/izpack/logo.png" todir="${izpack.staging}" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/Info.plist-template-pms" tofile="${izpack.staging}/osx/Info.plist" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/pms.sh" todir="${izpack.staging}/osx" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/copy-installer-jre.sh" todir="${izpack.staging}/osx" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/pms.icns" todir="${izpack.staging}/osx" overwrite="true" />
 									</target>
 								</configuration>
 							</execution>
 
+							<!-- TODO: Investigate if this can be done with the assembly plugin -->
 							<execution>
-								<id>prepare-package-osx</id>
+								<id>installer-application-with-jre-macosx</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+		
+								<configuration>
+									<tasks>
+										<mkdir dir="${izpack.installer.app}" />
+										<mkdir dir="${izpack.installer.app}/Contents" />
+										<mkdir dir="${izpack.installer.app}/Contents/MacOs" />
+										<mkdir dir="${izpack.installer.app}/Contents/PlugIns" />
+
+										<!-- Unpack the JRE, leave out as many unused features as possible -->
+										<untar src="${private-jre.macosx.directory}/${private-jre.macosx.filename}"
+											   dest="${izpack.installer.app}/Contents/PlugIns/${private-jre.macosx.archive-directory-name}"
+											   compression="gzip"
+											   stripAbsolutePathSpec="true"
+											   overwrite="true"
+											   failOnEmptyArchive="true">
+											<patternset>
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/d*" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/keytool" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/orbd" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/pack200" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/policytool" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/rmid" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/rmiregistry" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/servertool" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/tnameserv" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/bin/unpack200" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/deploy/*" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/deploy.jar" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/fx*.dylib" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/javaws.jar" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/jfxrt.jar" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/libjavafx*.dylib" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/libjfx*.dylib" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/lib/plugin.jar" />
+												<exclude name="${private-jre.macosx.archive-directory-name}/Contents/Home/man/*" />
+											</patternset>
+											<mapper>
+												<globmapper from="${private-jre.macosx.archive-directory-name}/*" to="*"/>
+											</mapper>
+										</untar>
+		
+										<chmod dir="${izpack.installer.app}/Contents/PlugIns/${private-jre.macosx.archive-directory-name}/Contents/Home/bin" perm="a+x" includes="*" />
+		
+										<copy file="${project.external-resources.directory}/osx/package.icns" todir="${izpack.installer.app}/Contents/Resources" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/Info.plist-template-installer" tofile="${izpack.installer.app}/Contents/Info.plist" overwrite="true" />
+										<copy file="${project.external-resources.directory}/osx/installer.sh" todir="${izpack.installer.app}/Contents/MacOs/" overwrite="true" />
+										<copy file="${project.build.directory}/${project.artifactId}-setup-${project.version}.jar" todir="${izpack.installer.app}/Contents/Resources/Java" overwrite="true" />
+		
+										<chmod dir="${izpack.installer.app}/Contents/MacOs/" perm="a+x" includes="*" />
+		
+										<tar destfile="${project.build.directory}/${project.artifactId}-${project.version}-setup-macosx.tar.gz"
+											compression="gzip"
+											longfile="gnu">
+											<tarfileset dir="${izpack.installer.app}"
+												prefix="${project.name} Setup.app"
+												excludes="**/java,**/installer.sh" />
+
+											<!-- "java" and "installer.sh" need to be executable -->
+											<tarfileset dir="${izpack.installer.app}"
+												prefix="${project.name} Setup.app"
+												includes="**/java,**/installer.sh"
+												filemode="755" />
+										</tar>
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- IzPack for cross platform packaging (http://izpack.org/) -->
+					<!-- http://docs.codehaus.org/display/IZPACK/Compiling+Using+Maven -->
+					<plugin>
+						<groupId>org.codehaus.izpack</groupId>
+						<artifactId>izpack-maven-plugin</artifactId>
+						<version>${izpack.version}</version>
+		
+						<executions>
+							<execution>
 								<phase>prepare-package</phase>
 								<goals>
-									<goal>run</goal>
+									<goal>izpack</goal>
 								</goals>
 								<configuration>
-									<target>
-										<!-- Make sure the target folder exists -->
-										<mkdir dir="${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}" />
-
-										<!-- Create the shortcut to the Applications folder -->
-										<exec executable="/usr/bin/osascript">
-											<arg value="-e" />
-											<arg value="tell application &quot;Finder&quot;" />
-											<arg value="-e" />
-											<arg value="set src to POSIX file &quot;/Applications&quot;" />
-											<arg value="-e" />
-											<arg value="set dest to POSIX file &quot;${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}&quot;" />
-											<arg value="-e" />
-											<arg value="make new alias file to folder src at folder dest" />
-											<arg value="-e" />
-											<arg value="end tell" />
-										</exec>
-									</target>
+									<baseDir>${izpack.staging}</baseDir>
+									<installFile>${izpack.staging}/install.xml</installFile>
+									<finalName>${project.artifactId}-setup-${project.version}</finalName>
 								</configuration>
 							</execution>
 						</executions>
+						<dependencies>
+							<!--
+								The IzPack plugin needs dependencies on its own modules or you will
+								get CannotResolveClassExceptions.
+							-->
+							<dependency>
+								<groupId>org.codehaus.izpack</groupId>
+								<artifactId>izpack-panel</artifactId>
+								<version>${izpack.version}</version>
+							</dependency>
+						</dependencies>
 					</plugin>
 
-					<!-- Plugin to assemble the PMS files in the right place before creating 
-						the App Bundle and DMG disk image. -->
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>make-assembly-osx</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<finalName>${project.parent.artifactId}-macosx-${project.parent.version}</finalName>
-									<appendAssemblyId>false</appendAssemblyId>
-									<descriptors>
-										<descriptor>${project.basedir}/src/main/assembly/assembly-osx.xml</descriptor>
-									</descriptors>
-									<archive>
-										<manifest>
-											<mainClass>net.pms.PMS</mainClass>
-										</manifest>
-									</archive>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- Plugin to create the OSX Application Bundle and DMG disk image. 
-						This will automatically copy all dependencies to a local repository, so the 
-						jar-with-dependencies is not needed here. -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>osxappbundle-maven-plugin</artifactId>
-						<version>1.0-alpha-2</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>bundle</goal>
-								</goals>
-								<configuration>
-									<mainClass>net.pms.PMS</mainClass>
-									<buildDirectory>${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}</buildDirectory>
-									<diskImageFile>${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}.dmg</diskImageFile>
-									<zipFile>${project.build.directory}/${project.parent.artifactId}-macosx-${project.parent.version}-app.zip</zipFile>
-									<javaApplicationStub>/System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/JavaApplicationStub</javaApplicationStub>
-									<bundleName>${project.core.name}</bundleName>
-									<iconFile>${project.external-resources.directory}/osx/pms.icns</iconFile>
-									<version>${project.version}</version>
-									<jvmVersion>1.6+</jvmVersion>
-
-									<!-- Options to the JVM, will be used as the value of VMOptions in Info.plist. -->
-									<vmOptions>-Xmx1024M -Xss16M -Dsun.java2d.d3d=false -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -jar</vmOptions>
-									<internetEnable>false</internetEnable>
-									<dictionaryFile>${project.external-resources.directory}/osx/Info.plist-template.xml</dictionaryFile>
-									<additionalClasspath />
-									<additionalResources />
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
