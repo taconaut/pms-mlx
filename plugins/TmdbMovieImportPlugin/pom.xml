@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-tmdb-movie-import-plugin</artifactId>
-	<version>4.0-SNAPSHOT</version>
+	<version>4.1-SNAPSHOT</version>
 
 	<name>PMS Tmdb Movie Import Plugin</name>
 	<description>Plugin used to import properties and tags for video files from TMDB</description>
@@ -17,11 +17,6 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.savvasdalkitsis</groupId>
-			<artifactId>jtmdb</artifactId>
-			<version>2.1.0</version>
-		</dependency>
 		<dependency>
 			<groupId>com.omertron</groupId>
 			<artifactId>themoviedbapi</artifactId>
@@ -61,11 +56,6 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>com.savvasdalkitsis</groupId>
-									<artifactId>jtmdb</artifactId>
-									<version>2.1.0</version>
-								</artifactItem>
-								<artifactItem>
 									<groupId>com.omertron</groupId>
 									<artifactId>themoviedbapi</artifactId>
 									<version>3.7</version>
@@ -86,7 +76,7 @@
 									<version>2.2.3</version>
 								</artifactItem>
 							</artifactItems>
-							<includeArtifactIds>jtmdb,themoviedbapi,jackson-core,jackson-annotations,jackson-databind</includeArtifactIds>
+							<includeArtifactIds>themoviedbapi,jackson-core,jackson-annotations,jackson-databind</includeArtifactIds>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>

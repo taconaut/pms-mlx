@@ -3,7 +3,6 @@ package net.pms.plugin.fileimport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -231,7 +230,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 	public List<FileProperty> getSupportedFileProperties() {
 		//add all supported properties
 		List<FileProperty> res = new ArrayList<FileProperty>();
-		res.add(FileProperty.VIDEO_CERTIFICATION);
+		// res.add(FileProperty.VIDEO_CERTIFICATION); // Fixme: see getFileProperty(FileProperty property) comments
 		res.add(FileProperty.VIDEO_BUDGET);
 		res.add(FileProperty.VIDEO_COVERURL);
 		res.add(FileProperty.VIDEO_DIRECTOR);
@@ -245,7 +244,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		res.add(FileProperty.VIDEO_REVENUE);
 		res.add(FileProperty.VIDEO_TAGLINE);
 		res.add(FileProperty.VIDEO_NAME);
-		res.add(FileProperty.VIDEO_TRAILERURL);
+		// res.add(FileProperty.VIDEO_TRAILERURL); // Fixme: see getFileProperty(FileProperty property) comments.
 		res.add(FileProperty.VIDEO_YEAR);
 		res.add(FileProperty.VIDEO_TMDBID);
 		
