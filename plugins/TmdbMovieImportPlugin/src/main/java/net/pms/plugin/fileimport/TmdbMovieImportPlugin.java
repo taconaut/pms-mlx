@@ -14,11 +14,11 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.savvasdalkitsis.jtmdb.CastInfo;
-import com.savvasdalkitsis.jtmdb.GeneralSettings;
-import com.savvasdalkitsis.jtmdb.Genre;
-import com.savvasdalkitsis.jtmdb.Movie;
-import com.savvasdalkitsis.jtmdb.Studio;
+import com.omertron.themoviedbapi.TheMovieDbApi;
+import com.omertron.themoviedbapi.results.*;
+import com.omertron.themoviedbapi.model.MovieDb;
+import com.omertron.themoviedbapi.MovieDbException;
+
 
 import net.pms.medialibrary.commons.enumarations.FileProperty;
 import net.pms.medialibrary.commons.enumarations.FileType;
@@ -54,8 +54,11 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		Producer
 	}
 	
+	// The TMDB API class
+	private TheMovieDbApi api;
+
 	//the tmdb movie having been imported
-	private Movie movie;
+	private MovieDb movie;
 	
 	//constants used to manage the min polling interval
 	private final int MIN_POLLING_INTERVAL_MS = 1000;
@@ -82,20 +85,21 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 	    try {
 	    	//search for the title
-	        List<Movie> movies = Movie.search(title);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(title, 0 , null, true, 0);
+	        int size = movies.getTotalResults();
 	        
-			if (movies != null && movies.size() > 0) {
+			if (movies != null && size > 0) {
 				//we've found at least one result
 				
 				//use the first one
-				movie = Movie.getInfo(movies.get(0).getID());
+				movie = api.getMovieInfo(movies.getResults().get(0).getId(), null, "casts,trailers");
 				
 				//log the results received
-				String moviesStr = String.format("Movie matched for '%s' on TMDb has id=%s, name='%s'", title, movies.get(0).getID(), movies.get(0).getName());
-				if(movies.size() > 1){
+				String moviesStr = String.format("Movie matched for '%s' on TMDb has id=%s, name='%s'", title, movies.getResults().get(0).getId(), movies.getResults().get(0).getTitle());
+				if(size > 1){
 					moviesStr += ". other (not considered) matches are ";
-					for(int i = 1; i < movies.size(); i++) {
-						moviesStr += String.format("id=%s, name='%s';", movies.get(i).getID(), movies.get(i).getName());
+					for(int i = 0; i < size; i++) {
+						moviesStr += String.format("id=%s, name='%s';", movies.getResults().get(i).getId(), movies.getResults().get(i).getTitle());
 					}
 					moviesStr = moviesStr.substring(0, moviesStr.length() - 2);
 				}
@@ -108,7 +112,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 			}else {
 	        	throw new FileImportException(String.format("No movie information found for title='%s'", title));			
 			}
-	    } catch(IOException ex) {
+	    } catch(MovieDbException ex) {
 	    	if(ex.getMessage().contains("response code: 503")){
 	    		//sometimes tmdb craps out with a 503 error. Try again if the max retries limit hasn't been reached
 	    		if(nbRetriesDone < MAX_RETRIES - 1) {
@@ -154,7 +158,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 		logger.debug("Importing TMDb movie by id=" + id);
 	    try {
-			movie = Movie.getInfo(tmdbId);
+			movie = api.getMovieInfo(tmdbId, null, "casts,trailers");
 			logger.debug("Imported TMDb movie by id=" + id);
         } catch (Throwable t) {
         	throw new FileImportException(String.format("Failed to import movie information for id='%s'", id), t);
@@ -179,46 +183,42 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 	@Override
 	public List<String> getTags(String tagName) {
 		List<String> res = null;
-		
 		if (tagName.equals(Tag.Actor.toString())) {
 			res = new ArrayList<String>();
 			if (movie != null && movie.getCast() != null) {
-				for (CastInfo ci : movie.getCast()) {
-					if (ci.getJob().equals("Actor")) {
-						res.add(ci.getName());
-					}
+				for (int i=0; i<movie.getCast().size(); i++) {
+					res.add(movie.getCast().get(i).getName());
 				}
 			}
 			
 		} else if (tagName.equals(Tag.Studio.toString())) {
 			res = new ArrayList<String>();
-			if (movie != null && movie.getStudios() != null) {
-				for (Studio s : movie.getStudios()) {
-					res.add(s.getName());
+			if (movie != null && movie.getProductionCompanies() != null) {
+				for (int i=0; i<movie.getProductionCompanies().size(); i++) {
+					res.add(movie.getProductionCompanies().get(i).getName());
 				}
 			}
 			
 		} else if (tagName.equals(Tag.Author.toString())) {
 			res = new ArrayList<String>();
-			if (movie != null && movie.getCast() != null) {
-				for (CastInfo ci : movie.getCast()) {
-					if (ci.getJob().equals("Author")) {
-						res.add(ci.getName());
+			if (movie != null && movie.getCrew() != null) {
+				for (int i=0; i<movie.getCrew().size(); i++) {
+					if (movie.getCrew().get(i).getJob().equals("Author")) {
+						res.add(movie.getCrew().get(i).getName());
 					}
 				}
 			}
 			
 		} else if (tagName.equals(Tag.Producer.toString())) {
 			res = new ArrayList<String>();
-			if (movie != null && movie.getCast() != null) {
-				for (CastInfo ci : movie.getCast()) {
-					if (ci.getJob().equals("Producer")) {
-						res.add(ci.getName());
+			if (movie != null && movie.getCrew() != null) {
+				for (int i=0; i<movie.getCrew().size(); i++) {
+					if (movie.getCrew().get(i).getJob().equals("Producer")) {
+						res.add(movie.getCrew().get(i).getName());
 					}
 				}
 			}
 		}
-	
 		return res;
 	}
 
@@ -257,18 +257,18 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		//return the proper object for every supported file property
 		switch (property) {
 		case VIDEO_CERTIFICATION:
-			return movie == null ? null : movie.getCertification();
+			return null; //movie == null ? null : movie.getCertification();  // Fixme: Unsure what this is & can't find a movie with a value that would make sense here.
 		case VIDEO_BUDGET:
-		    return movie == null ? null : movie.getBudget();
+		    return movie == null ? null : (int)movie.getBudget();
 		case VIDEO_COVERURL:
-			return movie == null ? null : !movie.getImages().posters.iterator().hasNext() ? null : movie.getImages().posters.iterator().next().getLargestImage().toString();
+			return movie == null ? null : "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original" + movie.getPosterPath();
 		case VIDEO_DIRECTOR:
 			String director = null;
-			if(movie != null && movie.getCast() != null){
-			    for(CastInfo ci : movie.getCast()){
-			    	if(ci.getJob().equals("Director")){
-			    		director = ci.getName();
-			    		break;
+			if(movie != null && movie.getCrew() != null){
+			    for(int i=0; i<movie.getCrew().size(); i++){
+					if(movie.getCrew().get(i).getJob().equals("Director")){
+						director = movie.getCrew().get(i).getName();
+						break;
 			    	}
 			    }			
 			}
@@ -277,8 +277,8 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 			List<String> genres = null;
 			if(movie != null && movie.getGenres() != null && !movie.getGenres().isEmpty()){
 				genres = new ArrayList<String>();
-			    for(Genre ci : movie.getGenres()){
-			    	genres.add(ci.getName());
+			    for(int i=0; i<movie.getGenres().size(); i++){
+					genres.add(movie.getGenres().get(i).getName());
 			    }
 			}
 		    return genres;
@@ -287,27 +287,25 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		case VIDEO_IMDBID:
 		    return movie == null ? null : movie.getImdbID();
 		case VIDEO_ORIGINALNAME:
-		    return movie == null ? null : movie.getOriginalName();
+		    return movie == null ? null : movie.getOriginalTitle();
 		case VIDEO_OVERVIEW:
 		    return movie == null || movie.getOverview().equals("null") ? null : movie.getOverview();
 		case VIDEO_RATINGPERCENT:
-			return movie == null ? null : (int)(movie.getRating() * 10);
+			return movie == null ? null : (int)(movie.getVoteAverage() * 10);
 		case VIDEO_RATINGVOTERS:
-			return movie == null ? null : movie.getVotes();
+			return movie == null ? null : movie.getVoteCount();
 		case VIDEO_REVENUE:
 		    return movie == null ? null : (int)movie.getRevenue();
 		case VIDEO_TAGLINE:
 		    return movie == null ? null : movie.getTagline();
 		case VIDEO_TMDBID:
-		    return movie == null ? null : movie.getID();
+		    return movie == null ? null : movie.getId();
 		case VIDEO_NAME:
-		    return movie == null ? null : movie.getName();
+		    return movie == null ? null : movie.getTitle();
 		case VIDEO_TRAILERURL:
-		    return movie == null || movie.getTrailer() == null ? null : movie.getTrailer().toString();
+		    return null; //movie == null || movie.getTrailers().get(0) == null ? null : movie.getTrailers().get(0).toString(); // Fixme: Needs to be parsed for video location.
 		case VIDEO_YEAR:
-			Calendar cal=Calendar.getInstance();
-			cal.setTime(movie.getReleasedDate());
-		    return movie == null || movie.getReleasedDate() == null ? null : cal.get(Calendar.YEAR);
+		    return movie == null || movie.getReleaseDate() == null ? null : Integer.parseInt(movie.getReleaseDate().substring(0,4));
 		default:
 			logger.warn("Unsupportede FileProperty: %s", property);
 			break;
@@ -344,6 +342,10 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 	public void importFileBySearchObject(Object searchObject) {
 		if(searchObject != null && searchObject instanceof TmdbMovieInfoPluginMovie) {
 			movie = ((TmdbMovieInfoPluginMovie)searchObject).getMovie();
+			try {
+				movie = api.getMovieInfo(movie.getId(), null, "casts,trailers");
+			} catch (MovieDbException ex){
+			}
 		}
 	}
 
@@ -352,13 +354,13 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		List<Object> res = null;
 	    try {
 	    	//search for the name
-	        List<Movie> movies = Movie.search(name);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(name, 0, null, true, 0);
 	        
 	        //create the return list if any movies were found
-			if (movies != null && movies.size() > 0) {
+			if (movies != null && movies.getTotalResults() > 0) {
 				res = new ArrayList<Object>();
-				for(int i = 0; i< movies.size(); i++){
-					res.add(new TmdbMovieInfoPluginMovie(movies.get(i)));
+				for(int i = movies.getTotalResults(); i > 0; i--){
+					res.add(new TmdbMovieInfoPluginMovie(movies.getResults().get(i-1)));
 				}
 			}
         } catch (Throwable t) {
@@ -390,7 +392,10 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 
 	@Override
 	public void initialize() {
-	    GeneralSettings.setApiKey("4cdddc892213dd24e5011fd710f8abf0");
+		try{
+			api = new TheMovieDbApi("4cdddc892213dd24e5011fd710f8abf0");
+		} catch (MovieDbException ex) {
+		}
 	}
 
 	@Override
