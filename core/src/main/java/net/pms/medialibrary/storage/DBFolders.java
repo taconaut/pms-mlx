@@ -684,14 +684,18 @@ class DBFolders extends DBBase {
 		List<DOFolder> tmpList = new ArrayList<DOFolder>();
 		if(folder instanceof DOMediaLibraryFolder){
     		for(int childId : getChildFolderIds(folder.getId(), conn, stmt)){
-    			DOFolder tmpFolder = getFolder(childId, conn, stmt);
-    			tmpFolder.setParentFolder((DOMediaLibraryFolder) folder);
-    			tmpFolder.setParentId(folder.getId());
-    			if(depth != MediaLibraryStorage.ALL_CHILDREN){ depth--; }
-    			if(tmpFolder instanceof DOMediaLibraryFolder){
-    				((DOMediaLibraryFolder)tmpFolder).setChildFolders(populateChildFolders(tmpFolder, depth, conn, stmt));
+    			try{
+	    			DOFolder tmpFolder = getFolder(childId, conn, stmt);
+	    			tmpFolder.setParentFolder((DOMediaLibraryFolder) folder);
+	    			tmpFolder.setParentId(folder.getId());
+	    			if(depth != MediaLibraryStorage.ALL_CHILDREN){ depth--; }
+	    			if(tmpFolder instanceof DOMediaLibraryFolder){
+	    				((DOMediaLibraryFolder)tmpFolder).setChildFolders(populateChildFolders(tmpFolder, depth, conn, stmt));
+	    			}
+	    			tmpList.add(tmpFolder);
+    			} catch(NullPointerException ex){
+    				log.error("Failed to set child folder for childId=" + childId);
     			}
-    			tmpList.add(tmpFolder);
     		}
 		}
 		
