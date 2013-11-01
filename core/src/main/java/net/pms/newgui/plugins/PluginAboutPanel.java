@@ -1,13 +1,18 @@
 package net.pms.newgui.plugins;
 
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.net.URI;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +84,27 @@ public class PluginAboutPanel extends JPanel {
 			//catch throwable for every external call to avoid having a plugin crash pms
 			log.error(String.format("Failed to load long description for plugin '%s'", plugin == null ? "null" : plugin.getName()), t);
 		}
-		builder.addLabel(longDescription, cc.xyw(2, 4, 5));
+		
+		// Use a JEditorPane to display the long description in order to allow hyperlinks inside description
+		JEditorPane longDescriptionPane = new JEditorPane("text/html", longDescription);
+		longDescriptionPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE); // required to use default font
+		longDescriptionPane.setEditable(false);
+		longDescriptionPane.setOpaque(false);
+		longDescriptionPane.addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent hle) {
+				if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+					if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+						try {
+							desktop.browse(new URI(hle.getURL().toString()));
+						} catch (Exception e) {
+							log.error(String.format("Failed to open link %s in browser", hle.getURL() == null ? "NULL" : hle.getURL()), e);
+						}
+					}
+				}
+			}
+		});
+		builder.add(longDescriptionPane, cc.xyw(2, 4, 5));
 
 		//web site and update labels
 		String websiteUrl = null;
