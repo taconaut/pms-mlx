@@ -1,17 +1,15 @@
 package net.pms.plugin.fileimport;
 
-import java.util.Calendar;
-
-import com.savvasdalkitsis.jtmdb.Movie;
+import com.omertron.themoviedbapi.model.MovieDb;
 
 public class TmdbMovieInfoPluginMovie {
-	private Movie movie;
+	private MovieDb movie;
 	
-	public TmdbMovieInfoPluginMovie(Movie movie) {
+	public TmdbMovieInfoPluginMovie(MovieDb movie) {
 		this.movie = movie;
 	}
 
-	public Movie getMovie() {
+	public MovieDb getMovie() {
 		return movie;
 	}
 	
@@ -20,12 +18,10 @@ public class TmdbMovieInfoPluginMovie {
 		String res = "";
 		if(movie != null) {
 			String yearString = "";
-			if(movie.getReleasedDate() != null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(movie.getReleasedDate());
-				yearString = String.format(" (%s)", cal.get(Calendar.YEAR));
+			if(movie.getReleaseDate() != null) {
+				yearString = String.format(" (%s)", movie.getReleaseDate().substring(0,4));
 			}
-			res = String.format("%s%s", movie.getName(), yearString);
+			res = String.format("%s%s", movie.getTitle(), yearString);
 		}
 		return res;
 	}
