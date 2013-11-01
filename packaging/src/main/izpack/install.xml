@@ -148,7 +148,7 @@
 			</file>
 			
 			<!-- Include default images used as icons on renderer -->
-			<fileset dir="${project.basedir}\src\main" targetdir="$INSTALL_PATH/${project.name}.app/Contents/MacOS">
+			<fileset dir="${project.basedir}/src/main" targetdir="$INSTALL_PATH/${project.name}.app/Contents/MacOS">
 					<include name="resources/**" />
 	            	<os family="mac" />
 			</fileset>
