@@ -648,7 +648,7 @@ class DBVideoFileInfo extends DBFileInfo {
 			stmt.setString(23, fileInfo.getName());
 			stmt.setInt(24, fileInfo.getTmdbId());
 			stmt.setString(25, fileInfo.getImdbId());
-			stmt.setString(26, fileInfo.getOverview());
+			stmt.setString(26, fileInfo.getOverview() == null ? null : (fileInfo.getOverview().length() > DBConstants.VIDEO_OVERVIEW_FIELDLENGTH ? fileInfo.getOverview().substring(0, DBConstants.VIDEO_OVERVIEW_FIELDLENGTH) : fileInfo.getOverview()));
 			stmt.setInt(27, fileInfo.getBudget());
 			stmt.setInt(28, fileInfo.getRevenue());
 			stmt.setString(29, fileInfo.getHomepageUrl());
@@ -720,7 +720,7 @@ class DBVideoFileInfo extends DBFileInfo {
     		stmt.setString(22, fileInfo.getName());
     		stmt.setInt(23, fileInfo.getTmdbId());
     		stmt.setString(24, fileInfo.getImdbId());
-    		stmt.setString(25, fileInfo.getOverview());
+    		stmt.setString(25, fileInfo.getOverview() == null ? null : (fileInfo.getOverview().length() > DBConstants.VIDEO_OVERVIEW_FIELDLENGTH ? fileInfo.getOverview().substring(0, DBConstants.VIDEO_OVERVIEW_FIELDLENGTH) : fileInfo.getOverview()));
     		stmt.setInt(26, fileInfo.getBudget());
     		stmt.setInt(27, fileInfo.getRevenue());
     		stmt.setString(28, fileInfo.getHomepageUrl());

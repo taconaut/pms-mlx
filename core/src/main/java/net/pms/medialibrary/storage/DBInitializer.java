@@ -238,7 +238,7 @@ class DBInitializer extends DBBase {
 			sb.append(", RATINGPERCENT     INT");
 			sb.append(", RATINGVOTERS      INT");
 			sb.append(", DIRECTOR          VARCHAR_IGNORECASE(512)");
-			sb.append(", OVERVIEW          VARCHAR_IGNORECASE(2056)");
+			sb.append(", OVERVIEW          VARCHAR_IGNORECASE(" + DBConstants.VIDEO_OVERVIEW_FIELDLENGTH + ")");
 			sb.append(", TAGLINE           VARCHAR_IGNORECASE(512)");
 			sb.append(", NAME              VARCHAR_IGNORECASE(512)");
 			sb.append(", ORIGINALNAME      VARCHAR_IGNORECASE(512)");
