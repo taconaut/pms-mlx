@@ -69,7 +69,7 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	 */
 	protected static final String[] HELP_PAGES = { "index.html", null,
 			"general_configuration.html", "navigation_share.html",
-			"transcoding.html", null, null };
+			"transcoding.html", null, null, null };
 
 	private NavigationShareTab ft;
 	private StatusTab st;
