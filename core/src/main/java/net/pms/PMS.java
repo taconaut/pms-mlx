@@ -983,6 +983,7 @@ public class PMS {
 	public void save() {
 		try {
 			configuration.save();
+			frame.save();
 		} catch (ConfigurationException e) {
 			logger.error("Could not save configuration", e);
 		}

@@ -58,4 +58,8 @@ public class DummyFrame implements IFrame {
 	@Override
 	public void setScanLibraryEnabled(boolean flag) {
 	}
+
+	@Override
+	public void save() {
+	}
 }

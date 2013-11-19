@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2012  Ph.Waeber
+ * Copyright (C) 2012  pw
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,10 +24,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -45,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import net.pms.Messages;
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
+import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.OmitPrefixesConfiguration;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
@@ -86,10 +90,10 @@ public class GeneralOptionsView extends JPanel {
 	private JTextField                tfOmitPrefix;
 	private JCheckBox                 cbOmitFiltering;
 	private JCheckBox                 cbOmitSorting;
-	private JButton                   bApply;
 	private ManagedFoldersPanel       pManagedFolders;
 
 	private JComponent                pOptions;
+	
 	public GeneralOptionsView() {
 		libConfig = MediaLibraryConfiguration.getInstance();
 
@@ -108,6 +112,16 @@ public class GeneralOptionsView extends JPanel {
 		this.scanState = libraryManager.getScanState().getScanState();
 		updateScanState();
 		pOptions.setVisible(cbEnableMediaLibrary.isSelected());
+	}
+	
+	/**
+	 * Gets the managed folders as they have been configured in the GUI.
+	 *
+	 * @return the managed folders
+	 */
+	public List<DOManagedFile> getManagedFolders(){
+		pManagedFolders.cleanManagedFolders();
+		return pManagedFolders.getManagedFolders();
 	}
 
 	private JComponent buildUseMediaLibrary() {
@@ -189,25 +203,6 @@ public class GeneralOptionsView extends JPanel {
 			}
 		});
 
-		bApply = new JButton(Messages.getString("ML.ManagedFoldersPanel.bApply"));
-		bApply.setToolTipText(Messages.getString("ML.ManagedFoldersPanel.bApply.ToolTipText"));
-		bApply.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pManagedFolders.cleanManagedFolders();
-				MediaLibraryStorage.getInstance().setManagedFolders(pManagedFolders.getManagedFolders());
-
-				libConfig.setPictureSaveFolderPath(tfPictureFolderPathValue.getText());
-
-				OmitPrefixesConfiguration omitCfg = new OmitPrefixesConfiguration();
-				omitCfg.setFiltering(cbOmitFiltering.isSelected());
-				omitCfg.setSorting(cbOmitSorting.isSelected());
-				omitCfg.setPrefixes(Arrays.asList(tfOmitPrefix.getText().trim().split(" ")));
-				libConfig.setOmitPrefixesConfiguration(omitCfg);
-			}
-		});
-
 		FormLayout layout = new FormLayout("3px, 10:grow, 3px", "3px, p, 7px, p, 7px, p, 7px, fill:p:grow, 3px, p, 3px");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.opaque(true);
@@ -217,7 +212,6 @@ public class GeneralOptionsView extends JPanel {
 		builder.add(buildLibrary(), cc.xy(2, 4));
 		builder.add(buildScanner(), cc.xy(2, 6));
 		builder.add(buildFolderManager(), cc.xy(2, 8));
-		builder.add(bApply, cc.xy(2, 10, CellConstraints.RIGHT, CellConstraints.CENTER));
 		
 		JScrollPane sp = new JScrollPane(builder.getPanel());
 		sp.setBorder(BorderFactory.createEmptyBorder());
@@ -353,6 +347,9 @@ public class GeneralOptionsView extends JPanel {
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					String folderPath = chooser.getSelectedFile().getAbsolutePath();
 					tfPictureFolderPathValue.setText(folderPath);
+					
+					// Save the configuration
+					libConfig.setPictureSaveFolderPath(tfPictureFolderPathValue.getText());
 				}
 			}
 		});
@@ -363,6 +360,18 @@ public class GeneralOptionsView extends JPanel {
 		builder.add(lOmitPrefix, cc.xy(1, 3));
 
 		tfOmitPrefix = new JTextField();
+		tfOmitPrefix.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				OmitPrefixesConfiguration omitCfg = new OmitPrefixesConfiguration();
+				omitCfg.setFiltering(cbOmitFiltering.isSelected());
+				omitCfg.setSorting(cbOmitSorting.isSelected());
+				omitCfg.setPrefixes(Arrays.asList(tfOmitPrefix.getText().trim().split(" ")));
+				
+				// Save the configuration
+				libConfig.setOmitPrefixesConfiguration(omitCfg);
+			}
+		});
 		builder.add(tfOmitPrefix, cc.xyw(3, 3, 3));
 
 		builder.addLabel(Messages.getString("ML.General.OmitPrefixes.When"), cc.xy(7, 3));

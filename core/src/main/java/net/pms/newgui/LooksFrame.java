@@ -21,6 +21,7 @@ package net.pms.newgui;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.sun.jna.Platform;
+
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
@@ -30,6 +31,7 @@ import net.pms.newgui.plugins.PluginsTab;
 import net.pms.newgui.update.AutoUpdateDialog;
 import net.pms.update.AutoUpdater;
 import net.pms.util.PropertiesUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,6 +80,7 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	private TranscodingTab tr;
 	private GeneralTab nt;
 	private HelpTab ht;
+	private MediaLibraryTab mediaLibraryTab;
 	private AbstractButton reload;
 	private JLabel status;
 	private static boolean lookAndFeelInitialized = false;
@@ -366,13 +370,14 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 		tr = new TranscodingTab(configuration);
 		nt = new GeneralTab(configuration);
 		ft = new NavigationShareTab(configuration);
+		mediaLibraryTab = new MediaLibraryTab();
 		ht = new HelpTab();
 
 		tabbedPane.addTab(Messages.getString("LooksFrame.18"), st.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.19"), tt.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.20"), nt.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.22"), ft.build());
-		tabbedPane.addTab(Messages.getString("ML.Tab.Header"), new MediaLibraryTab().build());
+		tabbedPane.addTab(Messages.getString("ML.Tab.Header"), mediaLibraryTab.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.27"), new PluginsTab());
 		tabbedPane.addTab(Messages.getString("LooksFrame.21"), tr.build());
 		tabbedPane.addTab(Messages.getString("LooksFrame.24"), ht.build());
@@ -514,5 +519,10 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	@Override
 	public void setScanLibraryEnabled(boolean flag) {
 		getFt().setScanLibraryEnabled(flag);
+	}
+
+	@Override
+	public void save() {
+		mediaLibraryTab.save();
 	}
 }

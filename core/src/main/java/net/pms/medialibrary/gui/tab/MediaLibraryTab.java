@@ -33,6 +33,7 @@ import net.pms.medialibrary.commons.events.SelectionChangeEvent;
 import net.pms.medialibrary.commons.events.SelectionChangeListener;
 import net.pms.medialibrary.gui.tab.dlnaview.DLNAViewPanel;
 import net.pms.medialibrary.gui.tab.libraryview.LibraryViewPanel;
+import net.pms.medialibrary.storage.MediaLibraryStorage;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -114,5 +115,9 @@ public class MediaLibraryTab {
 				break;
 		}
 		
+	}
+
+	public void save() {
+		MediaLibraryStorage.getInstance().setManagedFolders(generalOptionsPanel.getManagedFolders());
 	}
 }
