@@ -1,6 +1,66 @@
 Changelog:
 ==========
 
+pms-mlx 0.9 - 2013-??-??
+
+	Plugins:
+		- Improved plugin dialog:
+			- Nicer layout
+			- Added possibility to include clickable links in plugin long description
+			
+		- Implemented new plugin system:
+			- Most of the existing plugins should still work. Some might cause problems as the initialization process has changed
+			- Moved plugins from general configuration tab to its own plugin tab
+			- Localized all plugins (en, fr, de)
+			- Hide unavailable plugins in tree context menu
+			- Show unavailable plugins as grayed out (unusable) in plugin tab (e.g. iPhoto on windows)
+			
+		- Play count watcher
+			- Fixed play length calculation
+			
+		- IMDB file import:
+			- Fixed import
+			
+		- TMDB file import:
+			- Use APIv3 (thanks, christopher!)
+			
+		- iTunes:
+			- Use the same implementation as in the current pms
+			
+		- iPhoto:
+			- Use the same implementation as in the current pms
+			
+		- Shutdown:
+			- Added plugin allowing to shutdown/restart OS (thanks, Raptor 399!)
+			
+	GUI:
+		- Fix UI refresh issue when selecting a single plugin in the file import template panel.
+		- Use the global save button to save the media library properties.
+		- Show wait cursor when applying filter in library view (as the operation can be lengthy if many files have to loaded).
+		- Hide image and pictures actions as they aren't supported yet.
+		
+	Database:
+		- Trim overview if it is greater than DB field size (2056)
+		- Performance improvement when loading videos having external subtitles from DB
+		- Guarantee correct insert/update/delete operations in the database by making the entire operation transactional
+	
+	Misc:
+		- Added internally used notification center
+		- Fixed ArrayIndexOutOfBounds exception related to the help and the addition of the media library tab
+		
+	Maven:
+		- Plugins:
+			- maven-site-plugin 3.0 -> 3.3
+			- maven-dependency-plugin 2.4 -> 2.8
+			- maven-surefire-plugin: 2.11 -> 2.16
+			- git-commit-id-plugin: 1.9 -> 2.15
+			- maven-eclipse-plugin: 2.5.1 -> 2.9
+			- maven-idea-plugin: 2.1 -> 2.2.1
+			- doxia-module-docbook-simple: 1.2 -> 1.4
+			- maven-surefire-plugin: 2.15 -> 2.16
+			- maven-javadoc-plugin: 2.9 -> 2.9.1
+			- cobertura-maven-plugin: 2.5.2 -> 2.6
+
 1.90.2 - 2013-??-?? 
 
     Language updates:
