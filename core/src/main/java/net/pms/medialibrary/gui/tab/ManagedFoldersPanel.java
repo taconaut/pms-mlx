@@ -48,6 +48,10 @@ import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.gui.dialogs.FileImportTemplateDialog;
 import net.pms.medialibrary.gui.shared.EButton;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.NotificationSubscriber;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 
 public class ManagedFoldersPanel extends JPanel {
 	private static final long      serialVersionUID = 1558319355911044800L;
@@ -65,6 +69,19 @@ public class ManagedFoldersPanel extends JPanel {
 		storage = MediaLibraryStorage.getInstance();
 		addManagedFolders(storage.getManagedFolders());
 		applyLayout();
+		
+		// Subscribe to DB reset event
+		NotificationCenter.getInstance(DBEvent.class).subscribe(new NotificationSubscriber<DBEvent>() {
+			
+			@Override
+			public void onMessage(DBEvent obj) {
+				if(obj.getType() == Type.Reset) {
+					// Remove all managed folders when the DB has been reset
+					managedFolders.clear();
+					applyLayout();
+				}
+			}
+		});
 	}
 
 	private void addManagedFolders(List<DOManagedFile> mFolder) {

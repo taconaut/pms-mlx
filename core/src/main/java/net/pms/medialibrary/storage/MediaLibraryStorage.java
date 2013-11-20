@@ -50,6 +50,9 @@ import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataK
 import net.pms.medialibrary.commons.exceptions.StorageException;
 import net.pms.medialibrary.commons.helpers.FileImportHelper;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 
 public class MediaLibraryStorage implements IMediaLibraryStorage {		
 	public static final int ROOT_FOLDER_ID = 1;
@@ -182,21 +185,24 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
     }
 
 	@Override
-    public void cleanStorage() {
+	public void cleanStorage() {
 		int nbAudio = 0;
 		int nbPictures = 0;
-	    int nbVideo = 0;
-	    
-	    try {
+		int nbVideo = 0;
+
+		try {
 			nbVideo = dbVideoFileInfo.cleanVideoFileInfos();
-			if(log.isInfoEnabled()) log.info(String.format("%s videos removed from library while cleaning storage", nbVideo));
+			if (log.isInfoEnabled()) log.info(String.format("%s videos removed from library while cleaning storage", nbVideo));
 		} catch (StorageException e) {
 			log.error("Storage error (get)", e);
 		}
-	    
+
+		// Notify a DB clear video
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.Clean));
+
 		String statusMsg = String.format(Messages.getString("ML.Messages.CleanLibraryDone"), nbVideo, nbAudio, nbPictures);
 		PMS.get().getFrame().setStatusLine(statusMsg);
-    }
+	}
 	
 	@Override
 	public long getRootFolderId(){

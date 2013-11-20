@@ -365,7 +365,7 @@ public class GeneralOptionsView extends JPanel {
 		tfOmitPrefix.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				updateOmitPrefixesConfiguration();
+				saveOmitPrefixesConfiguration();
 			}
 		});
 		builder.add(tfOmitPrefix, cc.xyw(3, 3, 3));
@@ -377,7 +377,7 @@ public class GeneralOptionsView extends JPanel {
 			
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				updateOmitPrefixesConfiguration();
+				saveOmitPrefixesConfiguration();
 			}
 		});
 		builder.add(cbOmitSorting, cc.xy(9, 3));
@@ -387,7 +387,7 @@ public class GeneralOptionsView extends JPanel {
 			
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				updateOmitPrefixesConfiguration();
+				saveOmitPrefixesConfiguration();
 			}
 		});
 		builder.add(cbOmitFiltering, cc.xy(11, 3));
@@ -442,10 +442,10 @@ public class GeneralOptionsView extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if (JOptionPane.showConfirmDialog(bClearVideo.getTopLevelAncestor(), String.format(Messages.getString("ML.GeneralOptionsView.ResetDBMsg"), System
 				        .getProperty("line.separator"))) == JOptionPane.YES_OPTION) {
-					try {
+					try {						
 						// reset the storage
 						libraryManager.resetStorage();
-
+						
 						// update the configuration fields that have to be
 						MediaLibraryConfiguration config = MediaLibraryConfiguration.getInstance();
 						cbEnableMediaLibrary.setSelected(config.isMediaLibraryEnabled());
@@ -460,6 +460,8 @@ public class GeneralOptionsView extends JPanel {
 						tfOmitPrefix.setText(prefixes);
 						cbOmitFiltering.setSelected(omitCfg.isFiltering());
 						cbOmitSorting.setSelected(omitCfg.isSorting());
+						
+						// Show message in the pms status bar
 						net.pms.PMS.get().getFrame().setStatusLine(Messages.getString("ML.GeneralOptionsView.ResetDBDoneMsg"));
 					} catch (Exception ex) {
 						log.error("Failed to reset data base", ex);
@@ -469,9 +471,10 @@ public class GeneralOptionsView extends JPanel {
 		});
 		builder.add(bResetLibrary, cc.xy(9, 2));
 
-		builder.addLabel(Messages.getString("ML.GeneralOptionsView.lTracks"), cc.xy(2, 3));
+		// TODO: uncomment audio and pictures parts, once implemented
+		// builder.addLabel(Messages.getString("ML.GeneralOptionsView.lTracks"), cc.xy(2, 3));
 		this.lAudioCount = new JLabel(String.valueOf(this.libraryManager.getAudioCount()));
-		builder.add(this.lAudioCount, cc.xy(4, 3));
+		// builder.add(this.lAudioCount, cc.xy(4, 3));
 		this.bClearAudio = new JButton(Messages.getString("ML.GeneralOptionsView.bClear"));
 		this.bClearAudio.addMouseListener(new MouseAdapter() {
 			@Override
@@ -484,7 +487,7 @@ public class GeneralOptionsView extends JPanel {
 			}
 
 		});
-		builder.add(this.bClearAudio, cc.xy(6, 3));
+		// builder.add(this.bClearAudio, cc.xy(6, 3));
 
 		JButton bCleanLibrary = new JButton(Messages.getString("ML.GeneralOptionsView.bClearLibrary"));
 		bCleanLibrary.addMouseListener(new MouseAdapter() {
@@ -503,22 +506,22 @@ public class GeneralOptionsView extends JPanel {
 		});
 		builder.add(bCleanLibrary, cc.xy(9, 3));
 
-		builder.addLabel(Messages.getString("ML.GeneralOptionsView.lPictures"), cc.xy(2, 4));
+		// builder.addLabel(Messages.getString("ML.GeneralOptionsView.lPictures"), cc.xy(2, 4));
 		this.lPicturesCount = new JLabel(String.valueOf(this.libraryManager.getPictureCount()));
-		builder.add(this.lPicturesCount, cc.xy(4, 4));
+		// builder.add(this.lPicturesCount, cc.xy(4, 4));
 		this.bClearPictures = new JButton(Messages.getString("ML.GeneralOptionsView.bClear"));
 		this.bClearPictures.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				switch (JOptionPane.showConfirmDialog(bClearPictures.getTopLevelAncestor(), Messages.getString("ML.GeneralOptionsView.DeleteAllPicturesMsg"))) {
 					case JOptionPane.YES_OPTION:
-						libraryManager.clearAudio();
+						libraryManager.clearPictures();
 						break;
 				}
 			}
 
 		});
-		builder.add(this.bClearPictures, cc.xy(6, 4));
+		// builder.add(this.bClearPictures, cc.xy(6, 4));
 
 		return builder.getPanel();
 	}
@@ -546,7 +549,7 @@ public class GeneralOptionsView extends JPanel {
 		}
 	}
 
-	private void updateOmitPrefixesConfiguration() {
+	private void saveOmitPrefixesConfiguration() {
 		OmitPrefixesConfiguration omitCfg = new OmitPrefixesConfiguration();
 		omitCfg.setFiltering(cbOmitFiltering.isSelected());
 		omitCfg.setSorting(cbOmitSorting.isSelected());

@@ -34,6 +34,10 @@ import net.pms.medialibrary.commons.dataobjects.DOMediaLibraryFolder;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.events.LibraryShowListener;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.NotificationSubscriber;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -52,7 +56,39 @@ public class DLNAViewPanel extends JPanel {
 	*/  
 	public DLNAViewPanel(){
 		super(new GridLayout());
+		initialize();
 		
+		// Register DB reset notifications to update the tree
+		NotificationCenter.getInstance(DBEvent.class).subscribe(new NotificationSubscriber<DBEvent>() {
+			
+			@Override
+			public void onMessage(DBEvent obj) {
+				if(obj.getType() == Type.Reset || cbDisplayItems.isSelected()) {
+					// refresh the tree if a DB reset has been performed or if files are being displayed
+					initializeTree();
+					applyLayout();
+				}
+			}
+		});
+	}
+	
+	private void initialize(){
+		initializeTree();
+		
+		cbDisplayItems = new JCheckBox(Messages.getString("ML.DLNAViewPanel.cbDisplayItems"));
+		cbDisplayItems.setSelected(false);
+		cbDisplayItems.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateDisplayItems();
+			}
+		});
+		
+		applyLayout();		
+	}
+	
+	private void initializeTree() {
 		MediaLibraryStorage mediaLibraryStorage = MediaLibraryStorage.getInstance();
 
 		// create the tree structure from stored folders
@@ -69,19 +105,19 @@ public class DLNAViewPanel extends JPanel {
 				}
 			}
 		});
+	}
 
-		cbDisplayItems = new JCheckBox(Messages.getString("ML.DLNAViewPanel.cbDisplayItems"));
-		cbDisplayItems.setSelected(false);
-		cbDisplayItems.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				updateDisplayItems();
-			}
-		});
-		
-		
-		
+	public void setLibraryShowListener(LibraryShowListener libraryShowListener){
+		this.libraryShowListener = libraryShowListener;
+	}
+	
+	private void updateDisplayItems(){
+		setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		tree.setDisplayItems(cbDisplayItems.isSelected());
+		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	}
+	
+	private void applyLayout(){
 		PanelBuilder builder;
 		CellConstraints cc = new CellConstraints();
 
@@ -94,17 +130,7 @@ public class DLNAViewPanel extends JPanel {
         JScrollPane treeViewScrollPane = new JScrollPane(tree); 
 		builder.add(treeViewScrollPane, cc.xy(1, 3));
 		
+		removeAll();
 		add(builder.getPanel());
 	}
-	
-	public void setLibraryShowListener(LibraryShowListener libraryShowListener){
-		this.libraryShowListener = libraryShowListener;
-	}
-	
-	private void updateDisplayItems(){
-		setCursor(new Cursor(Cursor.WAIT_CURSOR));
-		tree.setDisplayItems(cbDisplayItems.isSelected());
-		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-	}
-	
 }

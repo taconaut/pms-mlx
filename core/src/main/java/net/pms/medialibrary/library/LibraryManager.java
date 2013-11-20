@@ -32,6 +32,9 @@ import net.pms.medialibrary.commons.interfaces.ILibraryManagerEventListener;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.scanner.FileScanner;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 
 public class LibraryManager implements ILibraryManager {
 	
@@ -69,6 +72,9 @@ public class LibraryManager implements ILibraryManager {
 		for(ILibraryManagerEventListener l : this.libraryManagerEventListeners){
 			l.itemCountChanged(getAudioCount(), FileType.AUDIO);
 		}
+
+		// Notify a DB clear audio event
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.ClearAudio));
 	}
 
 	@Override
@@ -77,6 +83,9 @@ public class LibraryManager implements ILibraryManager {
 		for(ILibraryManagerEventListener l : this.libraryManagerEventListeners){
 			l.itemCountChanged(getPictureCount(), FileType.PICTURES);
 		}
+		
+		// Notify a DB clear pictures event
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.ClearPictures));
 	}
 
 	@Override
@@ -87,6 +96,9 @@ public class LibraryManager implements ILibraryManager {
 			l.itemCountChanged(getAudioCount(), FileType.AUDIO);
 			l.itemCountChanged(getPictureCount(), FileType.PICTURES);
 		}
+
+		// Notify a DB reset event after having cleared the data
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.Reset));
 	}
 
 	@Override
@@ -96,6 +108,8 @@ public class LibraryManager implements ILibraryManager {
 			l.itemCountChanged(getVideoCount(), FileType.VIDEO);
 		}
 		
+		// Notify a DB clear video event
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.ClearVideo));		
 	}
 
 	@Override

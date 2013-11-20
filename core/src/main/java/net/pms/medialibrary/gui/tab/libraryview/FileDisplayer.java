@@ -48,6 +48,9 @@ import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.SortOption;
 import net.pms.medialibrary.gui.shared.FilterEditor;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.NotificationSubscriber;
+import net.pms.notifications.types.DBEvent;
 
 public class FileDisplayer extends JPanel {
 	private static final long serialVersionUID = -1722661396066035647L;
@@ -63,10 +66,23 @@ public class FileDisplayer extends JPanel {
 	private FilterEditor filterEditor;
 	private FileDisplayTable tFiles;
 	
+	private boolean isFilterApplied;
+	
 	public FileDisplayer(FileType fileType) {
 		super(new GridLayout(1, 1));
 		this.fileType = fileType;
 		init();
+		
+		// Subscribe to DB reset events in order to update the displayed files
+		NotificationCenter.getInstance(DBEvent.class).subscribe(new NotificationSubscriber<DBEvent>() {
+			
+			@Override
+			public void onMessage(DBEvent obj) {
+				if(isFilterApplied) {
+					applyFilter();
+				}
+			}
+		});
 	}
 	
 	private void init(){
@@ -159,6 +175,8 @@ public class FileDisplayer extends JPanel {
 //		}
 		tFiles.setContent(files);
 
+		isFilterApplied = true;
+		
 		setCursor(previousCursor);
 	}
 	
