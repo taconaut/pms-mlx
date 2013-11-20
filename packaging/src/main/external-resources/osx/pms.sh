@@ -23,7 +23,7 @@ JAVA_HOME="$APPLICATION_DIR/Contents/PlugIns/$JRE_DIR/Contents/Home"
 export JAVA_HOME
 
 # Setup the classpath
-PMS_JARS="$JAR_DIR/pms.jar:$JAR_DIR/lib/*"
+PMS_JARS="$JAR_DIR/pms-core.jar:$JAR_DIR/lib/*"
 
 PMS_HOME="$APPLICATION_DIR/Contents/Resources/Java"
 export PMS_HOME
