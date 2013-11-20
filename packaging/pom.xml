@@ -81,7 +81,7 @@
 		-->
 		<izpack.version>5.0.0-rc1-SNAPSHOT</izpack.version>
 		<izpack.staging>${project.build.directory}/staging</izpack.staging>
-		<izpack.installer.app>${project.build.directory}/${project.name} Setup.app</izpack.installer.app>
+		<izpack.installer.app>${project.build.directory}/${project.core.name} Setup.app</izpack.installer.app>
 
 		<nsis-maven-plugin-version>1.0-SNAPSHOT</nsis-maven-plugin-version>
 		<maven-assembly-plugin-version>2.4</maven-assembly-plugin-version>
@@ -830,12 +830,12 @@
 											compression="gzip"
 											longfile="gnu">
 											<tarfileset dir="${izpack.installer.app}"
-												prefix="${project.name} Setup.app"
+												prefix="${project.core.name} Setup.app"
 												excludes="**/java,**/installer.sh" />
 
 											<!-- "java" and "installer.sh" need to be executable -->
 											<tarfileset dir="${izpack.installer.app}"
-												prefix="${project.name} Setup.app"
+												prefix="${project.core.name} Setup.app"
 												includes="**/java,**/installer.sh"
 												filemode="755" />
 										</tar>

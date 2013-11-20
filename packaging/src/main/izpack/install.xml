@@ -11,10 +11,10 @@
 	-->
 
 	<info>
-		<appname>${project.name}</appname>
+		<appname>${project.core.name}</appname>
 		<appversion>${project.version}</appversion>
 		<url>${project.url}</url>
-		<uninstaller name="remove.task" path="${INSTALL_PATH}/${project.name}.app/Uninstall" write="yes" />
+		<uninstaller name="remove.task" path="${INSTALL_PATH}/${project.core.name}.app/Uninstall" write="yes" />
 		<javaversion>1.7</javaversion>
 		<requiresjdk>no</requiresjdk>
 	</info>
@@ -88,28 +88,28 @@
 			<!-- Constructing Mac OS X application bundle structure for now -->
 
 			<!-- TODO: Fix pms-core.jar -> pms.jar -->
-            <fileset dir="" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+            <fileset dir="" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<include name="lib/*" />
             	<exclude name="lib/pms-core.jar" />
             	<os family="mac" />
             </fileset>
 
-			<file src="lib/pms-core.jar"  targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+			<file src="lib/pms-core.jar"  targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<os family="mac" />
 			</file>
 
-            <fileset dir="${project.root.basedir}" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+            <fileset dir="${project.root.basedir}" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
 				<include name="*.md" />
 				<include name="*.txt" />
             	<os family="mac" />
             </fileset>
 
-            <fileset dir="${project.external-resources.directory}/osx" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+            <fileset dir="${project.external-resources.directory}/osx" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
 				<include name="fonts/**" />
             	<os family="mac" />
             </fileset>
 
-            <fileset dir="${project.core.external-resources.directory}" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+            <fileset dir="${project.core.external-resources.directory}" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
 				<include name="documentation/**" />
 				<include name="logback.xml" />
 				<include name="plugins/**" />
@@ -118,37 +118,37 @@
             	<os family="mac" />
             </fileset>
 
-			<file src="osx/Info.plist" targetdir="$INSTALL_PATH/${project.name}.app/Contents">
+			<file src="osx/Info.plist" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents">
             	<os family="mac" />
 			</file>
 
-			<file src="osx/pms.icns" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources">
+			<file src="osx/pms.icns" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources">
             	<os family="mac" />
 			</file>
 
-            <fileset dir="osx" targetdir="$INSTALL_PATH/${project.name}.app/Contents/MacOS">
+            <fileset dir="osx" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/MacOS">
 				<include name="copy-installer-jre.sh" />
 				<include name="pms.sh" />
             	<os family="mac" />
 			</fileset>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/MacOS/pms.sh" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/MacOS/pms.sh" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/MacOS/copy-installer-jre.sh" stage="postinstall" keep="false">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/MacOS/copy-installer-jre.sh" stage="postinstall" keep="false">
 				<args>
 					<arg value="$JAVA_HOME" />
 				</args>
 				<os family="mac" />
 			</executable>
 
-			<file src="${project.build.directory}/bin/osx/libmediainfo.dylib" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+			<file src="${project.build.directory}/bin/osx/libmediainfo.dylib" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<os family="mac" />
 			</file>
 			
 			<!-- Include default images used as icons on renderer -->
-			<fileset dir="${project.basedir}/src/main" targetdir="$INSTALL_PATH/${project.name}.app/Contents/MacOS">
+			<fileset dir="${project.basedir}/src/main" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/MacOS">
 					<include name="resources/**" />
 	            	<os family="mac" />
 			</fileset>
@@ -158,7 +158,7 @@
             <description>Third party binaries necessary for PMS to function properly.</description>
 
 			<!-- Mac OS X binaries -->
-            <fileset dir="${project.build.directory}/bin/osx" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx">
+            <fileset dir="${project.build.directory}/bin/osx" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx">
             	<include name="dcraw" />
             	<include name="ffmpeg" />
             	<include name="flac" />
@@ -168,27 +168,27 @@
             	<os family="mac" />
             </fileset>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/dcraw" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/dcraw" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/ffmpeg" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/ffmpeg" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/flac" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/flac" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/mencoder" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/mencoder" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/mplayer" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/mplayer" stage="never">
 				<os family="mac" />
 			</executable>
 
-			<executable targetfile="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java/osx/tsMuxeR" stage="never">
+			<executable targetfile="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java/osx/tsMuxeR" stage="never">
 				<os family="mac" />
 			</executable>
         </pack>
@@ -196,7 +196,7 @@
          <pack name="Configuration" required="no">
             <description>Standard configuration files for PMS.</description>
 
-			<file src="${external-resources.directory}/PMS.conf" targetdir="$INSTALL_PATH/${project.name}.app/Contents/Resources/Java">
+			<file src="${external-resources.directory}/PMS.conf" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<os family="mac" />
 			</file>
 		</pack>
