@@ -184,6 +184,9 @@ public class ManagedFoldersPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				DOManagedFile mf = new DOManagedFile();
 				mf.setFileImportTemplate(storage.getFileImportTemplate(1));
+				mf.setSubFoldersEnabled(true);
+				mf.setVideoEnabled(true);
+				
 				addManagedFolder(mf);
 				applyLayout();
 			}
@@ -211,6 +214,7 @@ public class ManagedFoldersPanel extends JPanel {
 		// show folders if there are any
 		JPanel pManagedFolders;
 		if (managedFolders.size() > 0) {
+			// TODO: uncomment audio and picture items once implemented
 			//create labels with tooltips
 			JLabel lSubFolders = new JLabel(new ImageIcon(getClass().getResource("/resources/images/subfolders-16.png")));
 			lSubFolders.setToolTipText(Messages.getString("ML.ManagedFoldersPanel.lSubfolders"));
@@ -225,8 +229,8 @@ public class ManagedFoldersPanel extends JPanel {
 			builder2.add(lSubFolders, cc.xy(1, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
 			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lFolderPath"), cc.xy(3, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
 			builder2.add(lVideo, cc.xy(9, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			builder2.add(lAudio, cc.xy(11, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			builder2.add(lPictures, cc.xy(13, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			// builder2.add(lAudio, cc.xy(11, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			// builder2.add(lPictures, cc.xy(13, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
 			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lPlugins"), cc.xyw(15, 1, 3, CellConstraints.CENTER, CellConstraints.DEFAULT));
 
 			int rowIndex = 2;
@@ -237,8 +241,8 @@ public class ManagedFoldersPanel extends JPanel {
 				builder2.add(f.getbBrowse(), cc.xy(5, rowIndex));
 				builder2.add(f.getbDelete(), cc.xy(7, rowIndex));
 				builder2.add(f.getCbVideo(), cc.xy(9, rowIndex));
-				builder2.add(f.getCbAudio(), cc.xy(11, rowIndex));
-				builder2.add(f.getCbPictures(), cc.xy(13, rowIndex));
+				// builder2.add(f.getCbAudio(), cc.xy(11, rowIndex));
+				// builder2.add(f.getCbPictures(), cc.xy(13, rowIndex));
 				builder2.add(f.getCbEnablePlugins(), cc.xy(15, rowIndex));
 				builder2.add(f.getbConfigureFileImportTemplate(), cc.xy(17, rowIndex));
 				builder2.add(f.getbScan(), cc.xy(19, rowIndex));

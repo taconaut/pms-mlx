@@ -147,13 +147,14 @@ public class ScanFolderDialog extends JDialog {
 				Messages.getString("ML.ScanFolderDialog.cbScanVideo"), true);
 		pFileTypes.add(cbScanVideo);
 
+		// TODO: uncomment once pictures and audio have been integrated
 		cbScanAudio = new JCheckBox(
-				Messages.getString("ML.ScanFolderDialog.cbScanAudio"), true);
-		pFileTypes.add(cbScanAudio);
+				Messages.getString("ML.ScanFolderDialog.cbScanAudio"), false);
+		// pFileTypes.add(cbScanAudio);
 
 		cbScanPictures = new JCheckBox(
-				Messages.getString("ML.ScanFolderDialog.cbScanPictures"), true);
-		pFileTypes.add(cbScanPictures);
+				Messages.getString("ML.ScanFolderDialog.cbScanPictures"), false);
+		// pFileTypes.add(cbScanPictures);
 
 		builder.add(pFileTypes,
 				cc.xy(4, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
