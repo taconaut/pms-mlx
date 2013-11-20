@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -363,13 +365,7 @@ public class GeneralOptionsView extends JPanel {
 		tfOmitPrefix.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				OmitPrefixesConfiguration omitCfg = new OmitPrefixesConfiguration();
-				omitCfg.setFiltering(cbOmitFiltering.isSelected());
-				omitCfg.setSorting(cbOmitSorting.isSelected());
-				omitCfg.setPrefixes(Arrays.asList(tfOmitPrefix.getText().trim().split(" ")));
-				
-				// Save the configuration
-				libConfig.setOmitPrefixesConfiguration(omitCfg);
+				updateOmitPrefixesConfiguration();
 			}
 		});
 		builder.add(tfOmitPrefix, cc.xyw(3, 3, 3));
@@ -377,9 +373,23 @@ public class GeneralOptionsView extends JPanel {
 		builder.addLabel(Messages.getString("ML.General.OmitPrefixes.When"), cc.xy(7, 3));
 
 		cbOmitSorting = new JCheckBox(Messages.getString("ML.General.OmitPrefixes.Sort"));
+		cbOmitSorting.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				updateOmitPrefixesConfiguration();
+			}
+		});
 		builder.add(cbOmitSorting, cc.xy(9, 3));
 
 		cbOmitFiltering = new JCheckBox(Messages.getString("ML.General.OmitPrefixes.Filter"));
+		cbOmitFiltering.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				updateOmitPrefixesConfiguration();
+			}
+		});
 		builder.add(cbOmitFiltering, cc.xy(11, 3));
 
 		//set initial values
@@ -534,5 +544,15 @@ public class GeneralOptionsView extends JPanel {
 			this.bStartPauseScan.setVisible(false);
 			this.bStopScan.setVisible(false);
 		}
+	}
+
+	private void updateOmitPrefixesConfiguration() {
+		OmitPrefixesConfiguration omitCfg = new OmitPrefixesConfiguration();
+		omitCfg.setFiltering(cbOmitFiltering.isSelected());
+		omitCfg.setSorting(cbOmitSorting.isSelected());
+		omitCfg.setPrefixes(Arrays.asList(tfOmitPrefix.getText().trim().split(" ")));
+		
+		// Save the configuration
+		libConfig.setOmitPrefixesConfiguration(omitCfg);
 	}
 }
