@@ -29,6 +29,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -320,13 +322,14 @@ public class GeneralTab {
 
 		builder.addLabel(Messages.getString("NetworkTab.36"), FormLayoutUtil.flip(cc.xy(1, 39), colSpec, orientation));
 		
-		ArrayList<RendererConfiguration> allConfs = RendererConfiguration.getAllRendererConfigurations();
+		ArrayList<RendererConfiguration> allConfs = RendererConfiguration.getAllRendererConfigurations();		
 		ArrayList<Object> keyValues = new ArrayList<Object>();
 		ArrayList<Object> nameValues = new ArrayList<Object>();
 		keyValues.add("");
 		nameValues.add(Messages.getString("NetworkTab.37"));
 
 		if (allConfs != null) {
+			sortRendererConfiurationsByName(allConfs);			
 			for (RendererConfiguration renderer : allConfs) {
 				if (renderer != null) {
 					keyValues.add(renderer.getRendererName());
@@ -385,6 +388,7 @@ public class GeneralTab {
 		nameValues.add(Messages.getString("NetworkTab.37"));
 		
 		if (allConfs != null) {
+			sortRendererConfiurationsByName(allConfs);
 			for (RendererConfiguration renderer : allConfs) {
 				if (renderer != null) {
 					keyValues.add(renderer.getRendererName());
@@ -411,6 +415,28 @@ public class GeneralTab {
 					logger.info("Setting renderer default: \"" + renderersKcbm.getSelectedKey() + "\"");
 					configuration.setRendererDefault((String) renderersKcbm.getSelectedKey());
 				}
+			}
+		});
+	}
+	
+	private void sortRendererConfiurationsByName(ArrayList<RendererConfiguration> rendererConfigurations){
+		Collections.sort(rendererConfigurations , new Comparator<RendererConfiguration>() {
+
+			@Override
+			public int compare(RendererConfiguration o1, RendererConfiguration o2) {
+				if(o1 == null && o2 == null){
+					return 0;
+				}
+				
+				if(o1 == null) {
+					return 1;
+				}
+				
+				if(o2 == null) {
+					return -1;
+				}
+				
+				return o1.getRendererName().toLowerCase().compareTo(o2.getRendererName().toLowerCase());
 			}
 		});
 	}
