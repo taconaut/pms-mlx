@@ -538,7 +538,7 @@
 								<id>build-pms-setup-full-x86-exe-windows</id>
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
-									<outputFile>${project.build.directory}/pms-${project.version}-setup-full-x86.exe</outputFile>
+									<outputFile>${project.build.directory}/pms-${project.version}-setup-windows-full-x86.exe</outputFile>
 									<setupScript>${project.external-resources.directory}/nsis/setup-x86.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
@@ -552,7 +552,7 @@
 								<id>build-pms-setup-full-x64-exe-windows</id>
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
-									<outputFile>${project.build.directory}/pms-${project.version}-setup-full-x64.exe</outputFile>
+									<outputFile>${project.build.directory}/pms-${project.version}-setup-windows-full-x64.exe</outputFile>
 									<setupScript>${project.external-resources.directory}/nsis/setup-x64.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
@@ -566,7 +566,7 @@
 								<id>build-pms-setup-without-jre-exe-windows</id>
 								<configuration>
 									<makensisBin>${makensis-bin}</makensisBin>
-									<outputFile>${project.build.directory}/pms-${project.version}-setup-without-jre.exe</outputFile>
+									<outputFile>${project.build.directory}/pms-${project.version}-setup-windows-without-jre.exe</outputFile>
 									<setupScript>${project.external-resources.directory}/nsis/setup-without-jre.nsi</setupScript>
 								</configuration>
 								<phase>package</phase>
@@ -606,7 +606,7 @@
 						<filtering>false</filtering>
 					</resource>
 				</resources>
-				
+
 				<plugins>
 					<!-- Assemble the PMS tar.gz archive distribution file. -->
 					<plugin>
@@ -619,8 +619,8 @@
 									<goal>single</goal>
 								</goals>
 								<configuration>
-									<finalName>pms-${project.version}-generic-linux-unix.tar.gz</finalName>
-                  <appendAssemblyId>false</appendAssemblyId>
+									<finalName>pms-${project.version}-generic-linux-unix</finalName>
+									<appendAssemblyId>false</appendAssemblyId>
 									<descriptors>
 										<descriptor>${project.basedir}/src/main/assembly/assembly-linux.xml</descriptor>
 									</descriptors>
