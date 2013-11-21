@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-plugins</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<name>PMS Plugins</name>
 	<description>Contains all officially supported plugins</description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms</artifactId>
-		<version>1.90.2-mlx_0.9</version>
+		<version>1.90.2-mlx_1.0-SNAPSHOT</version>
 	</parent>
 
 	<modules>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>github.com.taconaut</groupId>
 			<artifactId>pms-core</artifactId>
-			<version>1.90.2-mlx_0.9</version>
+			<version>1.90.2-mlx_1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
