@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms</artifactId>
-		<version>1.90.2-mlx_0.9-SNAPSHOT</version>
+		<version>1.90.2-mlx_0.9</version>
 	</parent>
 
 	<properties>
@@ -121,7 +121,7 @@
 		<dependency>
 			<groupId>github.com.taconaut</groupId>
 			<artifactId>pms-core</artifactId>
-			<version>1.90.2-mlx_0.9-SNAPSHOT</version>
+			<version>1.90.2-mlx_0.9</version>
 		</dependency>
 
 		<dependency>

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-tmdb-movie-import-plugin</artifactId>
-	<version>4.1-SNAPSHOT</version>
+	<version>4.1</version>
 
 	<name>PMS Tmdb Movie Import Plugin</name>
 	<description>Plugin used to import properties and tags for video files from TMDB</description>

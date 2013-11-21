@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-iphoto-dlna-folder-plugin</artifactId>
-	<version>3.0-SNAPSHOT</version>
+	<version>3.0</version>
 
 	<name>PMS iPhoto DLNA Folder Plugin</name>
 	<description>This plugin will add a folder containing the iPhoto library</description>
