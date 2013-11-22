@@ -53,6 +53,7 @@ import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.notifications.NotificationCenter;
 import net.pms.notifications.types.DBEvent;
 import net.pms.notifications.types.DBEvent.Type;
+import net.pms.notifications.types.ManagedFoldersChangedEvent;
 
 public class MediaLibraryStorage implements IMediaLibraryStorage {		
 	public static final int ROOT_FOLDER_ID = 1;
@@ -845,6 +846,7 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	public void setManagedFolders(List<DOManagedFile> folders){
 		try {
 			dbManagedFolders.setManagedFolders(folders);
+			NotificationCenter.getInstance(ManagedFoldersChangedEvent.class).post(new ManagedFoldersChangedEvent());
 			if(log.isDebugEnabled()) log.debug(String.format("Saved %s managed folders", folders.size()));
 		} catch (StorageException e) {
 			log.error("Storage error (set)", e);

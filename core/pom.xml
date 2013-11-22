@@ -61,6 +61,7 @@
 		<junit-version>4.11</junit-version>
 		<fest-assert-version>1.4</fest-assert-version>
 		<jmte-version>3.0</jmte-version>
+		<jnotify-version>0.94</jnotify-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
@@ -370,6 +371,12 @@
 			<artifactId>jmte</artifactId>
 			<version>${jmte-version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>jnotify</groupId>
+			<artifactId>jnotify</artifactId>
+			<version>${jnotify-version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -557,6 +564,18 @@
 							<packaging>jar</packaging>
 							<downloadUrl>http://sourceforge.net/projects/flib/files/flib/FLib%201.1.1/jcalendar.jar</downloadUrl>
 							<checksum>83eb4b1a4823daf3b5bea61958cf6097930f74fb</checksum>
+						</artifactItem>
+
+						<artifactItem>
+							<groupId>jnotify</groupId>
+							<artifactId>jnotify</artifactId>
+							<version>${jnotify-version}</version>
+							<packaging>jar</packaging>
+							<install>true</install>
+							<force>false</force>
+							<downloadUrl>http://sourceforge.net/projects/jnotify/files/jnotify/jnotify-${jnotify-version}/jnotify-lib-${jnotify-version}.zip</downloadUrl>
+							<checksum>7f81f3429b2fe061f75ed870ca749109</checksum>
+							<extractFile>jnotify-${jnotify-version}.jar</extractFile>
 						</artifactItem>
 
 					</artifactItems>
@@ -837,7 +856,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>copy-mediainfo-windows</id>
+								<id>copy-windows-dll</id>
 								<phase>process-resources</phase>
 								<goals>
 									<goal>run</goal>
@@ -847,6 +866,8 @@
 										<!-- MediaInfo library needs to be in the standard library path to be found -->
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo64.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify_64bit.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>
