@@ -19,6 +19,7 @@ import com.omertron.themoviedbapi.model.MovieDb;
 import com.omertron.themoviedbapi.MovieDbException;
 
 
+import net.pms.PMS;
 import net.pms.medialibrary.commons.enumarations.FileProperty;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.exceptions.FileImportException;
@@ -84,14 +85,14 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 	    try {
 	    	//search for the title
-	        TmdbResultsList<MovieDb> movies = api.searchMovie(title, 0 , null, true, 0);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(title, 0 , PMS.getConfiguration().getLanguage(), true, 0);
 	        int size = movies.getTotalResults();
 	        
 			if (movies != null && size > 0) {
 				//we've found at least one result
 				
 				//use the first one
-				movie = api.getMovieInfo(movies.getResults().get(0).getId(), null, "casts,trailers");
+				movie = api.getMovieInfo(movies.getResults().get(0).getId(), PMS.getConfiguration().getLanguage(), "casts,trailers");
 				
 				//log the results received
 				String moviesStr = String.format("Movie matched for '%s' on TMDb has id=%s, name='%s'", title, movies.getResults().get(0).getId(), movies.getResults().get(0).getTitle());
@@ -157,7 +158,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 		logger.debug("Importing TMDb movie by id=" + id);
 	    try {
-			movie = api.getMovieInfo(tmdbId, null, "casts,trailers");
+			movie = api.getMovieInfo(tmdbId, PMS.getConfiguration().getLanguage(), "casts,trailers");
 			logger.debug("Imported TMDb movie by id=" + id);
         } catch (Throwable t) {
         	throw new FileImportException(String.format("Failed to import movie information for id='%s'", id), t);
