@@ -343,7 +343,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		if(searchObject != null && searchObject instanceof TmdbMovieInfoPluginMovie) {
 			movie = ((TmdbMovieInfoPluginMovie)searchObject).getMovie();
 			try {
-				movie = api.getMovieInfo(movie.getId(), null, "casts,trailers");
+				movie = api.getMovieInfo(movie.getId(), PMS.getConfiguration().getLanguage(), "casts,trailers");
 			} catch (MovieDbException ex){
 			}
 		}
@@ -354,7 +354,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		List<Object> res = null;
 	    try {
 	    	//search for the name
-	        TmdbResultsList<MovieDb> movies = api.searchMovie(name, 0, null, true, 0);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(name, 0, PMS.getConfiguration().getLanguage(), true, 0);
 	        
 	        //create the return list if any movies were found
 			if (movies != null && movies.getTotalResults() > 0) {
