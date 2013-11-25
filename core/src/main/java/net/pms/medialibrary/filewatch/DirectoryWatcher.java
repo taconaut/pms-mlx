@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.contentobjects.jnotify.JNotify;
-import net.contentobjects.jnotify.JNotifyListener;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 import net.pms.notifications.NotificationCenter;
@@ -247,26 +246,5 @@ public class DirectoryWatcher {
 				startWatch(foldersToStartWatch);
 			}
 		}		
-	}
-
-	/**
-	 * Private class handling file and directory change notifications
-	 */
-	private class DirectoryChangeListener implements JNotifyListener {
-		public void fileRenamed(int wd, String rootPath, String oldName, String newName) {
-			if(logger.isDebugEnabled()) logger.debug("renamed " + rootPath + " : " + oldName + " -> " + newName);
-		}
-
-		public void fileModified(int wd, String rootPath, String name) {
-			if(logger.isDebugEnabled()) logger.debug("modified " + rootPath + " : " + name);
-		}
-
-		public void fileDeleted(int wd, String rootPath, String name) {
-			if(logger.isDebugEnabled()) logger.debug("deleted " + rootPath + " : " + name);
-		}
-
-		public void fileCreated(int wd, String rootPath, String name) {
-			if(logger.isDebugEnabled()) logger.debug("created " + rootPath + " : " + name);
-		}
 	}
 }
