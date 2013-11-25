@@ -1,6 +1,15 @@
 Changelog:
 ==========
 
+pms-mlx 1.0 - 2013-??-??
+
+	Plugins:
+		- TMDB file import:
+			- Use language set for pms as import language. The plugin will only import fields having been set for the given language and wont fall back to English anymore.
+
+	Misc:
+		- Re-added french and german language files for media library tab as they had gone missing.
+
 pms-mlx 0.9 - 2013-11-21
 
 	Plugins:
