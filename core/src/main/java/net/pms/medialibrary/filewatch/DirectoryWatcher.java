@@ -18,6 +18,8 @@
  */
 package net.pms.medialibrary.filewatch;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,14 +42,15 @@ public class DirectoryWatcher {
 	private static final Logger logger = LoggerFactory.getLogger(DirectoryWatcher.class);
 	private static DirectoryWatcher instance;
 	
-	private HashMap<String, Integer> watchIdsByWatchedDirectory;
+	private HashMap<DOManagedFile, Integer> watchIdsByWatchDirectory;
 	private ManagedFoldersChangedNotificationSubscriber managedFoldersChangedNotificationSubscriber;
 
 	/**
 	 * Private constructor to use class as a singleton
 	 */
 	private DirectoryWatcher() {
-		watchIdsByWatchedDirectory = new HashMap<String, Integer>();
+		watchIdsByWatchDirectory = new HashMap<DOManagedFile, Integer>();
+		managedFoldersChangedNotificationSubscriber = new ManagedFoldersChangedNotificationSubscriber();
 	}
 
 	/**
@@ -70,10 +73,9 @@ public class DirectoryWatcher {
 	 */
 	public void startWatch() {
 		// Start watching the directories
-		startWatchAll();
+		startWatch(MediaLibraryStorage.getInstance().getManagedFolders());
 		
 		// Subscribe to changes in managed folder configuration
-		managedFoldersChangedNotificationSubscriber = new ManagedFoldersChangedNotificationSubscriber();
 		NotificationCenter.getInstance(ManagedFoldersChangedEvent.class).subscribe(managedFoldersChangedNotificationSubscriber);
 	}
 
@@ -83,68 +85,104 @@ public class DirectoryWatcher {
 	public void stopWatch() {
 		// Unsubscribe to changes in managed folder configuration
 		NotificationCenter.getInstance(ManagedFoldersChangedEvent.class).unsubscribe(managedFoldersChangedNotificationSubscriber);
-		managedFoldersChangedNotificationSubscriber = null;
 		
-		// Stop watching the directories
-		stopWatchAll();
+		// Stop watching all the directories
+		List<String> allWatchedDirectoryPaths = new ArrayList<String>();
+		for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
+			allWatchedDirectoryPaths.add(managedFolder.getPath());
+		}
+		stopWatch(allWatchedDirectoryPaths);
 	}
 
 	/**
 	 * Starts watching all managed folders configured for watch.
 	 */
-	private void startWatchAll() {
+	private void startWatch(List<DOManagedFile> managedFolders) {
 		int mask = JNotify.FILE_CREATED 
 				| JNotify.FILE_DELETED
 				| JNotify.FILE_MODIFIED 
 				| JNotify.FILE_RENAMED;
 
-		List<DOManagedFile> managedFolders = MediaLibraryStorage.getInstance().getManagedFolders();
 		int nbFolders = 0;
 		for (DOManagedFile managedFolder : managedFolders) {
+			File directoryFile = new File(managedFolder.getPath());
+			if(!directoryFile.exists()) {
+				logger.warn(String.format("The directory '%s' does not exist. It won't be watched.", managedFolder.getPath()));
+				continue;
+			}
+			if(!directoryFile.isDirectory()) {
+				logger.warn(String.format("The path '%s' is not a directory. It won't be watched.", managedFolder.getPath()));
+				continue;
+			}
+			
 			if(managedFolder.isWatchEnabled()) {
 				try {
 					String directoryToWatch = managedFolder.getPath();
 					boolean watchSubFolders = managedFolder.isSubFoldersEnabled();
 					
 					int watchId = JNotify.addWatch(directoryToWatch, mask, watchSubFolders, new DirectoryChangeListener());
-					watchIdsByWatchedDirectory.put(directoryToWatch, watchId);					
+					watchIdsByWatchDirectory.put(managedFolder, watchId);					
 					nbFolders++;
 					
-					if(logger.isDebugEnabled()) logger.debug(String.format("Started watching folder='%s'. Watch subfolders=%s", directoryToWatch, watchSubFolders));
+					if(logger.isDebugEnabled()) logger.debug(String.format("Started watching directory='%s'. Watch subfolders=%s", directoryToWatch, watchSubFolders));
 				} catch (Throwable t) {
-					logger.error(String.format("Failed to start watching directory %s", managedFolder.getPath()), t);
+					logger.error(String.format("Failed to start watching directory '%s'", managedFolder.getPath()), t);
 				}
 			}
 		}
 		
-		logger.info(String.format("Started watching %s folders", nbFolders));
+		logger.info(String.format("Started watching %s directories", nbFolders));
 	}
 	
 	/**
 	 * Stops watching all folders currently being watched.
 	 */
-	private void stopWatchAll() {
-		if(watchIdsByWatchedDirectory.size() == 0){
+	private void stopWatch(List<String> managedFolderPaths) {
+		if(watchIdsByWatchDirectory.size() == 0){
 			// No folders are currently being watched, return!
 			return;
 		}
 		
 		int nbFolders = 0;
-		for(String folderPath : watchIdsByWatchedDirectory.keySet()) {
-			int watchId = watchIdsByWatchedDirectory.get(folderPath);
+		for(String managedFolderPath : managedFolderPaths) {
+			int watchId = -1;
+			boolean managedFolderFound = false;
+			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
+				if(managedFolder.getPath().equals(managedFolderPath)) {
+					watchId = watchIdsByWatchDirectory.get(managedFolder);
+					managedFolderFound = true;
+				}
+			}
+			
+			if(!managedFolderFound) {
+				logger.warn("Failed to stop watch on folder '%s' because it couldn't be found in the list of currently watched folders");
+				continue;
+			}
+			
 			try {
 				JNotify.removeWatch(watchId);
 				nbFolders++;
 				
-				if(logger.isDebugEnabled()) logger.debug(String.format("Stopped watching folder='%s'", folderPath));
+				if(logger.isDebugEnabled()) logger.debug(String.format("Stopped watching directory='%s'", managedFolderPath));
 			} catch (Throwable t) {
-				logger.error(String.format("Failed to stop watching directory %s", folderPath), t);
+				logger.error(String.format("Failed to stop watching directory '%s'", managedFolderPath), t);
 			}
 		}
 
-		watchIdsByWatchedDirectory.clear();
+		for(String managedFolderPath : managedFolderPaths) {
+			DOManagedFile managedFolderToRemove = null;
+			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
+				if(managedFolder.getPath().equals(managedFolderPath)) {
+					managedFolderToRemove = managedFolder;
+				}
+			}
+			
+			if(managedFolderToRemove != null) {
+				watchIdsByWatchDirectory.remove(managedFolderToRemove);
+			}
+		}
 		
-		logger.info(String.format("Stopped watching %s folders", nbFolders));
+		logger.info(String.format("Stopped watching %s directories", nbFolders));
 	}
 	
 	/**
@@ -155,8 +193,59 @@ public class DirectoryWatcher {
 
 		@Override
 		public void onMessage(ManagedFoldersChangedEvent obj) {
-			stopWatchAll();
-			startWatchAll();
+			List<DOManagedFile> configuredManagedFolders = MediaLibraryStorage.getInstance().getManagedFolders();
+
+			// Determine the folders for which watching has to be started. 
+			// These are either newly added folders or folders where the sub-directory property has changed
+			ArrayList<DOManagedFile> foldersToStartWatch = new ArrayList<DOManagedFile>();			
+			for(DOManagedFile configuredManagedFolder : configuredManagedFolders){
+				if(configuredManagedFolder.isWatchEnabled()) {
+					boolean folderFound = false;
+					for(DOManagedFile watchedManagedFolder : watchIdsByWatchDirectory.keySet()){
+						if(configuredManagedFolder.getPath().equals(watchedManagedFolder.getPath())) {
+							if(configuredManagedFolder.isSubFoldersEnabled() != watchedManagedFolder.isSubFoldersEnabled() ||
+									configuredManagedFolder.isWatchEnabled() != watchedManagedFolder.isWatchEnabled()) {
+								foldersToStartWatch.add(configuredManagedFolder);							
+							}
+							folderFound = true;
+							break;
+						}
+					}
+					
+					if(!folderFound) {
+						foldersToStartWatch.add(configuredManagedFolder);
+					}
+				}
+			}
+
+			// Determine the folders for which watching has to be stopped. 
+			// These are either removed folders or folders where the sub-directory property has changed
+			ArrayList<String> foldersToStopWatch = new ArrayList<String>();
+			for(DOManagedFile watchedManagedFolder : watchIdsByWatchDirectory.keySet()){
+				boolean folderFound = false;
+				for(DOManagedFile configuredManagedFolder : configuredManagedFolders) {
+					if(configuredManagedFolder.getPath().equals(watchedManagedFolder.getPath())) {
+						if(configuredManagedFolder.isSubFoldersEnabled() != watchedManagedFolder.isSubFoldersEnabled() ||
+								configuredManagedFolder.isWatchEnabled() != watchedManagedFolder.isWatchEnabled()) {
+							foldersToStopWatch.add(configuredManagedFolder.getPath());
+						}
+						folderFound = true;
+						break;
+					}
+				}
+				
+				if(!folderFound) {
+					foldersToStopWatch.add(watchedManagedFolder.getPath());
+				}
+			}
+			
+			if(foldersToStopWatch.size() > 0) {
+				stopWatch(foldersToStopWatch);
+			}
+			
+			if(foldersToStartWatch.size() > 0) {
+				startWatch(foldersToStartWatch);
+			}
 		}		
 	}
 
