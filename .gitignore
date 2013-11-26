@@ -13,6 +13,7 @@ contrib/ffmpeg/build/
 database/
 debug.log
 libmediainfo.dylib
+libjnotify.jnilib
 maven-eclipse.xml
 pms.iml
 target/

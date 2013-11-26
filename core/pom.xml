@@ -982,7 +982,10 @@
 										</untar>
 										
 										<!-- Make all downloaded binaries executable -->
-										<chmod dir="${external-resources.transcode-tools.directory}/osx" perm="a+x" includes="*" excludes="libmediainfo.dylib" />
+										<chmod dir="${external-resources.transcode-tools.directory}/osx" perm="a+x" includes="*" excludes="libmediainfo.dylib,libjnotify.jnilib" />
+										
+										<!-- Copy the jnotify library file to the standard library path -->
+										<copy file="${external-resources.transcode-tools.directory}/osx/libjnotify.jnilib" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>

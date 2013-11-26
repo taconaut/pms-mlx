@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.medialibrary.commons.dataobjects.DOAudioFileInfo;
+import net.pms.medialibrary.commons.dataobjects.DOCondition;
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOFilter;
@@ -43,7 +44,9 @@ import net.pms.medialibrary.commons.dataobjects.DOQuickTagEntry;
 import net.pms.medialibrary.commons.dataobjects.DOTableColumnConfiguration;
 import net.pms.medialibrary.commons.dataobjects.DOTemplate;
 import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
+import net.pms.medialibrary.commons.enumarations.ConditionOperator;
 import net.pms.medialibrary.commons.enumarations.ConditionType;
+import net.pms.medialibrary.commons.enumarations.ConditionValueType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.SortOption;
 import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
@@ -504,12 +507,43 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 
 	@Override
 	public void deleteFileInfoByFilePath(String filePath) {
-		try {
-			dbFileInfo.deleteFileInfoByFilePath(filePath);
-			if(log.isInfoEnabled()) log.info(String.format("Deleted file %s from library", filePath));
-		} catch (StorageException e) {
-			log.error("Storage error (delete)", e);
+		
+		// Get the file info
+		int pos = filePath.lastIndexOf(File.separatorChar) + 1;
+		String folderPath = filePath.substring(0, pos);
+		String fileName = filePath.substring(pos);
+		ArrayList<DOCondition> conditions = new ArrayList<DOCondition>();
+		conditions.add(new DOCondition(ConditionType.FILE_FOLDERPATH, ConditionOperator.IS, folderPath, "c1", ConditionValueType.STRING, null, null));
+		conditions.add(new DOCondition(ConditionType.FILE_FILENAME, ConditionOperator.IS, fileName, "c2", ConditionValueType.STRING, null, null));
+		DOFilter filter = new DOFilter("c1 AND c2", conditions);
+		
+		List<DOFileInfo> fileInfos = getFileInfo(filter, true, ConditionType.FILE_FILENAME, 1, SortOption.FileProperty);
+		if(fileInfos == null || fileInfos.size() == 0) {
+			log.warn(String.format("Failed to delete file '%s' because no file could be found in the library for this path.", filePath));
+			return;
 		}
+		
+		// Call the delete method according to the type
+		DOFileInfo fileInfo = fileInfos.get(0);
+		switch (fileInfo.getType()) {
+		case AUDIO:
+			// TODO: implement
+			break;
+			
+		case PICTURES:
+			// TODO: implement
+			break;
+			
+		case VIDEO:
+			deleteVideo(fileInfo.getId());
+			break;
+
+		default:
+			log.warn("Unexpected file type received. Type=" + fileInfo.getType());
+			break;
+		}
+		
+		if(log.isInfoEnabled()) log.info(String.format("Deleted file %s from library", filePath));
 	}
 
 	@Override

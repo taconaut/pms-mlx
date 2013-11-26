@@ -146,6 +146,10 @@
 			<file src="${project.build.directory}/bin/osx/libmediainfo.dylib" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<os family="mac" />
 			</file>
+
+			<file src="${project.build.directory}/bin/osx/libjnotify.jnilib" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
+            	<os family="mac" />
+			</file>
 			
 			<!-- Include default images used as icons on renderer -->
 			<fileset dir="${project.basedir}/src/main" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/MacOS">
