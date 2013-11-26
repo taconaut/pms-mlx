@@ -68,7 +68,6 @@
 		<!-- External files properties -->
 		<external-resources.directory>${project.basedir}/src/main/external-resources</external-resources.directory>
 		<external-resources.transcode-tools.directory>${external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
-		<transcode-tools.download.url>http://downloads.sourceforge.net/project/ps3mediaserver/transcode-tools</transcode-tools.download.url>
 		<target.transcode-tools.directory>${project.build.directory}/bin</target.transcode-tools.directory>
 	</properties>
 
@@ -863,7 +862,7 @@
 								</goals>
 								<configuration>
 									<target>
-										<!-- MediaInfo library needs to be in the standard library path to be found -->
+										<!-- MediaInfo and jnotify libraries need to be in the standard library path to be found -->
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo64.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify.dll" todir="${project.basedir}" overwrite="true" verbose="true" />

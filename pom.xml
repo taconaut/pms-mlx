@@ -169,9 +169,10 @@
 		<l10n-maven-plugin-version>1.0-alpha-2</l10n-maven-plugin-version>
 		
 		<!-- Transcode tools are being used by core (when debugging) and for packaging  -->
+		<transcode-tools.download.url>http://downloads.sourceforge.net/project/pms-mlx/transcode-tools</transcode-tools.download.url>
 		<transcode-tools.linux.filename>transcode-tools-linux-20130701.tar.gz</transcode-tools.linux.filename>
 		<transcode-tools.macosx.filename>transcode-tools-osx-20131106.tar.gz</transcode-tools.macosx.filename>
-		<transcode-tools.windows.x86.filename>transcode-tools-win32-20131116.tar.gz</transcode-tools.windows.x86.filename>
+		<transcode-tools.windows.x86.filename>transcode-tools-win32-20131126.tar.gz</transcode-tools.windows.x86.filename>
 	</properties>
 
 	<build>
