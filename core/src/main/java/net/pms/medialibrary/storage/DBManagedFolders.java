@@ -61,7 +61,7 @@ public class DBManagedFolders extends DBBase {
 				f.setPicturesEnabled(rs.getBoolean(5));
 				f.setSubFoldersEnabled(rs.getBoolean(6));
 				f.setFileImportTemplate(MediaLibraryStorage.getInstance().getFileImportTemplate(rs.getInt(7)));
-				f.setFileImportEnabled(rs.getBoolean(8));
+				f.setPluginImportEnabled(rs.getBoolean(8));
 				
 				res.add(f);
 			}
@@ -100,7 +100,7 @@ public class DBManagedFolders extends DBBase {
 	        	stmt.setBoolean(5, f.isPicturesEnabled());
 	        	stmt.setBoolean(6, f.isSubFoldersEnabled());
 	        	stmt.setInt(7, f.getFileImportTemplate().getId());
-	        	stmt.setBoolean(8, f.isFileImportEnabled());
+	        	stmt.setBoolean(8, f.isPluginImportEnabled());
 	        	stmt.executeUpdate();	
 			}
 			

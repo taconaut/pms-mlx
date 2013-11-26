@@ -560,6 +560,16 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 		}
 		return res;
 	}
+
+	@Override
+	public void updateFilePath(String folderPath, String oldFileName, String newFileName) {
+		try {
+			dbFileInfo.updateFileName(folderPath, oldFileName, newFileName);
+			log.debug(String.format("Updated file name from %s to %s in folder '%s'", oldFileName, newFileName, folderPath));
+		} catch (StorageException e) {
+			log.error("Storage error (update)", e);
+		}
+	}
 	
 	/*********************************************
 	 * 

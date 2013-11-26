@@ -42,7 +42,7 @@ import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 
 public class FileScanner implements Runnable{
-	public static FileScanner instance;
+	private static FileScanner instance;
 
 	private static final Logger log = LoggerFactory.getLogger(FileScanner.class);
 	private static int nbScans = 0;
@@ -93,7 +93,7 @@ public class FileScanner implements Runnable{
 		return new DOScanReport(scanState, nbScannedItems, nbItemsToScan);
 	}
 
-	public void scan(DOManagedFile mFolder) {
+	public void scanFolder(DOManagedFile mFolder) {
 		File folderToScan = new File(mFolder.getPath());
 		if (folderToScan.isDirectory()) {
 			net.pms.PMS.get().getFrame().setStatusLine(String.format(Messages.getString("ML.FileScanner.ScanFolder"), folderToScan.getAbsoluteFile()));
@@ -110,7 +110,7 @@ public class FileScanner implements Runnable{
 					
 					DOManagedFile tmpFile = new DOManagedFile(mFolder.isWatchEnabled(), currentFile.toString(), 
 							mFolder.isVideoEnabled(), mFolder.isAudioEnabled(), mFolder.isPicturesEnabled(),
-							mFolder.isSubFoldersEnabled(), mFolder.isFileImportEnabled(), mFolder.getFileImportTemplate());
+							mFolder.isSubFoldersEnabled(), mFolder.isPluginImportEnabled(), mFolder.getFileImportTemplate());
 					
 					if (currentFile.isFile()) {
 						enqueueManagedFile(tmpFile);
@@ -124,13 +124,49 @@ public class FileScanner implements Runnable{
 							}
 						}
 					} else if (currentFile.isDirectory() && mFolder.isSubFoldersEnabled()) {
-						scan(tmpFile);
+						scanFolder(tmpFile);
 					}
 				}
 			} else {
 				log.debug("No children found for folder " + folderToScan.getAbsolutePath());
 			}
 		}
+	}
+	
+	public boolean scanFile(DOManagedFile managedFile, boolean importFileProperties) {
+		boolean fileImported = false;
+		
+		File f = new File(managedFile.getPath());
+		if (f.isFile()) {
+				//Only update files if they're older then the configured value
+				Date dateLastUpdate = mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath());
+				Calendar comp = Calendar.getInstance();
+				comp.add(Calendar.DATE, -updateIntervalDays);
+				if (dateLastUpdate.before(comp.getTime())) {
+					// retrieve file info
+					DOFileInfo fileInfo = null;
+					try {
+						fileInfo = dataCollector.get(new DOManagedFile(managedFile.isWatchEnabled(), managedFile.getPath().toString(), managedFile.isVideoEnabled(), managedFile.isAudioEnabled(),
+								managedFile.isPicturesEnabled(), managedFile.isSubFoldersEnabled(), managedFile.isPluginImportEnabled(), managedFile.getFileImportTemplate()), importFileProperties);
+					} catch(Throwable t) {
+						log.error("Failed to collect info for " + managedFile.getPath(), t);
+					}
+					// insert file info if we were able to retrieve it
+					if (fileInfo != null) {
+						if(mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath()).equals(new Date(0))){
+							mediaLibraryStorage.insertFileInfo(fileInfo);
+							fileImported = true;
+							for(IFileScannerEventListener l : fileScannerEventListeners){
+								l.itemInserted(FileType.VIDEO);
+							}
+						}
+					} else {
+						if(log.isDebugEnabled()) log.debug("Couldn't read " + f);
+					}
+				}
+		}
+		
+		return fileImported;
 	}
 	
 	public void pause() throws ScanStateException{	
@@ -179,64 +215,34 @@ public class FileScanner implements Runnable{
 		int nbFilesAdded = 0;
 		//Calendar lastGetDate = Calendar.getInstance();
 		while ((mf = dequeueManagedFile()) != null) {
-			File f = new File(mf.getPath());
-			if (f.isFile()) {
-					// check if we have to pause or stop the thread
-					if (scanState == ScanState.PAUSING) {
-						try {
-							if(log.isInfoEnabled()) log.info("Scan paused");
-							net.pms.PMS.get().getFrame().setStatusLine("Scan paused");
-							changeScanState(ScanState.PAUSED);
-							synchronized (scanThreadPause) {
-								scanThreadPause.wait();
-							}
-							net.pms.PMS.get().getFrame().setStatusLine("Restarted scan");
-							
-							if (scanState == ScanState.STOPPING) {
-								break;
-							} else {
-								changeScanState(ScanState.RUNNING);
-								if(log.isInfoEnabled()) log.info("Scan started after pause");
-							}
-						} catch (InterruptedException ex) {
-							log.error("Scan stopped because pause has been interrupted by a Interrupt.", ex);
-							break;
-						}
-					} else if (scanState == ScanState.STOPPING) {
+			// check if we have to pause or stop the thread
+			if (scanState == ScanState.PAUSING) {
+				try {
+					if(log.isInfoEnabled()) log.info("Scan paused");
+					net.pms.PMS.get().getFrame().setStatusLine("Scan paused");
+					changeScanState(ScanState.PAUSED);
+					synchronized (scanThreadPause) {
+						scanThreadPause.wait();
+					}
+					net.pms.PMS.get().getFrame().setStatusLine("Restarted scan");
+					
+					if (scanState == ScanState.STOPPING) {
 						break;
+					} else {
+						changeScanState(ScanState.RUNNING);
+						if(log.isInfoEnabled()) log.info("Scan started after pause");
 					}
-
-					//Only update files if they're older then the configured value
-					Date dateLastUpdate = mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath());
-					Calendar comp = Calendar.getInstance();
-					comp.add(Calendar.DATE, -updateIntervalDays);
-					if (dateLastUpdate.before(comp.getTime())) {
-						// retrieve file info
-						DOFileInfo fileInfo = null;
-						try {
-							fileInfo = dataCollector.get(new DOManagedFile(mf.isWatchEnabled(), mf.getPath().toString(), mf.isVideoEnabled(), mf.isAudioEnabled(), mf
-						        .isPicturesEnabled(), mf.isSubFoldersEnabled(), mf.isFileImportEnabled(), mf.getFileImportTemplate()));
-						} catch(Throwable t) {
-							log.error("Failed to collect info for " + mf.getPath(), t);
-							continue;
-						}
-						// insert file info if we were able to retrieve it
-						if (fileInfo != null) {
-							if(mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath()).equals(new Date(0))){
-    							mediaLibraryStorage.insertFileInfo(fileInfo);
-    							nbFilesAdded++;
-    							for(IFileScannerEventListener l : fileScannerEventListeners){
-    								l.itemInserted(FileType.VIDEO);
-    							}
-							}
-						} else {
-							if(log.isDebugEnabled()) log.debug("Couldn't read " + f);
-						}
-					}
-			}
-			if (scanState == ScanState.STOPPING) {
-				if(log.isInfoEnabled()) log.info("Scan stopped after stopping request");
+				} catch (InterruptedException ex) {
+					log.error("Scan stopped because pause has been interrupted by a Interrupt.", ex);
+					break;
+				}
+			} else if (scanState == ScanState.STOPPING) {
 				break;
+			}
+			
+			// Scan the file
+			if(scanFile(mf, true)) {
+				nbFilesAdded++;
 			}
 		}
 

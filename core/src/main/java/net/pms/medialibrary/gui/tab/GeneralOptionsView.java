@@ -302,7 +302,7 @@ public class GeneralOptionsView extends JPanel {
 						try {
 							File f = new File(d.getManagedFolder().getPath());
 							MediaLibraryStorage.getInstance().setMetaDataValue(MetaDataKeys.LAST_SCAN_FOLDER_PATH.toString(), f.getParent());
-							FileScanner.getInstance().scan(d.getManagedFolder());
+							FileScanner.getInstance().scanFolder(d.getManagedFolder());
 						} catch (InitialisationException ex) {
 							log.error("Failed to get instance of FileScanner", ex);
 						}

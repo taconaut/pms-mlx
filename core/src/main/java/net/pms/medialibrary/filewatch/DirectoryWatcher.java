@@ -34,12 +34,16 @@ import net.pms.notifications.NotificationSubscriber;
 import net.pms.notifications.types.ManagedFoldersChangedEvent;
 
 /**
- * The DirectoryWatcher will start watching all configured managed folders when startWatch() is being called.
+ * This class will start watching all configured managed folders when startWatch() is being called.
  * When the managed folder configuration changes, the watched directories will be updated accordingly.
  */
 public class DirectoryWatcher {
 	private static final Logger logger = LoggerFactory.getLogger(DirectoryWatcher.class);
 	private static DirectoryWatcher instance;
+	
+	private final int JNOTIFY_MASK = JNotify.FILE_CREATED 
+										| JNotify.FILE_DELETED
+										| JNotify.FILE_RENAMED;
 	
 	private HashMap<DOManagedFile, Integer> watchIdsByWatchDirectory;
 	private ManagedFoldersChangedNotificationSubscriber managedFoldersChangedNotificationSubscriber;
@@ -71,11 +75,13 @@ public class DirectoryWatcher {
 	 * When the configuration of managed folders changes, the watched folders will be updated accordingly.
 	 */
 	public void startWatch() {
-		// Start watching the directories
+		// Start watching all configured directories
 		startWatch(MediaLibraryStorage.getInstance().getManagedFolders());
 		
 		// Subscribe to changes in managed folder configuration
-		NotificationCenter.getInstance(ManagedFoldersChangedEvent.class).subscribe(managedFoldersChangedNotificationSubscriber);
+		NotificationCenter
+			.getInstance(ManagedFoldersChangedEvent.class)
+			.subscribe(managedFoldersChangedNotificationSubscriber);
 	}
 
 	/**
@@ -83,9 +89,11 @@ public class DirectoryWatcher {
 	 */
 	public void stopWatch() {
 		// Unsubscribe to changes in managed folder configuration
-		NotificationCenter.getInstance(ManagedFoldersChangedEvent.class).unsubscribe(managedFoldersChangedNotificationSubscriber);
+		NotificationCenter
+			.getInstance(ManagedFoldersChangedEvent.class)
+			.unsubscribe(managedFoldersChangedNotificationSubscriber);
 		
-		// Stop watching all the directories
+		// Stops watching all directories currently being watched
 		List<String> allWatchedDirectoryPaths = new ArrayList<String>();
 		for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
 			allWatchedDirectoryPaths.add(managedFolder.getPath());
@@ -94,14 +102,11 @@ public class DirectoryWatcher {
 	}
 
 	/**
-	 * Starts watching all managed folders configured for watch.
+	 * Starts watching managed folders.
+	 * 
+	 * @param managedFolders The managed folders for which to start the watch
 	 */
 	private void startWatch(List<DOManagedFile> managedFolders) {
-		int mask = JNotify.FILE_CREATED 
-				| JNotify.FILE_DELETED
-				| JNotify.FILE_MODIFIED 
-				| JNotify.FILE_RENAMED;
-
 		int nbFolders = 0;
 		for (DOManagedFile managedFolder : managedFolders) {
 			File directoryFile = new File(managedFolder.getPath());
@@ -119,8 +124,8 @@ public class DirectoryWatcher {
 					String directoryToWatch = managedFolder.getPath();
 					boolean watchSubFolders = managedFolder.isSubFoldersEnabled();
 					
-					int watchId = JNotify.addWatch(directoryToWatch, mask, watchSubFolders, new DirectoryChangeListener());
-					watchIdsByWatchDirectory.put(managedFolder, watchId);					
+					int watchId = JNotify.addWatch(directoryToWatch, JNOTIFY_MASK, watchSubFolders, new DirectoryChangeListener());
+					watchIdsByWatchDirectory.put(managedFolder, watchId);
 					nbFolders++;
 					
 					if(logger.isDebugEnabled()) logger.debug(String.format("Started watching directory='%s'. Watch subfolders=%s", directoryToWatch, watchSubFolders));
@@ -134,16 +139,19 @@ public class DirectoryWatcher {
 	}
 	
 	/**
-	 * Stops watching all folders currently being watched.
+	 * Stops watching the specified managed folders.
+	 * 
+	 * @param managedFolderPaths The managed folder paths for which to start the watch
 	 */
 	private void stopWatch(List<String> managedFolderPaths) {
-		if(watchIdsByWatchDirectory.size() == 0){
-			// No folders are currently being watched, return!
+		if(managedFolderPaths == null || managedFolderPaths.size() == 0){
 			return;
 		}
 		
 		int nbFolders = 0;
 		for(String managedFolderPath : managedFolderPaths) {
+			
+			// Determine the watch ID for the current path
 			int watchId = -1;
 			boolean managedFolderFound = false;
 			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
@@ -158,6 +166,7 @@ public class DirectoryWatcher {
 				continue;
 			}
 			
+			// Remove current directory from watch
 			try {
 				JNotify.removeWatch(watchId);
 				nbFolders++;
@@ -168,6 +177,7 @@ public class DirectoryWatcher {
 			}
 		}
 
+		// Remove current directory from the map holding the references directoryPath -> watchId
 		for(String managedFolderPath : managedFolderPaths) {
 			DOManagedFile managedFolderToRemove = null;
 			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
@@ -195,7 +205,7 @@ public class DirectoryWatcher {
 			List<DOManagedFile> configuredManagedFolders = MediaLibraryStorage.getInstance().getManagedFolders();
 
 			// Determine the folders for which watching has to be started. 
-			// These are either newly added folders or folders where the sub-directory property has changed
+			// These are either newly added folders or folders where the sub-directory or watch properties has changed.
 			ArrayList<DOManagedFile> foldersToStartWatch = new ArrayList<DOManagedFile>();			
 			for(DOManagedFile configuredManagedFolder : configuredManagedFolders){
 				if(configuredManagedFolder.isWatchEnabled()) {
@@ -218,7 +228,7 @@ public class DirectoryWatcher {
 			}
 
 			// Determine the folders for which watching has to be stopped. 
-			// These are either removed folders or folders where the sub-directory property has changed
+			// These are either removed folders or folders where the sub-directory or watch properties has changed.
 			ArrayList<String> foldersToStopWatch = new ArrayList<String>();
 			for(DOManagedFile watchedManagedFolder : watchIdsByWatchDirectory.keySet()){
 				boolean folderFound = false;

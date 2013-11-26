@@ -107,10 +107,10 @@ public class ManagedFoldersPanel extends JPanel {
 			JCheckBox cbSubFolders = new JCheckBox();
 			cbSubFolders.setSelected(f.isSubFoldersEnabled());
 			JCheckBox cbEnablePlugins = new JCheckBox();
-			cbEnablePlugins.setSelected(f.isFileImportEnabled());
+			cbEnablePlugins.setSelected(f.isPluginImportEnabled());
 			
 			EButton bConfigureFileImportTemplate = new EButton(Messages.getString("ML.ScanFolderDialog.bConfigure"), f.getFileImportTemplate());
-			bConfigureFileImportTemplate.setEnabled(f.isFileImportEnabled());
+			bConfigureFileImportTemplate.setEnabled(f.isPluginImportEnabled());
 			bConfigureFileImportTemplate.addActionListener(new ActionListener() {
 				
 				@Override

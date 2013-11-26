@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2012  Ph.Waeber
+ * Copyright (C) 2013  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,6 +32,12 @@ import org.slf4j.LoggerFactory;
 public class FileHelper {
 	private static final Logger log = LoggerFactory.getLogger(FileHelper.class);
 
+	/**
+	 * Copies the file from srFile to dtFile
+	 *
+	 * @param srFile the source file
+	 * @param dtFile the destination file
+	 */
 	public static void copyFile(String srFile, String dtFile) {
 		try {
 			File f1 = new File(srFile);
@@ -55,5 +61,18 @@ public class FileHelper {
 			log.error(String.format("Failed to copy file %s to %s", srFile, dtFile), e);
 		}
 	}
-
+	
+	/**
+	 * Combines the two paths
+	 *
+	 * @param path1 the path 1
+	 * @param path2 the path 2
+	 * @return the combined path
+	 */
+	public static String combine (String path1, String path2)
+	{
+	    File file1 = new File(path1);
+	    File file2 = new File(file1, path2);
+	    return file2.getPath();
+	}
 }

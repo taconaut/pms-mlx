@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.h2.jdbcx.JdbcConnectionPool;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,6 +312,28 @@ class DBFileInfo extends DBBase {
 				log.error("Failed to roll back transaction to save point after a problem occured during update", e);
 			}
 			throw new StorageException("Failed to insert fileinfo for file" + fileInfo.getFilePath(), e);
+		} finally {
+			close(conn, stmt, rs, savePoint);
+		}
+	}
+
+	void updateFileName(String folderPath, String oldFileName, String newFileName) throws StorageException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Savepoint savePoint = null;
+
+		try {
+			conn = cp.getConnection();
+			
+			stmt = conn.prepareStatement("UPDATE FILE SET FILENAME = ?"
+			        + " WHERE FOLDERPATH = ? AND FILENAME = ?");
+			stmt.setString(1, newFileName);
+			stmt.setString(2, folderPath);
+			stmt.setString(3, oldFileName);
+			stmt.executeUpdate();
+		} catch (Exception e) {
+			throw new StorageException(String.format("Failed to update file name for folderPath='%s', oldName=%s, newName=%s", folderPath, oldFileName, newFileName), e);
 		} finally {
 			close(conn, stmt, rs, savePoint);
 		}
