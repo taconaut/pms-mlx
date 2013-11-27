@@ -23,14 +23,6 @@
             <lineEnding>keep</lineEnding>
         </file>
 
-        <!-- Include the tsMuxeR binary -->
-        <file>
-            <source>${project.binaries}/linux/tsMuxeR</source>
-            <outputDirectory>.</outputDirectory>
-            <fileMode>0755</fileMode>
-            <lineEnding>keep</lineEnding>
-        </file>
-
         <!-- Include executable script PMS.sh -->
         <file>
             <source>${project.external-resources.directory}/PMS.sh</source>
@@ -41,6 +33,19 @@
     </files>
 
 	<fileSets>
+		<!-- Include files from transcode-tools -->
+		<fileSet>
+			<directory>${project.binaries}/linux/</directory>
+			<outputDirectory>.</outputDirectory>
+			<fileMode>0755</fileMode>
+			<lineEnding>keep</lineEnding>
+			<includes>
+				<include>tsMuxeR</include>
+				<include>libjnotify.so</include>
+				<include>libjnotify-x86.so</include>
+			</includes>
+		</fileSet>
+		
 		<!-- Include required files contained at the root of the project (common to all projects) -->
 		<fileSet>
 			<directory>${project.root.basedir}</directory>

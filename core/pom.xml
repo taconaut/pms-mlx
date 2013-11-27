@@ -923,9 +923,14 @@
 										<get src="${transcode-tools.download.url}/linux/${transcode-tools.linux.filename}" dest="${external-resources.transcode-tools.directory}/${transcode-tools.linux.filename}" usetimestamp="true" />
 
 										<untar src="${external-resources.transcode-tools.directory}/${transcode-tools.linux.filename}" dest="${external-resources.transcode-tools.directory}/linux" compression="gzip" stripAbsolutePathSpec="true" overwrite="true" failOnEmptyArchive="true" />
-
-										<!-- Make all downloaded binaries executable. -->
-										<chmod dir="${external-resources.transcode-tools.directory}/linux" perm="a+x" includes="*" />
+										
+										
+										<!-- Make all downloaded binaries executable -->
+										<chmod dir="${external-resources.transcode-tools.directory}/linux" perm="a+x" includes="*" excludes="libjnotify.so,libjnotify-x86.so" />
+										
+										<!-- Copy the jnotify library files (x86 and x64) to the standard library path -->
+										<copy file="${external-resources.transcode-tools.directory}/linux/libjnotify.so" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/linux/libjnotify-x86.so" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>
