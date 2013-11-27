@@ -200,7 +200,7 @@
          <pack name="Configuration" required="no">
             <description>Standard configuration files for PMS.</description>
 
-			<file src="${external-resources.directory}/PMS.conf" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
+			<file src="${project.core.external-resources.directory}/PMS.conf" targetdir="$INSTALL_PATH/${project.core.name}.app/Contents/Resources/Java">
             	<os family="mac" />
 			</file>
 		</pack>
