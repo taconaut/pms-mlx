@@ -41,9 +41,7 @@ public class DirectoryWatcher {
 	private static final Logger logger = LoggerFactory.getLogger(DirectoryWatcher.class);
 	private static DirectoryWatcher instance;
 	
-	private final int JNOTIFY_MASK = JNotify.FILE_CREATED 
-										| JNotify.FILE_DELETED
-										| JNotify.FILE_RENAMED;
+	private final int JNOTIFY_MASK = JNotify.FILE_CREATED | JNotify.FILE_DELETED | JNotify.FILE_RENAMED;
 	
 	private HashMap<DOManagedFile, Integer> watchIdsByWatchDirectory;
 	private ManagedFoldersChangedNotificationSubscriber managedFoldersChangedNotificationSubscriber;
@@ -153,15 +151,14 @@ public class DirectoryWatcher {
 			
 			// Determine the watch ID for the current path
 			int watchId = -1;
-			boolean managedFolderFound = false;
 			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
 				if(managedFolder.getPath().equals(managedFolderPath)) {
 					watchId = watchIdsByWatchDirectory.get(managedFolder);
-					managedFolderFound = true;
+					break;
 				}
 			}
 			
-			if(!managedFolderFound) {
+			if(watchId < 0) {
 				logger.warn("Failed to stop watch on folder '%s' because it couldn't be found in the list of currently watched folders");
 				continue;
 			}
@@ -183,6 +180,7 @@ public class DirectoryWatcher {
 			for(DOManagedFile managedFolder : watchIdsByWatchDirectory.keySet()) {
 				if(managedFolder.getPath().equals(managedFolderPath)) {
 					managedFolderToRemove = managedFolder;
+					break;
 				}
 			}
 			
@@ -210,7 +208,7 @@ public class DirectoryWatcher {
 			for(DOManagedFile configuredManagedFolder : configuredManagedFolders){
 				if(configuredManagedFolder.isWatchEnabled()) {
 					boolean folderFound = false;
-					for(DOManagedFile watchedManagedFolder : watchIdsByWatchDirectory.keySet()){
+					for(DOManagedFile watchedManagedFolder : watchIdsByWatchDirectory.keySet()) {
 						if(configuredManagedFolder.getPath().equals(watchedManagedFolder.getPath())) {
 							if(configuredManagedFolder.isSubFoldersEnabled() != watchedManagedFolder.isSubFoldersEnabled() ||
 									configuredManagedFolder.isWatchEnabled() != watchedManagedFolder.isWatchEnabled()) {
