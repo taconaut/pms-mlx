@@ -20,6 +20,7 @@
 package net.pms;
 
 import com.sun.jna.Platform;
+
 import net.pms.configuration.Build;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
@@ -34,6 +35,7 @@ import net.pms.logging.FrameAppender;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
 import net.pms.medialibrary.dlna.RootFolder;
+import net.pms.medialibrary.filewatch.DirectoryWatcher;
 import net.pms.medialibrary.scanner.FullDataCollector;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 import net.pms.network.HTTPServer;
@@ -47,6 +49,7 @@ import net.pms.plugins.PluginsFactory;
 import net.pms.plugins.notifications.StartStopNotifier;
 import net.pms.update.AutoUpdater;
 import net.pms.util.*;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.event.ConfigurationEvent;
 import org.apache.commons.configuration.event.ConfigurationListener;
@@ -54,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -523,9 +527,9 @@ public class PMS {
 		
 		// Initialize the plugins before starting the server
 		PluginsFactory.initializePlugins();
-		
 
-
+		// Initialize the directory watcher who is responsible to update the media library when files are being changed
+		DirectoryWatcher.getInstance().startWatch();
 
 		boolean binding = false;
 		try {
@@ -571,11 +575,12 @@ public class PMS {
 		frame.serverReady();
 
 		// UPNPHelper.sendByeBye();
-		Runtime.getRuntime().addShutdownHook(new Thread("PMS Listeners Stopper") {
+		Runtime.getRuntime().addShutdownHook(new Thread("PMS shutdown") {
 			@Override
 			public void run() {
 				try {
 					PluginsFactory.shutdownPlugins();
+					DirectoryWatcher.getInstance().stopWatch();
 					
 					UPNPHelper.shutDownListener();
 					UPNPHelper.sendByeBye();

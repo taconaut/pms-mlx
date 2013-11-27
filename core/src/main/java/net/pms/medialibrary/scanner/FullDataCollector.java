@@ -91,7 +91,7 @@ public class FullDataCollector {
 	    instance = new FullDataCollector(videoCoverSaveFolderPath);
     }
 	
-	public DOFileInfo get(DOManagedFile mf) {
+	public DOFileInfo get(DOManagedFile mf, boolean importFileProperties) {
 		DOFileInfo retVal = null;
 		int sep = mf.getPath().lastIndexOf(java.io.File.separator) + 1;
 		String folderPath = mf.getPath().substring(0, sep);
@@ -103,11 +103,14 @@ public class FullDataCollector {
     				tmpVideoFileInfo.setFolderPath(folderPath);
     				tmpVideoFileInfo.setFileName(fileName);
     				tmpVideoFileInfo.setType(FileType.VIDEO);
-    				//get the information from pms internal util (mediainfo or ffmpeg)
-    				populateMovieInfo(tmpVideoFileInfo);
+    				
+    				if(importFileProperties) {
+	    				//get the information from pms internal util (mediainfo or ffmpeg)
+	    				populateMovieInfo(tmpVideoFileInfo);
+    				}
     				
     				//import the info with configured plugins
-    				if(mf.isFileImportEnabled()) {
+    				if(mf.isPluginImportEnabled()) {
     					FileImportHelper.updateFileInfo(mf.getFileImportTemplate(), tmpVideoFileInfo);
     					//TODO: Parametrize the creation of the sort name
     					tmpVideoFileInfo.setSortName(tmpVideoFileInfo.getName());

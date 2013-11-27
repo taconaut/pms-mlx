@@ -7,10 +7,15 @@
 .settings
 MediaInfo.dll
 MediaInfo64.dll
+jnotify.dll
+jnotify_64bit.dll
 contrib/ffmpeg/build/
 database/
 debug.log
 libmediainfo.dylib
+libjnotify.jnilib
+libjnotify.so
+libjnotify-x86.so
 maven-eclipse.xml
 pms.iml
 target/

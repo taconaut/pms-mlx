@@ -61,13 +61,13 @@
 		<junit-version>4.11</junit-version>
 		<fest-assert-version>1.4</fest-assert-version>
 		<jmte-version>3.0</jmte-version>
+		<jnotify-version>0.94</jnotify-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
 		<!-- External files properties -->
 		<external-resources.directory>${project.basedir}/src/main/external-resources</external-resources.directory>
 		<external-resources.transcode-tools.directory>${external-resources.directory}/transcode-tools</external-resources.transcode-tools.directory>
-		<transcode-tools.download.url>http://downloads.sourceforge.net/project/ps3mediaserver/transcode-tools</transcode-tools.download.url>
 		<target.transcode-tools.directory>${project.build.directory}/bin</target.transcode-tools.directory>
 	</properties>
 
@@ -370,6 +370,12 @@
 			<artifactId>jmte</artifactId>
 			<version>${jmte-version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>jnotify</groupId>
+			<artifactId>jnotify</artifactId>
+			<version>${jnotify-version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -557,6 +563,18 @@
 							<packaging>jar</packaging>
 							<downloadUrl>http://sourceforge.net/projects/flib/files/flib/FLib%201.1.1/jcalendar.jar</downloadUrl>
 							<checksum>83eb4b1a4823daf3b5bea61958cf6097930f74fb</checksum>
+						</artifactItem>
+
+						<artifactItem>
+							<groupId>jnotify</groupId>
+							<artifactId>jnotify</artifactId>
+							<version>${jnotify-version}</version>
+							<packaging>jar</packaging>
+							<install>true</install>
+							<force>false</force>
+							<downloadUrl>http://sourceforge.net/projects/jnotify/files/jnotify/jnotify-${jnotify-version}/jnotify-lib-${jnotify-version}.zip</downloadUrl>
+							<checksum>7f81f3429b2fe061f75ed870ca749109</checksum>
+							<extractFile>jnotify-${jnotify-version}.jar</extractFile>
 						</artifactItem>
 
 					</artifactItems>
@@ -837,16 +855,18 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>copy-mediainfo-windows</id>
+								<id>copy-windows-dll</id>
 								<phase>process-resources</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 								<configuration>
 									<target>
-										<!-- MediaInfo library needs to be in the standard library path to be found -->
+										<!-- MediaInfo and jnotify libraries need to be in the standard library path to be found -->
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo64.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify_64bit.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>
@@ -903,9 +923,14 @@
 										<get src="${transcode-tools.download.url}/linux/${transcode-tools.linux.filename}" dest="${external-resources.transcode-tools.directory}/${transcode-tools.linux.filename}" usetimestamp="true" />
 
 										<untar src="${external-resources.transcode-tools.directory}/${transcode-tools.linux.filename}" dest="${external-resources.transcode-tools.directory}/linux" compression="gzip" stripAbsolutePathSpec="true" overwrite="true" failOnEmptyArchive="true" />
-
-										<!-- Make all downloaded binaries executable. -->
-										<chmod dir="${external-resources.transcode-tools.directory}/linux" perm="a+x" includes="*" />
+										
+										
+										<!-- Make all downloaded binaries executable -->
+										<chmod dir="${external-resources.transcode-tools.directory}/linux" perm="a+x" includes="*" excludes="libjnotify.so,libjnotify-x86.so" />
+										
+										<!-- Copy the jnotify library files (x86 and x64) to the standard library path -->
+										<copy file="${external-resources.transcode-tools.directory}/linux/libjnotify.so" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/linux/libjnotify-x86.so" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>
@@ -962,7 +987,10 @@
 										</untar>
 										
 										<!-- Make all downloaded binaries executable -->
-										<chmod dir="${external-resources.transcode-tools.directory}/osx" perm="a+x" includes="*" excludes="libmediainfo.dylib" />
+										<chmod dir="${external-resources.transcode-tools.directory}/osx" perm="a+x" includes="*" excludes="libmediainfo.dylib,libjnotify.jnilib" />
+										
+										<!-- Copy the jnotify library file to the standard library path -->
+										<copy file="${external-resources.transcode-tools.directory}/osx/libjnotify.jnilib" todir="${project.basedir}" overwrite="true" verbose="true" />
 									</target>
 								</configuration>
 							</execution>

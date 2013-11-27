@@ -71,6 +71,7 @@ public interface IMediaLibraryStorage {
 	List<DOFileInfo> getFileInfo(DOFilter filter, boolean sortAscending, ConditionType sortField, int maxResults, SortOption sortOption);
 	List<String> getExistingTags(FileType fileType);
 	List<String> getTagValues(String tagName, boolean isAscending, int minOccurences);
+	void updateFilePath(String folderPath, String oldFileName, String newFileName);
 	
 	//VideoFileInfo
 	void deleteAllVideos();

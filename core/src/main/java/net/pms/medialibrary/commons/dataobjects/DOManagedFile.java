@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2012  Ph.Waeber
+ * Copyright (C) 2013  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,18 +21,35 @@ package net.pms.medialibrary.commons.dataobjects;
 public class DOManagedFile {
 	private boolean watchEnabled;
 	private String  path;
+	
 	private boolean videoEnabled;
 	private boolean audioEnabled;
 	private boolean picturesEnabled;
 	private boolean subFoldersEnabled;
 	private DOFileImportTemplate importConfig;
-	private boolean fileImportEnabled;
+	private boolean pluginImportEnabled;
 
+	/**
+	 * Instantiates a new managed file data object.
+	 */
 	public DOManagedFile() {
 		this(false, "", false, false, false, false, false, new DOFileImportTemplate());
 	}
 
-	public DOManagedFile(boolean watchEnabled, String path, boolean videoEnabled, boolean audioEnabled, boolean picturesEnabled, boolean subFoldersEnabled, boolean fileImportEnabled, DOFileImportTemplate importConfig) {
+	/**
+	 * Instantiates a new managed file data object.
+	 *
+	 * @param watchEnabled should the folder be watched?
+	 * @param path the path of the file or folder
+	 * @param videoEnabled should video files be imported?
+	 * @param audioEnabled should video audio be imported?
+	 * @param picturesEnabled should image files be imported?
+	 * @param subFoldersEnabled should sub-folders be handled?
+	 * @param pluginImportEnabled should files be imported using the configured plugins?
+	 * @param importConfig the import configuration
+	 */
+	public DOManagedFile(boolean watchEnabled, String path, boolean videoEnabled, boolean audioEnabled,
+			boolean picturesEnabled, boolean subFoldersEnabled, boolean pluginImportEnabled, DOFileImportTemplate importConfig) {
 		setWatchEnabled(watchEnabled);
 		setPath(path);
 		setVideoEnabled(videoEnabled);
@@ -40,7 +57,7 @@ public class DOManagedFile {
 		setPicturesEnabled(picturesEnabled);
 		setSubFoldersEnabled(subFoldersEnabled);
 		setFileImportTemplate(importConfig);
-		setFileImportEnabled(fileImportEnabled);
+		setPluginImportEnabled(pluginImportEnabled);
 	}
 
 	public void setWatchEnabled(boolean watchEnabled) {
@@ -100,12 +117,12 @@ public class DOManagedFile {
 		this.importConfig = importConfig;
 	}
 
-	public void setFileImportEnabled(boolean enabled) {
-		fileImportEnabled = enabled;
+	public void setPluginImportEnabled(boolean enabled) {
+		pluginImportEnabled = enabled;
 	}
 
-	public boolean isFileImportEnabled() {
-		return fileImportEnabled;
+	public boolean isPluginImportEnabled() {
+		return pluginImportEnabled;
 	}
 
 	@Override
@@ -121,7 +138,7 @@ public class DOManagedFile {
 		        && isPicturesEnabled() == compObj.isPicturesEnabled() 
 		        && isVideoEnabled() == compObj.isVideoEnabled()
 		        && isSubFoldersEnabled() == compObj.isSubFoldersEnabled()
-		        //&& isFileImportEnabled() == compObj.isFileImportEnabled() //don't use this attribute as it isn't part of the primary key in the db
+		        //&& isPluginImportEnabled() == compObj.isPluginImportEnabled() //don't use this attribute as it isn't part of the primary key in the db
 		        ) { 
 			return true; 
 		}
@@ -144,6 +161,6 @@ public class DOManagedFile {
 	@Override
 	public String toString(){
 		return String.format("folder=%s, watch=%s, subfolders=%s, video=%s, audio=%s, pictures=%s, fileImport=%s, fileImportTemplate=%s", 
-				getPath(), isWatchEnabled(), isSubFoldersEnabled(), isVideoEnabled(), isAudioEnabled(), isPicturesEnabled(), isFileImportEnabled(), getFileImportTemplate().getId());
+				getPath(), isWatchEnabled(), isSubFoldersEnabled(), isVideoEnabled(), isAudioEnabled(), isPicturesEnabled(), isPluginImportEnabled(), getFileImportTemplate().getId());
 	}
 }

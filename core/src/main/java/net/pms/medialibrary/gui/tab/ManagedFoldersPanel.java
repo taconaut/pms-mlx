@@ -107,10 +107,10 @@ public class ManagedFoldersPanel extends JPanel {
 			JCheckBox cbSubFolders = new JCheckBox();
 			cbSubFolders.setSelected(f.isSubFoldersEnabled());
 			JCheckBox cbEnablePlugins = new JCheckBox();
-			cbEnablePlugins.setSelected(f.isFileImportEnabled());
+			cbEnablePlugins.setSelected(f.isPluginImportEnabled());
 			
 			EButton bConfigureFileImportTemplate = new EButton(Messages.getString("ML.ScanFolderDialog.bConfigure"), f.getFileImportTemplate());
-			bConfigureFileImportTemplate.setEnabled(f.isFileImportEnabled());
+			bConfigureFileImportTemplate.setEnabled(f.isPluginImportEnabled());
 			bConfigureFileImportTemplate.addActionListener(new ActionListener() {
 				
 				@Override
@@ -221,7 +221,7 @@ public class ManagedFoldersPanel extends JPanel {
 		builder.add(bAddFolder, cc.xy(1, 2, CellConstraints.CENTER, CellConstraints.BOTTOM));
 
 		FormLayout layout2 = new FormLayout(
-		        "center:p, 2px, 20:grow, 2px, p, 2px, p, 10px, center:p, 2px, center:p, 2px, center:p, 10px, p, 2px, p, 10px, p", // columns
+		        "center:p, 5px, center:p, 2px, 20:grow, 2px, p, 2px, p, 10px, center:p, 2px, center:p, 2px, center:p, 10px, p, 2px, p, 10px, p", // columns
 		        "p, p, p, p, p, p, p, p, p, p," + // rows (40)
 		        "p, p, p, p, p, p, p, p, p, p," + 
 		        "p, p, p, p, p, p, p, p, p, p," + 
@@ -233,6 +233,8 @@ public class ManagedFoldersPanel extends JPanel {
 		if (managedFolders.size() > 0) {
 			// TODO: uncomment audio and picture items once implemented
 			//create labels with tooltips
+			JLabel lWatch = new JLabel(new ImageIcon(getClass().getResource("/resources/images/watch_folder-16.png")));
+			lWatch.setToolTipText(Messages.getString("ML.ManagedFoldersPanel.lWatch"));
 			JLabel lSubFolders = new JLabel(new ImageIcon(getClass().getResource("/resources/images/subfolders-16.png")));
 			lSubFolders.setToolTipText(Messages.getString("ML.ManagedFoldersPanel.lSubfolders"));
 			JLabel lVideo = new JLabel(new ImageIcon(getClass().getResource("/resources/images/videofolder-16.png")));
@@ -243,26 +245,28 @@ public class ManagedFoldersPanel extends JPanel {
 			lPictures.setToolTipText(Messages.getString("ML.ManagedFoldersPanel.lPictures"));
 
 			// set headers
-			builder2.add(lSubFolders, cc.xy(1, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lFolderPath"), cc.xy(3, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			builder2.add(lVideo, cc.xy(9, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			// builder2.add(lAudio, cc.xy(11, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			// builder2.add(lPictures, cc.xy(13, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
-			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lPlugins"), cc.xyw(15, 1, 3, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			builder2.add(lWatch, cc.xy(1, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			builder2.add(lSubFolders, cc.xy(3, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lFolderPath"), cc.xy(5, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			builder2.add(lVideo, cc.xy(11, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			// builder2.add(lAudio, cc.xy(13, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			// builder2.add(lPictures, cc.xy(15, 1, CellConstraints.CENTER, CellConstraints.DEFAULT));
+			builder2.addLabel(Messages.getString("ML.ManagedFoldersPanel.lPlugins"), cc.xyw(17, 1, 3, CellConstraints.CENTER, CellConstraints.DEFAULT));
 
 			int rowIndex = 2;
 			for (ManagedFolderObj f : managedFolders) {
 				f.setIndex(rowIndex - 2);
-				builder2.add(f.getCbSubFolders(), cc.xy(1, rowIndex));
-				builder2.add(f.getTfFolderPath(), cc.xy(3, rowIndex));
-				builder2.add(f.getbBrowse(), cc.xy(5, rowIndex));
-				builder2.add(f.getbDelete(), cc.xy(7, rowIndex));
-				builder2.add(f.getCbVideo(), cc.xy(9, rowIndex));
-				// builder2.add(f.getCbAudio(), cc.xy(11, rowIndex));
-				// builder2.add(f.getCbPictures(), cc.xy(13, rowIndex));
-				builder2.add(f.getCbEnablePlugins(), cc.xy(15, rowIndex));
-				builder2.add(f.getbConfigureFileImportTemplate(), cc.xy(17, rowIndex));
-				builder2.add(f.getbScan(), cc.xy(19, rowIndex));
+				builder2.add(f.getCbWatch(), cc.xy(1, rowIndex));
+				builder2.add(f.getCbSubFolders(), cc.xy(3, rowIndex));
+				builder2.add(f.getTfFolderPath(), cc.xy(5, rowIndex));
+				builder2.add(f.getbBrowse(), cc.xy(7, rowIndex));
+				builder2.add(f.getbDelete(), cc.xy(9, rowIndex));
+				builder2.add(f.getCbVideo(), cc.xy(11, rowIndex));
+				// builder2.add(f.getCbAudio(), cc.xy(13, rowIndex));
+				// builder2.add(f.getCbPictures(), cc.xy(15, rowIndex));
+				builder2.add(f.getCbEnablePlugins(), cc.xy(17, rowIndex));
+				builder2.add(f.getbConfigureFileImportTemplate(), cc.xy(19, rowIndex));
+				builder2.add(f.getbScan(), cc.xy(21, rowIndex));
 				rowIndex++;
 			}
 			pManagedFolders = builder2.getPanel();

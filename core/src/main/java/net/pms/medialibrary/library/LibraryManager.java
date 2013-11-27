@@ -149,7 +149,7 @@ public class LibraryManager implements ILibraryManager {
 
 	@Override
     public void scanFolder(DOManagedFile mFolder) {
-	    this.fileScanner.scan(mFolder);
+	    this.fileScanner.scanFolder(mFolder);
     }
 
 	@Override

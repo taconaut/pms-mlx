@@ -36,8 +36,6 @@
 		<project.core.binaries>${project.core.basedir}/target/bin</project.core.binaries>
 		<project.core.external-resources.directory>${project.core.basedir}/src/main/external-resources</project.core.external-resources.directory>
 
-		
-		<transcode-tools.download.url>http://downloads.sourceforge.net/project/ps3mediaserver/transcode-tools</transcode-tools.download.url>
 		<target.transcode-tools.directory>${project.build.directory}/bin</target.transcode-tools.directory>
 
 		<external-resources.private-jre.directory>${project.external-resources.directory}/private-jre</external-resources.private-jre.directory>
@@ -384,6 +382,8 @@
 						<excludes>
 							<exclude>MediaInfo.dll</exclude>
 							<exclude>MediaInfo64.dll</exclude>
+							<exclude>jnotify.dll</exclude>
+							<exclude>jnotify_64bit.dll</exclude>
 							<exclude>${windows-service-wrapper.x86.filename}</exclude>
 						</excludes>
 						<!-- Avoid inadvertently filtering binaries -->
@@ -439,16 +439,18 @@
 							</execution>
 
 							<execution>
-								<id>unpack-private-jre-and-copy-libmediainfo-windows</id>
+								<id>unpack-private-jre-and-copy-dlls-windows</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 								<configuration>
 									<target>
-										<!-- MediaInfo library needs to be in the standard library path to be found -->
+										<!-- MediaInfo and jnotify libraries need to be in the standard library path to be found -->
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 										<copy file="${external-resources.transcode-tools.directory}/win32/MediaInfo64.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
+										<copy file="${external-resources.transcode-tools.directory}/win32/jnotify_64bit.dll" todir="${project.basedir}" overwrite="true" verbose="true" />
 
 										<!-- Unpack winodws service wrapper. -->
 										<unzip src="${external-resources.transcode-tools.directory}/win32/${windows-service-wrapper.x86.filename}" dest="${target.transcode-tools.directory}/win32" stripAbsolutePathSpec="true" overwrite="true" failOnEmptyArchive="true">

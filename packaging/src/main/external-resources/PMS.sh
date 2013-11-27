@@ -59,4 +59,4 @@ if [ "x$FONTCONFIG_FILE" = "x" ]; then
 fi
 
 # Execute the JVM
-exec "$JAVA" $JAVA_OPTS -Xmx1024M -Xss1024k -Dfile.encoding=UTF-8 -Dsun.java2d.d3d=false -Djava.net.preferIPv4Stack=true -Djna.nosys=true -classpath "$PMS_JARS" net.pms.PMS "$@"
+exec "$JAVA" $JAVA_OPTS -Xmx1024M -Xss1024k -Dfile.encoding=UTF-8 -Dsun.java2d.d3d=false -Djava.net.preferIPv4Stack=true -Djava.library.path=. -Djna.nosys=true -classpath "$PMS_JARS" net.pms.PMS "$@"

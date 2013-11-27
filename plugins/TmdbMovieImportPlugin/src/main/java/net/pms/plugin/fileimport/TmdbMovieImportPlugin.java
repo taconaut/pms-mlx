@@ -289,7 +289,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		case VIDEO_ORIGINALNAME:
 		    return movie == null ? null : movie.getOriginalTitle();
 		case VIDEO_OVERVIEW:
-		    return movie == null || movie.getOverview().equals("null") ? null : movie.getOverview();
+		    return movie == null || movie.getOverview() == null || movie.getOverview().equals("null") ? null : movie.getOverview();
 		case VIDEO_RATINGPERCENT:
 			return movie == null ? null : (int)(movie.getVoteAverage() * 10);
 		case VIDEO_RATINGVOTERS:
