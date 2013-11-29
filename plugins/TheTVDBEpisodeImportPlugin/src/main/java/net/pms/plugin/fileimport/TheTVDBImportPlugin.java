@@ -4,19 +4,22 @@ import java.io.IOException;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+
+import net.pms.PMS;
 import net.pms.medialibrary.commons.enumarations.FileProperty;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.exceptions.FileImportException;
 import net.pms.util.PmsProperties;
 
-import com.moviejukebox.thetvdb.TheTVDB;
-import com.moviejukebox.thetvdb.model.Episode;
-import com.moviejukebox.thetvdb.model.Series;
 import java.util.*;
 import javax.swing.ImageIcon;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.omertron.thetvdbapi.TheTVDBApi;
+import com.omertron.thetvdbapi.model.Episode;
+import com.omertron.thetvdbapi.model.Series;
 
 import net.pms.plugin.fileimport.thetvdb.fileparser.EpisodeFile;
 import net.pms.plugin.fileimport.thetvdb.fileparser.EpisodeFileParser;
@@ -32,23 +35,18 @@ import net.pms.plugins.FileImportPlugin;
 public class TheTVDBImportPlugin implements FileImportPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(TheTVDBImportPlugin.class);
-    private TheTVDB tvDB = new TheTVDB("D19EF2AFF971007D");
+    private TheTVDBApi tvDB = new TheTVDBApi("D19EF2AFF971007D");
     /**
      * The found episode object
      */
-    private Episode episode;
-    /**
-     * The found series. (Serial is the singular of series, right?)
-     */
-    private Series serial;
-    private String lang = "en";
+    private Episode currentEpisode;
+    private Series currentSeries;
+    private String lang = PMS.getConfiguration().getLanguage();
+    
     public static final ResourceBundle messages = ResourceBundle.getBundle("net.pms.plugin.fileimport.thetvdb.lang.messages");
-    /**
-     * Holds only the project version. It's used to always use the maven build
-     * number in code
-     */
+    
+    // Holds only the project version. It's used to always use the maven buildnumber in code
     private static final PmsProperties properties = new PmsProperties();
-
     static {
         try {
             properties.loadFromResourceFile("/thetvdbimportplugin.properties", TheTVDBImportPlugin.class);
@@ -56,13 +54,10 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
             log.error("Could not load thetvdbimportplugin.properties", e);
         }
     }
-    /**
-     * GUI
-     */
+    
     private GlobalConfigurationPanel pGlobalConfiguration;
-    /**
-     * The global configuration is shared amongst all plugin instances.
-     */
+    
+    // The global configuration is shared amongst all plugin instances.
     private static final GlobalConfiguration globalConfig;
 
     static {
@@ -75,53 +70,22 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     }
 
     /**
-     * @todo See if we can scroll the tag list in the GUI as the full tag list
-     * pushed to config dialog off the bottom of the screen
-     */
-    /**
-     * Available tags. (Shortened as the gui does not scroll the list).
+     * Available tags.
      */
     private enum Tag {
-
-        CombinedEpisodeNumber,
-        CombinedSeason,
-        DvdChapter,
-        DvdDiscId,
-        DvdEpisodeNumber,
-        DvdSeason,
-        EpImgFlag,
-        EpisodeNumber,
-        GuestStars,
-        Language,
-        ProductionCode,
-        SeasonNumber,
+    	EpisodeNumber,
+    	SeasonNumber,
+    	FirstAired,
+    	GuestStars,
         Writers,
-        AbsoluteNumber,
-        Filename,
-        LastUpdated,
-        SeriesId //,
-//        SeasonId,
-//        SeriesName,
-//        Banner,
-//        SeriesOverview,
-//        FirstAired,
-//        SeriesImdbId,
-//        Actors,
-//        SeriesZap2ItId,
-//        AirsDayOfWeek,
-//        AirsTime,
-//        ContentRating,
-//        Network,
-//        SeriesRating,
-//        Runtime,
-//        Status,
-//        Faxnart,
-//        SeriesLastUpdated
+    	Runtime,
+    	Network,
+    	SeriesName
     }
 
     public void importFile(String title, String filePath) throws FileImportException {
-        serial = null;
-        episode = null;
+        currentSeries = null;
+        currentEpisode = null;
         logDebug("importing TheTVDB episode with file: " + filePath);
 
         boolean parseOk = true;
@@ -143,15 +107,15 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
                 //we've found at least one result
 
                 //use the first one
-                serial = tvDB.getSeries(series.get(0).getId(), "en");
+                currentSeries = tvDB.getSeries(series.get(0).getId(), "en");
 
                 //log the results received
-                logInfo("Series matched for '" + fileObg.getSeries() + "' on TvDB has imdbDb='" + serial.getImdbId() + "', name='" + serial.getSeriesName() + "'.");
-                episode = tvDB.getEpisode(serial.getId(), fileObg.getSeason(), fileObg.getEpisode(), lang);
+                logInfo("Series matched for '" + fileObg.getSeries() + "' on TvDB has imdbDb='" + currentSeries.getImdbId() + "', name='" + currentSeries.getSeriesName() + "'.");
+                currentEpisode = tvDB.getEpisode(currentSeries.getId(), fileObg.getSeason(), fileObg.getEpisode(), lang);
 
-                if (episode != null) {
+                if (currentEpisode != null) {
                     //log the results received
-                    logInfo("Episode matched for series '" + serial.getSeriesName() + "' Title='" + episode.getEpisodeName() + "'");
+                    logInfo("Episode matched for series '" + currentSeries.getSeriesName() + "' Title='" + currentEpisode.getEpisodeName() + "'");
                 }
                 if (series.size() > 1) {
                     String seriesStr = "Other (not considered) matches are ";
@@ -171,11 +135,11 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
 
     @Override
     public void importFileById(String id) throws FileImportException {
-        serial = null;
-        episode = null;
+        currentSeries = null;
+        currentEpisode = null;
 
-        episode = tvDB.getEpisodeById(id, lang);
-        serial = tvDB.getSeries(episode.getSeriesId(), lang);
+        currentEpisode = tvDB.getEpisodeById(id, lang);
+        currentSeries = tvDB.getSeries(currentEpisode.getSeriesId(), lang);
     }
 
     @Override
@@ -203,7 +167,6 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     public List<FileProperty> getSupportedFileProperties() {
         //add all supported properties
         List<FileProperty> res = new ArrayList<FileProperty>();
-        res.add(FileProperty.VIDEO_CERTIFICATION);
         res.add(FileProperty.VIDEO_COVERURL);
         res.add(FileProperty.VIDEO_DIRECTOR);
         res.add(FileProperty.VIDEO_GENRES);
@@ -219,35 +182,48 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     public Object getFileProperty(FileProperty property) {
         Object res = null;
         // return the proper object for every supported file property
-        switch (property) {
-            case VIDEO_CERTIFICATION:
-                res = episode == null ? null : episode.getRating();
-                break;
-            case VIDEO_COVERURL:
-                res = serial == null ? null : serial.getPoster();
-                break;
-            case VIDEO_DIRECTOR:
-                res = episode == null ? null : episode.getDirectors();
-                break;
-            case VIDEO_GENRES:
-                res = serial == null ? null : serial.getGenres();
-                break;
-            case VIDEO_IMDBID:
-                res = episode == null ? null : episode.getImdbId();
-                break;
-            case VIDEO_OVERVIEW:
-                res = episode == null ? null : episode.getOverview();
-                break;
-            case VIDEO_RATINGPERCENT:
-                res = episode == null ? null : episode.getRating();
-                break;
-            case VIDEO_NAME:
-                res = episode == null ? null : episode.getEpisodeName();
-                break;
-            case VIDEO_YEAR:
-                res = episode == null ? null : episode.getFirstAired();
-                break;
-        }
+		switch (property) {
+		case VIDEO_COVERURL:
+			res = currentSeries == null ? null : currentSeries.getPoster();
+			break;
+		case VIDEO_DIRECTOR:
+			res = currentEpisode == null && currentEpisode.getDirectors().size() > 0 ? null : currentEpisode.getDirectors().get(0);
+			break;
+		case VIDEO_GENRES:
+			res = currentSeries == null ? null : currentSeries.getGenres();
+			break;
+		case VIDEO_IMDBID:
+			res = currentEpisode == null ? null : currentEpisode.getImdbId();
+			break;
+		case VIDEO_OVERVIEW:
+			res = currentEpisode == null ? null : currentEpisode.getOverview();
+			break;
+		case VIDEO_RATINGPERCENT:
+			if (currentEpisode != null && currentEpisode.getRating() != null && !currentEpisode.getRating().equals("")) {
+				try {
+					double rating = Double.parseDouble(currentEpisode.getRating());
+					res = (int) (10 * rating);
+				} catch (Exception ex) {
+					log.error("Failed to parse rating as a double. value=" + currentEpisode.getRating());
+				}
+			}
+			break;
+		case VIDEO_NAME:
+			res = currentEpisode == null ? null : currentEpisode.getEpisodeName();
+			break;
+		case VIDEO_YEAR:
+			if (currentEpisode != null && currentEpisode.getFirstAired() != null && !currentEpisode.getFirstAired().equals("")) {
+				try {
+					res = Integer.parseInt(currentEpisode.getFirstAired().substring(0, 4));
+				} catch (Exception ex) {
+					log.error("Failed to parse the year in first air date. value=" + currentEpisode.getFirstAired());
+				}
+			}
+			break;
+		default:
+			log.warn("Unexpected FileProperty received: " + property);
+			break;
+		}
 
         return res;
     }
@@ -265,73 +241,24 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     @Override
     public List<String> getTags(String tagName) {
         List<String> res = new ArrayList<String>();
-        if (tagName.equals(Tag.AbsoluteNumber.toString())) {
-            res.add(episode.getAbsoluteNumber());
-//        } else if (tagName.equals(Tag.Actors.toString())) {
-//            res = serial.getActors();
-//        } else if (tagName.equals(Tag.AirsDayOfWeek.toString())) {
-//            res.add(serial.getAirsDayOfWeek().toString());
-//        } else if (tagName.equals(Tag.AirsTime.toString())) {
-//            res.add(serial.getAirsTime().toString());
-//        } else if (tagName.equals(Tag.Banner.toString())) {
-            res.add(serial.getBanner());
-        } else if (tagName.equals(Tag.CombinedEpisodeNumber.toString())) {
-            res.add(episode.getCombinedEpisodeNumber());
-        } else if (tagName.equals(Tag.CombinedSeason.toString())) {
-            res.add(episode.getCombinedSeason());
-//        } else if (tagName.equals(Tag.ContentRating.toString())) {
-//            res.add(serial.getContentRating());
-        } else if (tagName.equals(Tag.DvdChapter.toString())) {
-            res.add(episode.getDvdChapter());
-        } else if (tagName.equals(Tag.DvdEpisodeNumber.toString())) {
-            res.add(episode.getDvdEpisodeNumber());
-        } else if (tagName.equals(Tag.DvdSeason.toString())) {
-            res.add(episode.getDvdSeason());
-        } else if (tagName.equals(Tag.EpImgFlag.toString())) {
-            res.add(episode.getEpImgFlag());
-        } else if (tagName.equals(Tag.EpisodeNumber.toString())) {
-            res.add(Integer.toString(episode.getEpisodeNumber()));
-//        } else if (tagName.equals(Tag.Fanart.toString())) {
-//            res.add(serial.getFanart());
-        } else if (tagName.equals(Tag.Filename.toString())) {
-            res.add(episode.getFilename());
-//        } else if (tagName.equals(Tag.FirstAired.toString())) {
-//            res.add(serial.getFirstAired());
-        } else if (tagName.equals(Tag.GuestStars.toString())) {
-            res = episode.getGuestStars();
-        } else if (tagName.equals(Tag.Language.toString())) {
-            res.add(serial.getLanguage());
-        } else if (tagName.equals(Tag.LastUpdated.toString())) {
-            res.add(episode.getLastUpdated());
-//        } else if (tagName.equals(Tag.Network.toString())) {
-//            res.add(serial.getNetwork());
-        } else if (tagName.equals(Tag.ProductionCode.toString())) {
-            res.add(episode.getProductionCode());
-//        } else if (tagName.equals(Tag.Runtime.toString())) {
-//            res.add(serial.getRuntime());
-//        } else if (tagName.equals(Tag.SeasonId.toString())) {
-//            res.add(episode.getSeasonId());
+        if (tagName.equals(Tag.EpisodeNumber.toString())) {
+            res.add(String.valueOf(currentEpisode.getEpisodeNumber()));
         } else if (tagName.equals(Tag.SeasonNumber.toString())) {
-            res.add(Integer.toString(episode.getSeasonNumber()));
-        } else if (tagName.equals(Tag.SeriesId.toString())) {
-            res.add(serial.getSeriesId());
-//        } else if (tagName.equals(Tag.SeriesImdbId.toString())) {
-//            res.add(serial.getImdbId());
-//        } else if (tagName.equals(Tag.SeriesLastUpdated.toString())) {
-//            res.add(serial.getLastUpdated());
-//        } else if (tagName.equals(Tag.SeriesName.toString())) {
-//            res.add(serial.getSeriesName());
-//        } else if (tagName.equals(Tag.SeriesOverview.toString())) {
-//            res.add(serial.getOverview());
-//        } else if (tagName.equals(Tag.SeriesRating.toString())) {
-//            res.add(serial.getRating());
-//        } else if (tagName.equals(Tag.SeriesZap2ItId.toString())) {
-//            res.add(serial.getZap2ItId());
-//        } else if (tagName.equals(Tag.Status.toString())) {
-//            res.add(serial.getStatus());
+            res.add(String.valueOf(currentEpisode.getSeasonNumber()));
+        } else if (tagName.equals(Tag.FirstAired.toString())) {
+            res.add(String.valueOf(currentEpisode.getFirstAired()));
+        } else if (tagName.equals(Tag.GuestStars.toString())) {
+            res.addAll(currentEpisode.getGuestStars());
         } else if (tagName.equals(Tag.Writers.toString())) {
-            res = episode.getWriters();
+            res.addAll(currentEpisode.getWriters());
+        } else if (tagName.equals(Tag.Runtime.toString())) {
+            res.add(String.valueOf(currentSeries.getRuntime()));
+        } else if (tagName.equals(Tag.Network.toString())) {
+            res.add(String.valueOf(currentSeries.getNetwork()));
+        } else if (tagName.equals(Tag.SeriesName.toString())) {
+            res.add(String.valueOf(currentSeries.getSeriesName()));
         }
+        
         return res;
     }
 
@@ -345,7 +272,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     }
 
     public String getName() {
-        return "theTvDB";
+        return "TheTVDB";
     }
 
     @Override

@@ -31,20 +31,20 @@ public class EpisodeFileParser {
         File sasonPath = theFile.getParentFile();
         File seriesPath = sasonPath.getParentFile();
 
+
         String fileName = theFile.getName();
-        String seasonName = sasonPath.getName();
-        String seriesName = seriesPath.getName();
-        Pattern pattern = Pattern.compile(".*S([0-9]+)E([0-9]+).*");
+        Pattern pattern = Pattern.compile(".*[Ss]([0-9]+)[Ee]([0-9]+).*");
         Matcher matcher = pattern.matcher(fileName);
-        fileObj.setSeasonName(seasonName);
-        fileObj.setSeries(seriesName);
         if (matcher.matches()) {
             int season = Integer.parseInt(matcher.group(1));
             int episode = Integer.parseInt(matcher.group(2));
             fileObj.setSeason(season);
             fileObj.setEpisode(episode);
+
+            fileObj.setSeasonName(sasonPath.getName());
+            fileObj.setSeries(seriesPath.getName());
         } else {
-            throw new EpisodeFileParserException("Unable to parse file '" + thePath + "'");
+            throw new EpisodeFileParserException("Unable to parse file '" + fileName + "'");
         }
 
         return fileObj;
