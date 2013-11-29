@@ -28,6 +28,7 @@
 		<module>VideoSettingsDlnaFolderPlugin</module>
 		<module>WebDlnaFolderPlugin</module>
 		<module>WebservicePlugin</module>
+		<module>TheTVDBEpisodeImportPlugin</module>
 	</modules>
 
 	<properties>
