@@ -108,24 +108,13 @@ public class DOFileInfo {
 		try { retVal = retVal.replace("%is_actif", String.valueOf(isActive())); } catch(Exception ex){ }
 		
 		String tagPrefix = "%tag_";
-		while(retVal.contains(tagPrefix)) {
-			int tagNameStartIndex = retVal.indexOf(tagPrefix) + tagPrefix.length();
-			int tagNameEndIndex = -1;
-			for(int i = tagNameStartIndex; i < retVal.length(); i++) {
-				char currentChar = retVal.charAt(i);
-				if(!Character.isLetterOrDigit(currentChar)) {
-					tagNameEndIndex = i;
-					break;
-				}
-			}
-			if(tagNameEndIndex == -1) {
-				tagNameEndIndex = retVal.length();
-			}
-			
-			String tagName = retVal.substring(tagNameStartIndex, tagNameEndIndex);
-			String tagsString = "";
-			StringBuilder sb = new StringBuilder();
-			if(getTags() != null && getTags().containsKey(tagName)){
+		Map<String, List<String>> allTags = getTags();
+		for(String tagName : allTags.keySet()) {
+			String replaceTagName = tagPrefix + tagName;
+			if(retVal.contains(replaceTagName)) {
+				// Create the string which will be replaced
+				String tagsString = "";
+				StringBuilder sb = new StringBuilder();
 				List<String> tagValues = getTags().get(tagName);
 				Collections.sort(tagValues);
 				for(String tagValue : tagValues){
@@ -136,8 +125,9 @@ public class DOFileInfo {
 				if(tagsString.endsWith(", ")){
 					tagsString = tagsString.substring(0, tagsString.length() - 2);
 				}
+				
+				retVal = retVal.replace(replaceTagName, tagsString);
 			}
-			retVal = retVal.replace(tagPrefix + tagName, tagsString);
 		}
 		
 		return retVal;
