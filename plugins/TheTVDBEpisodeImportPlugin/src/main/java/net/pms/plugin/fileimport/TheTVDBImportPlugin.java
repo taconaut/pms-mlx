@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import net.pms.PMS;
 import net.pms.medialibrary.commons.enumarations.FileProperty;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.exceptions.FileImportException;
@@ -21,11 +20,11 @@ import com.omertron.thetvdbapi.TheTVDBApi;
 import com.omertron.thetvdbapi.model.Episode;
 import com.omertron.thetvdbapi.model.Series;
 
+import net.pms.plugin.fileimport.thetvdb.configuration.GlobalConfiguration;
 import net.pms.plugin.fileimport.thetvdb.fileparser.EpisodeFile;
 import net.pms.plugin.fileimport.thetvdb.fileparser.EpisodeFileParser;
 import net.pms.plugin.fileimport.thetvdb.fileparser.EpisodeFileParserException;
-import net.pms.plugin.fileimport.tvdb.configuration.GlobalConfiguration;
-import net.pms.plugin.fileimport.tvdb.gui.GlobalConfigurationPanel;
+import net.pms.plugin.fileimport.thetvdb.gui.GlobalConfigurationPanel;
 import net.pms.plugins.FileImportPlugin;
 
 /**
@@ -34,14 +33,13 @@ import net.pms.plugins.FileImportPlugin;
  */
 public class TheTVDBImportPlugin implements FileImportPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(TheTVDBImportPlugin.class);
+    private static final Logger logger = LoggerFactory.getLogger(TheTVDBImportPlugin.class);
     private TheTVDBApi tvDB = new TheTVDBApi("D19EF2AFF971007D");
     /**
      * The found episode object
      */
     private Episode currentEpisode;
     private Series currentSeries;
-    private String lang = PMS.getConfiguration().getLanguage();
     
     public static final ResourceBundle messages = ResourceBundle.getBundle("net.pms.plugin.fileimport.thetvdb.lang.messages");
     
@@ -51,7 +49,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
         try {
             properties.loadFromResourceFile("/thetvdbimportplugin.properties", TheTVDBImportPlugin.class);
         } catch (IOException e) {
-            log.error("Could not load thetvdbimportplugin.properties", e);
+        	logger.error("Could not load thetvdbimportplugin.properties", e);
         }
     }
     
@@ -65,7 +63,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
         try {
             globalConfig.load();
         } catch (IOException e) {
-            log.error("Failed to load global configuration", e);
+        	logger.error("Failed to load global configuration", e);
         }
     }
 
@@ -102,16 +100,16 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
 
         if (parseOk) {
             logDebug("Search TVDB for series '" + fileObg.getSeries() + "'");
-            List<Series> series = tvDB.searchSeries(fileObg.getSeries(), "en");
+            List<Series> series = tvDB.searchSeries(fileObg.getSeries(), globalConfig.getImportLanguage());
             if (series != null && series.size() > 0) {
                 //we've found at least one result
 
                 //use the first one
-                currentSeries = tvDB.getSeries(series.get(0).getId(), "en");
+                currentSeries = tvDB.getSeries(series.get(0).getId(), globalConfig.getImportLanguage());
 
                 //log the results received
                 logInfo("Series matched for '" + fileObg.getSeries() + "' on TvDB has imdbDb='" + currentSeries.getImdbId() + "', name='" + currentSeries.getSeriesName() + "'.");
-                currentEpisode = tvDB.getEpisode(currentSeries.getId(), fileObg.getSeason(), fileObg.getEpisode(), lang);
+                currentEpisode = tvDB.getEpisode(currentSeries.getId(), fileObg.getSeason(), fileObg.getEpisode(), globalConfig.getImportLanguage());
 
                 if (currentEpisode != null) {
                     //log the results received
@@ -138,8 +136,8 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
         currentSeries = null;
         currentEpisode = null;
 
-        currentEpisode = tvDB.getEpisodeById(id, lang);
-        currentSeries = tvDB.getSeries(currentEpisode.getSeriesId(), lang);
+        currentEpisode = tvDB.getEpisodeById(id, globalConfig.getImportLanguage());
+        currentSeries = tvDB.getSeries(currentEpisode.getSeriesId(), globalConfig.getImportLanguage());
     }
 
     @Override
@@ -204,7 +202,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
 					double rating = Double.parseDouble(currentEpisode.getRating());
 					res = (int) (10 * rating);
 				} catch (Exception ex) {
-					log.error("Failed to parse rating as a double. value=" + currentEpisode.getRating());
+					logger.error("Failed to parse rating as a double. value=" + currentEpisode.getRating());
 				}
 			}
 			break;
@@ -216,12 +214,12 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
 				try {
 					res = Integer.parseInt(currentEpisode.getFirstAired().substring(0, 4));
 				} catch (Exception ex) {
-					log.error("Failed to parse the year in first air date. value=" + currentEpisode.getFirstAired());
+					logger.error("Failed to parse the year in first air date. value=" + currentEpisode.getFirstAired());
 				}
 			}
 			break;
 		default:
-			log.warn("Unexpected FileProperty received: " + property);
+			logger.warn("Unexpected FileProperty received: " + property);
 			break;
 		}
 
@@ -319,12 +317,20 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
             pGlobalConfiguration = new GlobalConfigurationPanel(globalConfig);
         }
         pGlobalConfiguration.applyConfig();
-//        return pGlobalConfiguration;
-        return null;
+
+        return pGlobalConfiguration;
     }
 
     @Override
     public void saveConfiguration() {
+		if(pGlobalConfiguration != null) {
+			pGlobalConfiguration.updateConfiguration(globalConfig);
+			try {
+				globalConfig.save();
+			} catch (IOException e) {
+				logger.error("Failed to save global configuration", e);
+			}
+		}
     }
 
     @Override
@@ -333,15 +339,15 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     }
 
     private void logDebug(String message) {
-        if (log.isDebugEnabled()) {
-            log.debug(message);
+        if (logger.isDebugEnabled()) {
+        	logger.debug(message);
         }
 
     }
 
     private void logInfo(String message) {
-        if (log.isInfoEnabled()) {
-            log.info(message);
+        if (logger.isInfoEnabled()) {
+        	logger.info(message);
         }
     }
 }

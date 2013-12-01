@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -119,16 +120,10 @@ public class GeneralTab {
 		cmp.setFont(cmp.getFont().deriveFont(Font.BOLD));
 		builder.addLabel(Messages.getString("NetworkTab.0"), 
 				FormLayoutUtil.flip(cc.xy(1, 7), colSpec, orientation));
-		final KeyedComboBoxModel kcbm = new KeyedComboBoxModel(new Object[] {
-				"ar", "bg", "ca", "zhs", "zht", "cz", "da", "nl", "en", "fi", "fr",
-				"de", "el", "iw", "is", "it", "ja", "ko", "no", "pl", "pt", "br",
-				"ro", "ru", "sl", "es", "sv", "tr" }, new Object[] {
-				"Arabic", "Bulgarian", "Catalan", "Chinese (Simplified)",
-				"Chinese (Traditional)", "Czech", "Danish", "Dutch", "English",
-				"Finnish", "French", "German", "Greek", "Hebrew", "Icelandic", "Italian",
-				"Japanese", "Korean", "Norwegian", "Polish", "Portuguese",
-				"Portuguese (Brazilian)", "Romanian", "Russian", "Slovenian",
-				"Spanish", "Swedish", "Turkish" });
+		Map<String, String> languages = PmsConfiguration.getSupportedLanguages();
+		final KeyedComboBoxModel kcbm = new KeyedComboBoxModel(
+				languages.keySet().toArray(new String[languages.size()]), 
+				languages.values().toArray(new String[languages.size()]));
 		langs = new JComboBox(kcbm);
 		langs.setEditable(false);
 		String defaultLang = null;

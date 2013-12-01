@@ -204,6 +204,8 @@ public class PmsConfiguration {
 	private final ProgramPaths programPaths;
 
 	private final IpFilter filter = new IpFilter();
+	
+	private static Map<String, String> supportedLanguages;
 
 	/*
 	 * aCodec  - audio codec
@@ -2381,5 +2383,77 @@ public class PmsConfiguration {
 	 */
 	public String getShortFilenameFormat() {
 		return getString(KEY_FILENAME_FORMAT_SHORT, FILENAME_FORMAT_SHORT);
+	}
+	
+	/**
+	 * Gets the languages supported by pms. The map is sorted by display name.
+	 *
+	 * @return the supported languages
+	 */
+	public static Map<String, String> getSupportedLanguages() {
+		if(supportedLanguages == null) {
+			HashMap<String, String> languages = new HashMap<String, String>();
+			languages.put("ar", "Arabic");
+			languages.put("bg", "Bulgarian");
+			languages.put("ca", "Catalan");
+			languages.put("zhs", "Chinese (Simplified)");
+			languages.put("zht", "Chinese (Traditional)");
+			languages.put("cz", "Czech");
+			languages.put("da", "Danish");
+			languages.put("nl", "Dutch");
+			languages.put("en", "English");
+			languages.put("fi", "Finnish");
+			languages.put("fr", "French");
+			languages.put("de", "German");
+			languages.put("el", "Greek");
+			languages.put("iw", "Hebrew");
+			languages.put("is", "Icelandic");
+			languages.put("it", "Italian");
+			languages.put("ja", "Japanese");
+			languages.put("ko", "Korean");
+			languages.put("no", "Norwegian");
+			languages.put("pl", "Polish");
+			languages.put("pt", "Portuguese");
+			languages.put("br", "Portuguese (Brazilian)");
+			languages.put("ro", "Romanian");
+			languages.put("ru", "Russian");
+			languages.put("sl", "Slovenian");
+			languages.put("es", "Spanish");
+			languages.put("sv", "Swedish");
+			languages.put("tr", "Turkish");
+
+	        LanguageNameComparator bvc =  new LanguageNameComparator(languages);
+			supportedLanguages = new TreeMap<String,String>(bvc);
+			supportedLanguages.putAll(languages);
+		}
+		
+		return supportedLanguages;
+	}
+	
+	/**
+	 * The Class LanguageNameComparator is being used to sort languages by their display name.
+	 */
+	private static class LanguageNameComparator implements Comparator<String> {
+
+	    Map<String, String> base;
+	    public LanguageNameComparator(Map<String, String> base) {
+	        this.base = base;
+	    }
+
+	    public int compare(String a, String b) {
+	    	if(base.get(a) == null && base.get(b) == null) {
+	    		return 0;
+	    	}
+	    	
+	    	if(base.get(a) == null) {
+	    		return -1;
+	    	}
+	    	
+	    	if(base.get(b) == null) {
+	    		return 1;
+	    	}
+	    	
+	    	return base.get(a).compareTo(base.get(b));
+	    }
 	}
 }

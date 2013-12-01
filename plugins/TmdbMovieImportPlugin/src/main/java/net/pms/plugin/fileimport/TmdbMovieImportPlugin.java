@@ -18,11 +18,11 @@ import com.omertron.themoviedbapi.results.*;
 import com.omertron.themoviedbapi.model.MovieDb;
 import com.omertron.themoviedbapi.MovieDbException;
 
-
-import net.pms.PMS;
 import net.pms.medialibrary.commons.enumarations.FileProperty;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.exceptions.FileImportException;
+import net.pms.plugin.fileimport.tmdb.configuration.GlobalConfiguration;
+import net.pms.plugin.fileimport.tmdb.gui.GlobalConfigurationPanel;
 import net.pms.plugins.FileImportPlugin;
 import net.pms.util.PmsProperties;
 
@@ -70,6 +70,18 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 
 	private final int MAX_RETRIES = 3;
 	private int nbRetriesDone = 0;
+	private GlobalConfigurationPanel pGlobalConfiguration;
+
+	/** The global configuration is shared amongst all plugin instances. */
+	private static final GlobalConfiguration globalConfig;
+	static {
+		globalConfig = new GlobalConfiguration();
+		try {
+			globalConfig.load();
+		} catch (IOException e) {
+			logger.error("Failed to load global configuration", e);
+		}
+	}
 
 	@Override
 	public String getName() {
@@ -85,14 +97,14 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 	    try {
 	    	//search for the title
-	        TmdbResultsList<MovieDb> movies = api.searchMovie(title, 0 , PMS.getConfiguration().getLanguage(), true, 0);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(title, 0 , globalConfig.getImportLanguage(), true, 0);
 	        int size = movies.getTotalResults();
 	        
 			if (movies != null && size > 0) {
 				//we've found at least one result
 				
 				//use the first one
-				movie = api.getMovieInfo(movies.getResults().get(0).getId(), PMS.getConfiguration().getLanguage(), "casts,trailers");
+				movie = api.getMovieInfo(movies.getResults().get(0).getId(), globalConfig.getImportLanguage(), "casts,trailers");
 				
 				//log the results received
 				String moviesStr = String.format("Movie matched for '%s' on TMDb has id=%s, name='%s'", title, movies.getResults().get(0).getId(), movies.getResults().get(0).getTitle());
@@ -158,7 +170,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		
 		logger.debug("Importing TMDb movie by id=" + id);
 	    try {
-			movie = api.getMovieInfo(tmdbId, PMS.getConfiguration().getLanguage(), "casts,trailers");
+			movie = api.getMovieInfo(tmdbId, globalConfig.getImportLanguage(), "casts,trailers");
 			logger.debug("Imported TMDb movie by id=" + id);
         } catch (Throwable t) {
         	throw new FileImportException(String.format("Failed to import movie information for id='%s'", id), t);
@@ -343,7 +355,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		if(searchObject != null && searchObject instanceof TmdbMovieInfoPluginMovie) {
 			movie = ((TmdbMovieInfoPluginMovie)searchObject).getMovie();
 			try {
-				movie = api.getMovieInfo(movie.getId(), PMS.getConfiguration().getLanguage(), "casts,trailers");
+				movie = api.getMovieInfo(movie.getId(), globalConfig.getImportLanguage(), "casts,trailers");
 			} catch (MovieDbException ex){
 			}
 		}
@@ -354,7 +366,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		List<Object> res = null;
 	    try {
 	    	//search for the name
-	        TmdbResultsList<MovieDb> movies = api.searchMovie(name, 0, PMS.getConfiguration().getLanguage(), true, 0);
+	        TmdbResultsList<MovieDb> movies = api.searchMovie(name, 0, globalConfig.getImportLanguage(), true, 0);
 	        
 	        //create the return list if any movies were found
 			if (movies != null && movies.getTotalResults() > 0) {
@@ -372,7 +384,11 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 
 	@Override
 	public JComponent getGlobalConfigurationPanel() {
-		return null;
+		if(pGlobalConfiguration == null ) {
+			pGlobalConfiguration = new GlobalConfigurationPanel(globalConfig);
+		}
+		pGlobalConfiguration.applyConfig();
+		return pGlobalConfiguration;
 	}
 
 	@Override
@@ -400,6 +416,14 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 
 	@Override
 	public void saveConfiguration() {
+		if(pGlobalConfiguration != null) {
+			pGlobalConfiguration.updateConfiguration(globalConfig);
+			try {
+				globalConfig.save();
+			} catch (IOException e) {
+				logger.error("Failed to save global configuration", e);
+			}
+		}
 	}
 
 	@Override
