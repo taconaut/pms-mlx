@@ -4,11 +4,21 @@ Changelog:
 pms-mlx 1.0 - 2013-??-??
 
 	Plugins:
-		- TMDB file import:
-			- Use language set for pms as import language. The plugin will only import fields having been set for the given language and wont fall back to English anymore.
-
+		- TMDb file import:
+			- Configure the import language in the plugin configuration panel. The default language being used is the one configured for pms.
+			  The plugin will only import fields having been set for the given language and wont fall back to English anymore.
+			  
+		- TheTVDB file import:
+			- Added as official plugin (thanks, cjsewell!)
+			- Imports series information from thtvdb.com. It expects to have the parent folder of a file having the name of the season,
+			  it's parent folder having the season name and the name containing S<season_number>E<episode_number>.
+			  e.g xxx/The Simpsons/Season 1/s01e01 - Simpsons Roasting on an Open Fire.avi
+			- Configure the import language in the plugin configuration panel. The default language being used is the one configured for pms.
+			
 	Misc:
-		- Re-added french and german language files for media library tab as they had gone missing.
+		- Added file watch functionality. Check a managed folder (and its children) to be watched for file changes.
+		- Re-added French and German language files for media library tab as they had gone missing.
+		- Sort languages by name.
 
 pms-mlx 0.9 - 2013-11-21
 
