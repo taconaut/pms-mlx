@@ -785,6 +785,10 @@ public class FileImportHelper {
 			validateStringValue(value, fileProperty);
 			fileInfo.setOriginalName((String)value);
 			break;
+		case VIDEO_SORTNAME:
+			validateStringValue(value, fileProperty);
+			fileInfo.setSortName((String)value);
+			break;
 		case VIDEO_OVERVIEW:
 			validateStringValue(value, fileProperty);
 			fileInfo.setOverview((String)value);

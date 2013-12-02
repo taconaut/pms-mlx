@@ -130,6 +130,7 @@ public interface FileImportPlugin extends PluginBase {
 	 * VIDEO_RATINGPERCENT = Integer<br>
 	 * VIDEO_RATINGVOTERS = Integer<br>
 	 * VIDEO_REVENUE = Integer<br>
+	 * VIDEO_SORTNAME = String<br>
 	 * VIDEO_TAGLINE = String<br>
 	 * VIDEO_TMDBID = Integer<br>
 	 * VIDEO_TRAILERURL = String<br>
