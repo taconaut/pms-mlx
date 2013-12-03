@@ -257,6 +257,7 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		res.add(FileProperty.VIDEO_REVENUE);
 		res.add(FileProperty.VIDEO_TAGLINE);
 		res.add(FileProperty.VIDEO_NAME);
+		res.add(FileProperty.VIDEO_SORTNAME);
 		// res.add(FileProperty.VIDEO_TRAILERURL); // Fixme: see getFileProperty(FileProperty property) comments.
 		res.add(FileProperty.VIDEO_YEAR);
 		res.add(FileProperty.VIDEO_TMDBID);
@@ -313,6 +314,8 @@ public class TmdbMovieImportPlugin implements FileImportPlugin {
 		case VIDEO_TMDBID:
 		    return movie == null ? null : movie.getId();
 		case VIDEO_NAME:
+		    return movie == null ? null : movie.getTitle();
+		case VIDEO_SORTNAME:
 		    return movie == null ? null : movie.getTitle();
 		case VIDEO_TRAILERURL:
 		    return null; //movie == null || movie.getTrailers().get(0) == null ? null : movie.getTrailers().get(0).toString(); // Fixme: Needs to be parsed for video location.

@@ -210,6 +210,7 @@ public class ImdbMovieImportPlugin implements FileImportPlugin {
 		res.add(FileProperty.VIDEO_RATINGVOTERS);
 		res.add(FileProperty.VIDEO_NAME);
 		res.add(FileProperty.VIDEO_YEAR);
+		res.add(FileProperty.VIDEO_SORTNAME);
 		
 		return res;
 	}
@@ -289,6 +290,9 @@ public class ImdbMovieImportPlugin implements FileImportPlugin {
 			}
 			break;
 		case VIDEO_NAME:
+			res = getValue("Title");
+			break;
+		case VIDEO_SORTNAME:
 			res = getValue("Title");
 			break;
 		case VIDEO_YEAR:
