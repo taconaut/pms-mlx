@@ -112,8 +112,6 @@ public class FullDataCollector {
     				//import the info with configured plugins
     				if(mf.isPluginImportEnabled()) {
     					FileImportHelper.updateFileInfo(mf.getFileImportTemplate(), tmpVideoFileInfo);
-    					//TODO: Parametrize the creation of the sort name
-    					tmpVideoFileInfo.setSortName(tmpVideoFileInfo.getName());
     				}
     				
     				if(tmpVideoFileInfo.getName().equals("")) {

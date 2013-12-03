@@ -17,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.omertron.thetvdbapi.TheTVDBApi;
+import com.omertron.thetvdbapi.model.Banner;
+import com.omertron.thetvdbapi.model.Banners;
+import com.omertron.thetvdbapi.model.BannerType;
 import com.omertron.thetvdbapi.model.Episode;
 import com.omertron.thetvdbapi.model.Series;
 
@@ -40,6 +43,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
      */
     private Episode currentEpisode;
     private Series currentSeries;
+    private String cover;
     
     public static final ResourceBundle messages = ResourceBundle.getBundle("net.pms.plugin.fileimport.thetvdb.lang.messages");
     
@@ -84,8 +88,11 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     public void importFile(String title, String filePath) throws FileImportException {
         currentSeries = null;
         currentEpisode = null;
+        cover = null;
+
         logDebug("importing TheTVDB episode with file: " + filePath);
 
+        Banners banners;
         boolean parseOk = true;
         EpisodeFileParser fileParser = new EpisodeFileParser(filePath);
         EpisodeFile fileObg = new EpisodeFile();
@@ -115,6 +122,24 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
                     //log the results received
                     logInfo("Episode matched for series '" + currentSeries.getSeriesName() + "' Title='" + currentEpisode.getEpisodeName() + "'");
                 }
+
+                // Find the most suitable cover
+                banners = tvDB.getBanners(series.get(0).getId());
+                if (!banners.getSeasonList().isEmpty()) {
+                    for (Banner banner : banners.getSeasonList()) {
+                        if ((banner.getSeason() == fileObg.getSeason()) && (banner.getBannerType2() == BannerType.Season)) {
+                            cover = banner.getUrl();
+                            break;
+                        }
+                    }
+                } else {
+                    cover = banners.getPosterList().get(0).getUrl();
+                }
+                if (cover == null) {
+                    cover = currentSeries.getPoster();
+                }
+                logInfo("Using cover from " + cover);
+
                 if (series.size() > 1) {
                     String seriesStr = "Other (not considered) matches are ";
                     for (int i = 1; i < series.size(); i++) {
@@ -172,6 +197,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
         res.add(FileProperty.VIDEO_OVERVIEW);
         res.add(FileProperty.VIDEO_RATINGPERCENT);
         res.add(FileProperty.VIDEO_NAME);
+        res.add(FileProperty.VIDEO_SORTNAME);
         res.add(FileProperty.VIDEO_YEAR);
         return res;
     }
@@ -182,7 +208,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
         // return the proper object for every supported file property
 		switch (property) {
 		case VIDEO_COVERURL:
-			res = currentSeries == null ? null : currentSeries.getPoster();
+			res = cover;
 			break;
 		case VIDEO_DIRECTOR:
 			res = currentEpisode == null && currentEpisode.getDirectors().size() > 0 ? null : currentEpisode.getDirectors().get(0);
@@ -208,6 +234,9 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
 			break;
 		case VIDEO_NAME:
 			res = currentEpisode == null ? null : currentEpisode.getEpisodeName();
+			break;
+		case VIDEO_SORTNAME:
+			res = currentEpisode == null ? null : String.format("%d%03d", currentEpisode.getSeasonNumber(), currentEpisode.getEpisodeNumber());
 			break;
 		case VIDEO_YEAR:
 			if (currentEpisode != null && currentEpisode.getFirstAired() != null && !currentEpisode.getFirstAired().equals("")) {

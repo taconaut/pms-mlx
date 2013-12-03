@@ -162,7 +162,7 @@ public class FileImportPropertiesPanel extends JPanel {
 
 	private JPanel buildFilePropertyPreferencesPanel() {
 		FormLayout layout = new FormLayout("5px, f:p:g, 15px, f:p:g, 15px, f:p:g, 15px, f:p:g, 15px, f:p:g, 15px, f:p:g, 5px",
-		        "5px, t:p, 15px, t:p, 15px, t:p, 5px");
+		        "5px, t:p, 15px, t:p, 15px, t:p, 15px, t:p, 5px");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.border(new TitledBorder("Properties"));
 		builder.opaque(true);
