@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms</artifactId>
-		<version>1.90.2-mlx_1.0-SNAPSHOT</version>
+		<version>1.90.2-mlx-1.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
