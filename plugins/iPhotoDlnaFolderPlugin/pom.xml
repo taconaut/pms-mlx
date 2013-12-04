@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-iphoto-dlna-folder-plugin</artifactId>
-	<version>3.1</version>
+	<version>3.1.1-SNAPSHOT</version>
 
 	<name>PMS iPhoto DLNA Folder Plugin</name>
 	<description>This plugin will add a folder containing the iPhoto library</description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms-plugins</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	
 	<dependencies>

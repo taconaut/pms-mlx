@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-play-count-watcher-plugin</artifactId>
-	<version>2.1</version>
+	<version>2.1.1-SNAPSHOT</version>
 
 	<name>PMS Play Count Watcher Plugin</name>
 	<description>Plugin used to increment play counts in the media library after a file has been played</description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms-plugins</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 
 	<build>
