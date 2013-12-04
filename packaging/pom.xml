@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms</artifactId>
-		<version>1.90.2-mlx-1.0-SNAPSHOT</version>
+		<version>1.90.2-mlx-1.0</version>
 	</parent>
 
 	<properties>
@@ -85,7 +85,7 @@
 		<maven-assembly-plugin-version>2.4</maven-assembly-plugin-version>
 	</properties>
 
-	<pluginRepositories>
+	<pluginRepositories>    
 		<!-- Repository where the izpack-maven-plugin and such live -->
 		<pluginRepository>
 			<id>codehaus-releases</id>
@@ -99,7 +99,7 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<repositories>
+	<repositories>    
 		<!-- Repository where the izpack-maven-plugin and such live -->
 		<repository>
 			<id>codehaus-releases</id>
@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>github.com.taconaut</groupId>
 			<artifactId>pms-core</artifactId>
-			<version>1.90.2-mlx-1.0-SNAPSHOT</version>
+			<version>1.90.2-mlx-1.0</version>
 		</dependency>
 
 		<dependency>

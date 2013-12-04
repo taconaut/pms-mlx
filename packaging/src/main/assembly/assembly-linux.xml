@@ -14,7 +14,7 @@
 	<includeBaseDirectory>true</includeBaseDirectory>
 
     <files>
-        <!-- Include pms-X.YY.Z-SNAPSHOT-jar-with-dependencies as pms.jar-->
+        <!-- Include pms-X.YY.Z-jar-with-dependencies as pms.jar-->
         <file>
             <source>${project.build.directory}/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>
             <outputDirectory>.</outputDirectory>

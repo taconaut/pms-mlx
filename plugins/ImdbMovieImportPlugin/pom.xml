@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>pms-imdb-movie-import-plugin</artifactId>
-	<version>3.1-SNAPSHOT</version>
+	<version>3.1</version>
 
 	<name>PMS Imdb Movie Import Plugin</name>
 	<description>Plugin used to import properties and tags for video files from IMDB</description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms-plugins</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<dependencies>
