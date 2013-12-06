@@ -62,14 +62,12 @@ public class PmsConfiguration {
 	private static final int MENCODER_MAX_THREADS = 8;
 
 	private static final String KEY_ALTERNATE_SUBTITLE_FOLDER = "alternate_subtitle_folder";
-	private static final String KEY_ALTERNATE_THUMB_FOLDER = "alternate_thumb_folder";
 	private static final String KEY_SHOW_APERTURE_LIBRARY = "show_aperture_library";
 	private static final String KEY_AUDIO_BITRATE = "audio_bitrate";
 	private static final String KEY_AUDIO_CHANNEL_COUNT = "audio_channels";
 	private static final String KEY_AUDIO_LANGUAGES = "audio_languages";
 	private static final String KEY_AUDIO_RESAMPLE = "audio_resample";
 	private static final String KEY_AUDIO_SUB_LANGS = "audio_subtitle_languages";
-	private static final String KEY_AUDIO_THUMBNAIL_METHOD = "audio_thumbnail_method";
 	private static final String KEY_AUTO_UPDATE = "auto_update";
 	private static final String KEY_AUTOLOAD_SUBTITLES = "autoload_external_subtitles";
 	private static final String KEY_AVISYNTH_CONVERT_FPS = "avisynth_convert_fps";
@@ -84,7 +82,6 @@ public class PmsConfiguration {
 	private static final String KEY_MENCODER_CODEC_SPECIFIC_SCRIPT = "mencoder_codec_specific_script";
 	private static final String KEY_DISABLE_FAKESIZE = "disable_fakesize";
 	public static final String KEY_DISABLE_SUBTITLES = "disable_subtitles"; // used by MEncoderVideo
-	private static final String KEY_DVD_ISO_THUMBNAILS = "dvd_iso_thumbnails";
 	private static final String KEY_AUDIO_EMBED_DTS_IN_PCM = "audio_embed_dts_in_pcm";
 	private static final String KEY_ENGINES = "engines";
 	private static final String KEY_FFMPEG_ALTERNATIVE_PATH = "alternativeffmpegpath"; // TODO deprecated: FFmpegDVRMSRemux will be removed and DVR-MS will be transcoded
@@ -97,14 +94,9 @@ public class PmsConfiguration {
 	private static final String KEY_FORCED_SUBTITLE_LANGUAGE = "forced_subtitle_language";
 	private static final String KEY_FORCED_SUBTITLE_TAGS = "forced_subtitle_tags";
 	private static final String KEY_FORCE_TRANSCODE_FOR_EXTENSIONS = "force_transcode_for_extensions";
-	private static final String KEY_HIDE_EMPTY_FOLDERS = "hide_empty_folders";
-	private static final String KEY_HIDE_ENGINENAMES = "hide_engine_names";
-	private static final String KEY_HIDE_EXTENSIONS = "hide_extensions";
 	private static final String KEY_HIDE_MEDIA_LIBRARY_FOLDER = "hide_media_library_folder";
-	private static final String KEY_HIDE_TRANSCODE_FOLDER = "hide_transcode_folder";
 	private static final String KEY_HIDE_VIDEO_SETTINGS = "hide_video_settings";
 	private static final String KEY_HTTP_ENGINE_V2 = "http_engine_v2";
-	private static final String KEY_IMAGE_THUMBNAILS_ENABLED = "image_thumbnails";
 	private static final String KEY_IP_FILTER = "ip_filter";
 	private static final String KEY_SHOW_IPHOTO_LIBRARY = "show_iphoto_library";
 	private static final String KEY_SHOW_ITUNES_LIBRARY = "show_itunes_library";
@@ -145,7 +137,6 @@ public class PmsConfiguration {
 	private static final String KEY_NETWORK_INTERFACE = "network_interface";
 	private static final String KEY_DISABLE_TRANSCODE_FOR_EXTENSIONS = "disable_transcode_for_extensions";
 	private static final String KEY_NUMBER_OF_CPU_CORES = "number_of_cpu_cores";
-	private static final String KEY_OPEN_ARCHIVES = "enable_archive_browsing";
 	private static final String KEY_OVERSCAN = "mencoder_overscan";
 	private static final String KEY_PLUGIN_DIRECTORY = "plugins";
 	private static final String KEY_PREVENTS_SLEEP = "prevents_sleep_mode";
@@ -158,13 +149,10 @@ public class PmsConfiguration {
 	private static final String KEY_SHARES = "shares";
 	private static final String KEY_SKIP_LOOP_FILTER_ENABLED = "mencoder_skip_loop_filter";
 	private static final String KEY_SKIP_NETWORK_INTERFACES = "skip_network_interfaces";
-	private static final String KEY_SORT_METHOD = "sort_method";
 	private static final String KEY_SUBS_COLOR = "subtitle_color";
 	private static final String KEY_SUBTITLE_CODEPAGE = "subtitle_codepage";
 	private static final String KEY_SUBTITLE_LANGUAGES = "subtitle_languages";
 	private static final String KEY_TEMP_FOLDER_PATH = "temp_directory";
-	private static final String KEY_THUMBNAIL_GENERATION_ENABLED = "generate_thumbnails";
-	private static final String KEY_THUMBNAIL_SEEK_POS = "thumbnail_seek_position";
 	private static final String KEY_TRANSCODE_BLOCKS_MULTIPLE_CONNECTIONS = "transcode_block_multiple_connections";
 	private static final String KEY_TRANSCODE_FOLDER_NAME = "transcode_folder_name";
 	private static final String KEY_TRANSCODE_KEEP_FIRST_CONNECTION = "transcode_keep_first_connection";
@@ -253,29 +241,21 @@ public class PmsConfiguration {
 	 */
 	public static final Set<String> NEED_RELOAD_FLAGS = new HashSet<String>(
 		asList(
-			KEY_ALTERNATE_THUMB_FOLDER,
 			KEY_NETWORK_INTERFACE,
 			KEY_IP_FILTER,
-			KEY_SORT_METHOD,
-			KEY_HIDE_EMPTY_FOLDERS,
-			KEY_HIDE_TRANSCODE_FOLDER,
 			KEY_HIDE_MEDIA_LIBRARY_FOLDER,
-			KEY_OPEN_ARCHIVES,
 			KEY_USE_CACHE,
-			KEY_HIDE_ENGINENAMES,
 			KEY_SHOW_ITUNES_LIBRARY,
 			KEY_SHOW_IPHOTO_LIBRARY,
 			KEY_SHOW_APERTURE_LIBRARY,
 			KEY_ENGINES,
 			KEY_FOLDERS,
 			KEY_HIDE_VIDEO_SETTINGS,
-			KEY_AUDIO_THUMBNAIL_METHOD,
 			KEY_DISABLE_TRANSCODE_FOR_EXTENSIONS,
 			KEY_FORCE_TRANSCODE_FOR_EXTENSIONS,
 			KEY_SERVER_PORT,
 			KEY_SERVER_HOSTNAME,
-			KEY_CHAPTER_SUPPORT,
-			KEY_HIDE_EXTENSIONS
+			KEY_CHAPTER_SUPPORT
 		)
 	);
 
@@ -850,26 +830,6 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns the number of seconds from the start of a video file (the seek
-	 * position) where the thumbnail image for the movie should be extracted
-	 * from. Default is 2 seconds.
-	 * @return The seek position in seconds.
-	 */
-	public int getThumbnailSeekPos() {
-		return getInt(KEY_THUMBNAIL_SEEK_POS, 2);
-	}
-
-	/**
-	 * Sets the number of seconds from the start of a video file (the seek
-	 * position) where the thumbnail image for the movie should be extracted
-	 * from.
-	 * @param value The seek position in seconds.
-	 */
-	public void setThumbnailSeekPos(int value) {
-		configuration.setProperty(KEY_THUMBNAIL_SEEK_POS, value);
-	}
-
-	/**
 	 * Returns whether the user wants ASS/SSA subtitle support. Default is
 	 * true.
 	 *
@@ -1179,24 +1139,6 @@ public class PmsConfiguration {
 	}
 
 	/**
-	 * Returns true if archives (e.g. .zip or .rar) should be browsable by
-	 * PMS, false otherwise.
-	 * @return True if archives should be browsable.
-	 */
-	public boolean isArchiveBrowsing() {
-		return getBoolean(KEY_OPEN_ARCHIVES, false);
-	}
-
-	/**
-	 * Set to true if archives (e.g. .zip or .rar) should be browsable by
-	 * PMS, false otherwise.
-	 * @param value Set to true if archives should be browsable.
-	 */
-	public void setArchiveBrowsing(boolean value) {
-		configuration.setProperty(KEY_OPEN_ARCHIVES, value);
-	}
-
-	/**
 	 * Returns true if MEncoder should use the deinterlace filter, false
 	 * otherwise.
 	 * @return True if the deinterlace filter should be used.
@@ -1330,41 +1272,6 @@ public class PmsConfiguration {
 	 */
 	public void setMaximumBitrate(String value) {
 		configuration.setProperty(KEY_MAX_BITRATE, value);
-	}
-
-	/**
-	 * Returns true if thumbnail generation is enabled, false otherwise.
-	 *
-	 * @return boolean indicating whether thumbnail generation is enabled.
-	 */
-	public boolean isThumbnailGenerationEnabled() {
-		return getBoolean(KEY_THUMBNAIL_GENERATION_ENABLED, true);
-	}
-
-	/**
-	 * Sets the thumbnail generation option.
-	 */
-	public void setThumbnailGenerationEnabled(boolean value) {
-		configuration.setProperty(KEY_THUMBNAIL_GENERATION_ENABLED, value);
-	}
-
-	/**
-	 * Returns true if PMS should generate thumbnails for images. Default value
-	 * is true.
-	 *
-	 * @return True if image thumbnails should be generated.
-	 */
-	public boolean getImageThumbnailsEnabled() {
-		return getBoolean(KEY_IMAGE_THUMBNAILS_ENABLED, true);
-	}
-
-	/**
-	 * Set to true if PMS should generate thumbnails for images.
-	 *
-	 * @param value True if image thumbnails should be generated.
-	 */
-	public void setImageThumbnailsEnabled(boolean value) {
-		configuration.setProperty(KEY_IMAGE_THUMBNAILS_ENABLED, value);
 	}
 
 	/**
@@ -1777,22 +1684,6 @@ public class PmsConfiguration {
 		configuration.setProperty(KEY_NETWORK_INTERFACE, value);
 	}
 
-	public boolean isHideEngineNames() {
-		return getBoolean(KEY_HIDE_ENGINENAMES, false);
-	}
-
-	public void setHideEngineNames(boolean value) {
-		configuration.setProperty(KEY_HIDE_ENGINENAMES, value);
-	}
-
-	public boolean isHideExtensions() {
-		return getBoolean(KEY_HIDE_EXTENSIONS, false);
-	}
-
-	public void setHideExtensions(boolean value) {
-		configuration.setProperty(KEY_HIDE_EXTENSIONS, value);
-	}
-
 	public String getShares() {
 		return getString(KEY_SHARES, "");
 	}
@@ -1864,57 +1755,6 @@ public class PmsConfiguration {
 
 	public void setMEncoderOverscan(int value) {
 		configuration.setProperty(KEY_OVERSCAN, value);
-	}
-
-	/**
-	 * Returns sort method to use for ordering lists of files. One of the
-	 * following values is returned:
-	 * <ul>
-	 * <li>0: Locale-sensitive A-Z</li>
-	 * <li>1: Sort by modified date, newest first</li>
-	 * <li>2: Sort by modified date, oldest first</li>
-	 * <li>3: Case-insensitive ASCIIbetical sort</li>
-	 * <li>4: Locale-sensitive natural sort</li>
-	 * <li>5: Random</li>
-	 * </ul>
-	 * Default value is 4: locale-sensitive natural sort.
-	 * @return The sort method
-	 */
-	public int getSortMethod() {
-		return getInt(KEY_SORT_METHOD, 4);
-	}
-
-	/**
-	 * Set the sort method to use for ordering lists of files. The following
-	 * values are recognized:
-	 * <ul>
-	 * <li>0: Locale-sensitive A-Z</li>
-	 * <li>1: Sort by modified date, newest first</li>
-	 * <li>2: Sort by modified date, oldest first</li>
-	 * <li>3: Case-insensitive ASCIIbetical sort</li>
-	 * <li>4: Locale-sensitive natural sort</li>
-	 * <li>5: Random</li>
-	 * </ul>
-	 * @param value The sort method to use
-	 */
-	public void setSortMethod(int value) {
-		configuration.setProperty(KEY_SORT_METHOD, value);
-	}
-
-	public int getAudioThumbnailMethod() {
-		return getInt(KEY_AUDIO_THUMBNAIL_METHOD, 0);
-	}
-
-	public void setAudioThumbnailMethod(int value) {
-		configuration.setProperty(KEY_AUDIO_THUMBNAIL_METHOD, value);
-	}
-
-	public String getAlternateThumbFolder() {
-		return getString(KEY_ALTERNATE_THUMB_FOLDER, "");
-	}
-
-	public void setAlternateThumbFolder(String value) {
-		configuration.setProperty(KEY_ALTERNATE_THUMB_FOLDER, value);
 	}
 
 	public String getAlternateSubtitlesFolder() {
@@ -2008,42 +1848,6 @@ public class PmsConfiguration {
 
 	public void setShowItunesLibrary(boolean value) {
 		configuration.setProperty(KEY_SHOW_ITUNES_LIBRARY, value);
-	}
-
-	public boolean isHideEmptyFolders() {
-		return getBoolean(PmsConfiguration.KEY_HIDE_EMPTY_FOLDERS, false);
-	}
-
-	public void setHideEmptyFolders(final boolean value) {
-		this.configuration.setProperty(PmsConfiguration.KEY_HIDE_EMPTY_FOLDERS, value);
-	}
-
-	public boolean isHideMediaLibraryFolder() {
-		return getBoolean(PmsConfiguration.KEY_HIDE_MEDIA_LIBRARY_FOLDER, false);
-	}
-
-	public void setHideMediaLibraryFolder(final boolean value) {
-		this.configuration.setProperty(PmsConfiguration.KEY_HIDE_MEDIA_LIBRARY_FOLDER, value);
-	}
-
-	// TODO (breaking change): rename to e.g. isTranscodeFolderEnabled
-	// (and return true by default)
-	public boolean getHideTranscodeEnabled() {
-		return getBoolean(KEY_HIDE_TRANSCODE_FOLDER, false);
-	}
-
-	// TODO (breaking change): rename to e.g. setTranscodeFolderEnabled
-	// (and negate the value in the caller)
-	public void setHideTranscodeEnabled(boolean value) {
-		configuration.setProperty(KEY_HIDE_TRANSCODE_FOLDER, value);
-	}
-
-	public boolean isDvdIsoThumbnails() {
-		return getBoolean(KEY_DVD_ISO_THUMBNAILS, false);
-	}
-
-	public void setDvdIsoThumbnails(boolean value) {
-		configuration.setProperty(KEY_DVD_ISO_THUMBNAILS, value);
 	}
 
 	public Object getCustomProperty(String property) {

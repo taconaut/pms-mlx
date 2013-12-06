@@ -32,7 +32,6 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pms.PMS;
 import net.pms.dlna.CueFolder;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DVDISOFile;
@@ -295,7 +294,7 @@ public class FileSystemResource extends VirtualFolder {
 			} else {
 				
 				/* Optionally ignore empty directories */
-				if (f.isDirectory() && PMS.getConfiguration().isHideEmptyFolders() && !isFolderRelevant(f)) {					
+				if (f.isDirectory() && getDLNAResourceConfiguration().isHideEmptyFolders() && !isFolderRelevant(f)) {					
 					if(logger.isInfoEnabled()) logger.info("Ignoring empty/non relevant directory: " + f.getName());
 				}
 				
@@ -317,7 +316,7 @@ public class FileSystemResource extends VirtualFolder {
 	private boolean isFolderRelevant(File f) {
 		boolean isRelevant = false;
 
-		if (f.isDirectory() && PMS.getConfiguration().isHideEmptyFolders()) {
+		if (f.isDirectory() && getDLNAResourceConfiguration().isHideEmptyFolders()) {
 			File[] children = f.listFiles();
 
 			// listFiles() returns null if "this abstract pathname does not denote a directory, or if an I/O error occurs".
@@ -353,7 +352,7 @@ public class FileSystemResource extends VirtualFolder {
 	 */
 	private boolean isFileRelevant(File f) {
 		String fileName = f.getName().toLowerCase();
-		return (PMS.getConfiguration().isArchiveBrowsing() && (fileName.endsWith(".zip") || fileName.endsWith(".cbz") ||
+		return (getDLNAResourceConfiguration().isBrowseArchives() && (fileName.endsWith(".zip") || fileName.endsWith(".cbz") ||
 			fileName.endsWith(".rar") || fileName.endsWith(".cbr"))) ||
 			fileName.endsWith(".iso") || fileName.endsWith(".img") || 
 			fileName.endsWith(".m3u") || fileName.endsWith(".m3u8") || fileName.endsWith(".pls") || fileName.endsWith(".cue");

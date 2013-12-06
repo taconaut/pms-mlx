@@ -20,12 +20,14 @@ package net.pms.dlna;
 
 import jwbroek.cuelib.*;
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.dlna.Range.Time;
 import net.pms.encoders.FFmpegAudio;
 import net.pms.encoders.MEncoderVideo;
 import net.pms.encoders.Player;
 import net.pms.formats.Format;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +48,8 @@ public class CueFolder extends DLNAResource {
 	}
 	private boolean valid = true;
 
-	public CueFolder(File f) {
+	public CueFolder(File f, DLNAResourceConfiguration configuration) {
+		super(configuration);
 		playlistfile = f;
 		setLastModified(playlistfile.lastModified());
 	}
@@ -128,7 +131,7 @@ public class CueFolder extends DLNAResource {
 						}
 
 						Position start = track.getIndices().get(0).getPosition();
-						RealFile realFile = new RealFile(new File(playlistfile.getParentFile(), f.getFile()));
+						RealFile realFile = new RealFile(new File(playlistfile.getParentFile(), f.getFile()), getDLNAResourceConfiguration());
 						addChild(realFile);
 						addedResources.add(realFile);
 

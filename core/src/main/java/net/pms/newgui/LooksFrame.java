@@ -517,11 +517,6 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	}
 
 	@Override
-	public void setScanLibraryEnabled(boolean flag) {
-		getFt().setScanLibraryEnabled(flag);
-	}
-
-	@Override
 	public void save() {
 		mediaLibraryTab.save();
 	}

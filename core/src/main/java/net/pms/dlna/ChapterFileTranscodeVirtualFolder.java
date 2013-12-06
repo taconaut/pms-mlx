@@ -18,6 +18,7 @@
  */
 package net.pms.dlna;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 
 /**
@@ -42,8 +43,8 @@ public class ChapterFileTranscodeVirtualFolder extends VirtualFolder {
 	 * @param interval The interval (in minutes) at which a chapter marker will be
 	 * 			placed.
 	 */
-	public ChapterFileTranscodeVirtualFolder(String name, String thumbnailIcon, int interval) {
-		super(name, thumbnailIcon);
+	public ChapterFileTranscodeVirtualFolder(String name, String thumbnailIcon, int interval, DLNAResourceConfiguration configuration) {
+		super(name, thumbnailIcon, configuration);
 		this.interval = interval;
 	}
 

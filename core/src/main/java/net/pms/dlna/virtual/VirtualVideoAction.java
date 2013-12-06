@@ -18,6 +18,7 @@
  */
 package net.pms.dlna.virtual;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAMediaAudio;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
@@ -50,7 +51,8 @@ public abstract class VirtualVideoAction extends DLNAResource {
 	 * @param enabled If true, a green tick mark is shown as thumbnail. If false, a red cross is shown. This initial value
 	 * is usually changed via the {@link #enable()} function.
 	 */
-	public VirtualVideoAction(String name, boolean enabled) {
+	public VirtualVideoAction(String name, boolean enabled, DLNAResourceConfiguration configuration) {
+		super(configuration);
 		this.name = name;
 		thumbnailContentType = HTTPResource.PNG_TYPEMIME;
 		thumbnailIconOK = "images/apply-256.png";

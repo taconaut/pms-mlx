@@ -18,10 +18,11 @@
  */
 package net.pms.dlna;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
 
 public class WebVideoStream extends WebStream {
-	public WebVideoStream(String fluxName, String URL, String thumbURL) {
-		super(fluxName, URL, thumbURL, Format.VIDEO);
+	public WebVideoStream(String fluxName, String URL, String thumbURL, DLNAResourceConfiguration configuration) {
+		super(fluxName, URL, thumbURL, Format.VIDEO, configuration);
 	}
 }

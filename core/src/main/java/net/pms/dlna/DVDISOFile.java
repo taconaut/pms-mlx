@@ -19,8 +19,8 @@
 package net.pms.dlna;
 
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
-import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.formats.Format;
 import net.pms.io.OutputParams;
@@ -51,8 +51,8 @@ public class DVDISOFile extends VirtualFolder {
 		return getFilename(file);
 	}
 
-	public DVDISOFile(File file) {
-		super(getName(file), null);
+	public DVDISOFile(File file, DLNAResourceConfiguration configuration) {
+		super(getName(file), null, configuration);
 		this.file = file;
 
 		/*
@@ -137,7 +137,7 @@ public class DVDISOFile extends VirtualFolder {
 			 * Common-sense is a single video track on a DVD is usually greater than 1h
 			 */
 			if (titles[i] > 10 && (titles[i] != oldduration || oldduration < 3600)) {
-				DVDISOTitle dvd = new DVDISOTitle(file, i);
+				DVDISOTitle dvd = new DVDISOTitle(file, i, getDLNAResourceConfiguration());
 				addChild(dvd);
 				oldduration = titles[i];
 			}

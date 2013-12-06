@@ -18,17 +18,18 @@
  */
 package net.pms.dlna;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
 
 // FIXME (breaking change): rename VideoFeed
 public class VideosFeed extends Feed {
 	@Override
 	protected void manageItem() {
-		WebVideoStream fi = new WebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
+		WebVideoStream fi = new WebVideoStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL(), getDLNAResourceConfiguration());
 		addChild(fi);
 	}
 
-	public VideosFeed(String url) {
-		super("" + System.currentTimeMillis(), url, Format.VIDEO);
+	public VideosFeed(String url, DLNAResourceConfiguration configuration) {
+		super("" + System.currentTimeMillis(), url, Format.VIDEO, configuration);
 	}
 }

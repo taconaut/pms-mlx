@@ -21,6 +21,9 @@ package net.pms.dlna;
 import com.github.junrar.Archive;
 import com.github.junrar.exception.RarException;
 import com.github.junrar.rarfile.FileHeader;
+
+import net.pms.configuration.DLNAResourceConfiguration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,8 @@ public class RarredFile extends DLNAResource {
 	private File f;
 	private Archive rarFile;
 
-	public RarredFile(File f) {
+	public RarredFile(File f, DLNAResourceConfiguration configuration) {
+		super(configuration);
 		this.f = f;
 		setLastModified(f.lastModified());
 
@@ -45,7 +49,7 @@ public class RarredFile extends DLNAResource {
 
 			for (FileHeader fh : headers) {
 				// if (fh.getFullUnpackSize() < MAX_ARCHIVE_ENTRY_SIZE && fh.getFullPackSize() < MAX_ARCHIVE_ENTRY_SIZE)
-				addChild(new RarredEntry(fh.getFileNameString(), f, fh.getFileNameString(), fh.getFullUnpackSize()));
+				addChild(new RarredEntry(fh.getFileNameString(), f, fh.getFileNameString(), fh.getFullUnpackSize(), getDLNAResourceConfiguration()));
 			}
 
 			rarFile.close();

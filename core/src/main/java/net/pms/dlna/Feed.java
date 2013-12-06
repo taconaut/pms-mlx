@@ -24,6 +24,9 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+
+import net.pms.configuration.DLNAResourceConfiguration;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jdom.Content;
 import org.jdom.Element;
@@ -98,8 +101,8 @@ public class Feed extends DLNAResource {
 		}
 	}
 
-	public Feed(String name, String url, int type) {
-		super(type);
+	public Feed(String name, String url, int type, DLNAResourceConfiguration configuration) {
+		super(type, configuration);
 		setUrl(url);
 		setName(name);
 	}
@@ -202,7 +205,7 @@ public class Feed extends DLNAResource {
 	}
 
 	protected void manageItem() {
-		FeedItem fi = new FeedItem(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL(), null, getSpecificType());
+		FeedItem fi = new FeedItem(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL(), null, getSpecificType(), getDLNAResourceConfiguration());
 		addChild(fi);
 	}
 

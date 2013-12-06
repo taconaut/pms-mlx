@@ -18,6 +18,7 @@
  */
 package net.pms.dlna;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.network.HTTPResourceAuthenticator;
 
 import java.io.IOException;
@@ -57,8 +58,8 @@ public class WebStream extends DLNAResource {
 	@Deprecated
 	protected String thumbURL;
 
-	public WebStream(String fluxName, String url, String thumbURL, int type) {
-		super(type);
+	public WebStream(String fluxName, String url, String thumbURL, int type, DLNAResourceConfiguration configuration) {
+		super(type, configuration);
 
 		try {
 			URL tmpUrl = new URL(url);

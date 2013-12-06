@@ -20,6 +20,7 @@ package net.pms.dlna;
 
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.formats.FormatFactory;
@@ -28,6 +29,7 @@ import net.pms.io.OutputParams;
 import net.pms.io.ProcessWrapperImpl;
 import net.pms.util.FileUtil;
 import net.pms.util.ProcessUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +49,8 @@ public class DVDISOTitle extends DLNAResource {
 	private int title;
 	private long length;
 
-	public DVDISOTitle(File file, int title) {
+	public DVDISOTitle(File file, int title, DLNAResourceConfiguration configuration) {
+		super(configuration);
 		this.file = file;
 		this.title = title;
 		setLastModified(file.lastModified());
@@ -75,7 +78,7 @@ public class DVDISOTitle extends DLNAResource {
 		OutputParams params = new OutputParams(configuration);
 		params.maxBufferSize = 1;
 
-		if (configuration.isDvdIsoThumbnails()) {
+		if (getDLNAResourceConfiguration().isDvdIsoThumbnailsEnabled()) {
 			try {
 				params.workDir = configuration.getTempFolder();
 			} catch (IOException e1) {
@@ -182,7 +185,7 @@ public class DVDISOTitle extends DLNAResource {
 			}
 		}
 
-		if (configuration.isDvdIsoThumbnails()) {
+		if (getDLNAResourceConfiguration().isDvdIsoThumbnailsEnabled()) {
 			try {
 				String frameName = "" + this.hashCode();
 				frameName = configuration.getTempFolder() + "/mplayer_thumbs/" + frameName + "00000001/0000000";
@@ -339,8 +342,8 @@ public class DVDISOTitle extends DLNAResource {
 				break;
 			}
 
-			if (isNotBlank(configuration.getAlternateThumbFolder())) {
-				thumbFolder = new File(configuration.getAlternateThumbFolder());
+			if (isNotBlank(getDLNAResourceConfiguration().getAlternateThumbFolder())) {
+				thumbFolder = new File(getDLNAResourceConfiguration().getAlternateThumbFolder());
 
 				if (!thumbFolder.isDirectory()) {
 					thumbFolder = null;

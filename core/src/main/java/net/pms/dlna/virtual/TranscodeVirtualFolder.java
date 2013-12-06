@@ -19,9 +19,10 @@
 package net.pms.dlna.virtual;
 
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 
 public class TranscodeVirtualFolder extends VirtualFolder {
-	public TranscodeVirtualFolder(String thumbnailIcon) { // XXX thumbnailIcon is always null
-		super(PMS.getConfiguration().getTranscodeFolderName(), thumbnailIcon);
+	public TranscodeVirtualFolder(String thumbnailIcon, DLNAResourceConfiguration configuration) { // XXX thumbnailIcon is always null
+		super(PMS.getConfiguration().getTranscodeFolderName(), thumbnailIcon, configuration);
 	}
 }
