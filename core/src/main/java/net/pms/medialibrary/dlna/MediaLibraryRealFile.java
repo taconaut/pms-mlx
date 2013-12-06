@@ -28,6 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.InputFile;
 import net.pms.dlna.RealFile;
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
@@ -67,7 +68,7 @@ public class MediaLibraryRealFile extends RealFile {
 	 * @param fileType the file type
 	 */
 	public MediaLibraryRealFile(DOFileInfo fileInfo, FileDisplayProperties displayProperties, FileType fileType) {
-		super(new File(fileInfo.getFilePath()));
+		super(new File(fileInfo.getFilePath()), DLNAResourceConfiguration.getDefaultConfiguration());
 
 		setFileType(fileType);
 		setFileInfo(fileInfo);
@@ -78,7 +79,7 @@ public class MediaLibraryRealFile extends RealFile {
 		//set the base file if we are a folder
 		if (displayProperties.getFileDisplayType() == FileDisplayType.FOLDER) {
 			fileBase = MediaLibraryStorage.getInstance().getFileFolder(displayProperties.getTemplate().getId());
-			originalFile = new RealFile(new File(fileInfo.getFilePath()));
+			originalFile = new RealFile(new File(fileInfo.getFilePath()), getDLNAResourceConfiguration());
 			handleFileFolderDisplayNameMasks(fileBase);
 		}
 	}
@@ -92,7 +93,7 @@ public class MediaLibraryRealFile extends RealFile {
 	 * @param fileType the file type
 	 */
 	private MediaLibraryRealFile(DOFileEntryBase fileBase, DOFileInfo fileInfo, FileDisplayProperties displayProperties, FileType fileType, RealFile originalFile) {
-		super(new File(fileInfo.getFilePath()));
+		super(new File(fileInfo.getFilePath()), DLNAResourceConfiguration.getDefaultConfiguration());
 
 		setFileType(fileType);
 		setFileInfo(fileInfo);

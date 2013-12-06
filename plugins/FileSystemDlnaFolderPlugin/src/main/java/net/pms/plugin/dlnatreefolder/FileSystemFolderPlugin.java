@@ -93,7 +93,7 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	@Override
 	public DLNAResource getDLNAResource() {
 		if(fileSystemResource == null){
-			fileSystemResource = new FileSystemResource(rootFolderName, instanceConfig.getFolderPaths());
+			fileSystemResource = new FileSystemResource(rootFolderName, instanceConfig.getFolderPaths(), instanceConfig != null ? instanceConfig : globalConfig);
 		}
 		
 		return fileSystemResource;

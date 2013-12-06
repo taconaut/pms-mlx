@@ -27,6 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.FileTranscodeVirtualFolder;
@@ -137,7 +138,7 @@ public class DLNAHelper {
 	}
 
 	public static void addMultipleFiles(DLNAResource parent, RealFile child, RealFile originalFile) {
-		FileTranscodeVirtualFolder rootFolder = new FileTranscodeVirtualFolder("", null);
+		FileTranscodeVirtualFolder rootFolder = new FileTranscodeVirtualFolder("", null, DLNAResourceConfiguration.getDefaultConfiguration());
 		rootFolder.setParent(parent);
 		rootFolder.addChild(originalFile.clone());
 		rootFolder.resolve();

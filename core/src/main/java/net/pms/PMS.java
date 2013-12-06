@@ -22,6 +22,7 @@ package net.pms;
 import com.sun.jna.Platform;
 
 import net.pms.configuration.Build;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaDatabase;
@@ -561,7 +562,7 @@ public class PMS {
 		// initialize the cache
 		if (configuration.getUseCache()) {
 			initializeDatabase(); // XXX: this must be done *before* new MediaLibrary -> new MediaLibraryFolder
-			mediaLibrary = new MediaLibrary();
+			mediaLibrary = new MediaLibrary(DLNAResourceConfiguration.getDefaultConfiguration());
 			logger.info("A tiny cache admin interface is available at: http://" + server.getHost() + ":" + server.getPort() + "/console/home");
 		}
 

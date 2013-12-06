@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.io.OutputParams;
 import net.pms.io.ProcessWrapperImpl;
@@ -54,7 +55,7 @@ public class MediaLibraryFileInfo extends VirtualFolder {
 	 * @param thumbnailIcon the thumbnail icon
 	 */
 	public MediaLibraryFileInfo(String displayName, String thumbnailIcon) {
-		super(displayName, thumbnailIcon);
+		super(displayName, thumbnailIcon, DLNAResourceConfiguration.getDefaultConfiguration());
 	}
 	
 	/* (non-Javadoc)

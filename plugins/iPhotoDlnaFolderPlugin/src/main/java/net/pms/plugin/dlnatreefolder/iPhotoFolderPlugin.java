@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xmlwise.Plist;
-
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.virtual.VirtualFolder;
@@ -81,13 +81,13 @@ public class iPhotoFolderPlugin implements DlnaTreeFolderPlugin {
 					@SuppressWarnings("unchecked")
 					List<Map<?, ?>> listOfRolls = (List<Map<?, ?>>) iPhotoLib.get("List of Rolls");
 
-					iPhotoVirtualFolder = new VirtualFolder(rootFolderName, null);
+					iPhotoVirtualFolder = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 
 					for (Map<?, ?> roll : listOfRolls) {
 						Object rollName = roll.get("RollName");
 
 						if (rollName != null) {
-							VirtualFolder virtualFolder = new VirtualFolder(rollName.toString(), null);
+							VirtualFolder virtualFolder = new VirtualFolder(rollName.toString(), null, DLNAResourceConfiguration.getDefaultConfiguration());
 
 							// List of photos in an event (roll)
 							List<?> rollPhotos = (List<?>) roll.get("KeyList");
@@ -99,7 +99,7 @@ public class iPhotoFolderPlugin implements DlnaTreeFolderPlugin {
 									Object imagePath = photoProperties.get("ImagePath");
 
 									if (imagePath != null) {
-										RealFile realFile = new RealFile(new File(imagePath.toString()));
+										RealFile realFile = new RealFile(new File(imagePath.toString()), DLNAResourceConfiguration.getDefaultConfiguration());
 										virtualFolder.addChild(realFile);
 									}
 								}

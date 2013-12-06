@@ -10,6 +10,7 @@ import com.savvasdalkitsis.jtmdb.Movie;
 import com.savvasdalkitsis.jtmdb.ServerResponse;
 import com.savvasdalkitsis.jtmdb.Session;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
 import net.pms.plugin.filedetail.TmdbHelper;
@@ -23,6 +24,7 @@ public class RatingResource extends DLNAResource {
 	private InputStream resStream;
 
 	public RatingResource(DOVideoFileInfo video, float rating) {
+		super(DLNAResourceConfiguration.getDefaultConfiguration());
 	    this.video = video;
 	    this.rating = rating;
 	    

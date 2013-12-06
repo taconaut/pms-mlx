@@ -27,6 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.RealFile;
 import net.pms.formats.FLAC;
@@ -196,7 +197,7 @@ public class FullDataCollector {
 				log.error("File " + fi.getFilePath() + " doesn't exist or couldn't be opened as a file for reading");
 				return;
 			}
-			RealFile rf = new RealFile(inFile);
+			RealFile rf = new RealFile(inFile, DLNAResourceConfiguration.getDefaultConfiguration());
 			//add the parent to avoid a null pointer exception when calling isValid
 			rf.setParent(dummyParent);
 			if(!rf.isValid()){

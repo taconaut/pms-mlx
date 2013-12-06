@@ -28,6 +28,7 @@ import xmlwise.Plist;
 import com.sun.jna.Platform;
 
 import net.pms.Messages;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.virtual.VirtualFolder;
@@ -105,7 +106,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 					iTunesLib = Plist.load(URLDecoder.decode(iTunesFile, System.getProperty("file.encoding"))); // loads the (nested) properties.
 					Tracks = (Map<?, ?>) iTunesLib.get("Tracks"); // the list of tracks
 					Playlists = (List<?>) iTunesLib.get("Playlists"); // the list of Playlists
-					res = new VirtualFolder(rootFolderName, null);
+					res = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 
 					VirtualFolder playlistsFolder = null;
 
@@ -118,13 +119,13 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 						if (Playlist.containsKey("Music") && Playlist.get("Music").equals(Boolean.TRUE)) {
 							// Create virtual folders for artists, albums and genres
 
-							VirtualFolder musicFolder = new VirtualFolder(Playlist.get("Name").toString(), null);
+							VirtualFolder musicFolder = new VirtualFolder(Playlist.get("Name").toString(), null, DLNAResourceConfiguration.getDefaultConfiguration());
 							res.addChild(musicFolder);
 
-							VirtualFolder virtualFolderArtists = new VirtualFolder(Messages.getString("PMS.13"), null);
-							VirtualFolder virtualFolderAlbums = new VirtualFolder(Messages.getString("PMS.16"), null);
-							VirtualFolder virtualFolderGenres = new VirtualFolder(Messages.getString("PMS.19"), null);
-							VirtualFolder virtualFolderAllTracks = new VirtualFolder(Messages.getString("PMS.11"), null);
+							VirtualFolder virtualFolderArtists = new VirtualFolder(Messages.getString("PMS.13"), null, DLNAResourceConfiguration.getDefaultConfiguration());
+							VirtualFolder virtualFolderAlbums = new VirtualFolder(Messages.getString("PMS.16"), null, DLNAResourceConfiguration.getDefaultConfiguration());
+							VirtualFolder virtualFolderGenres = new VirtualFolder(Messages.getString("PMS.19"), null, DLNAResourceConfiguration.getDefaultConfiguration());
+							VirtualFolder virtualFolderAllTracks = new VirtualFolder(Messages.getString("PMS.11"), null, DLNAResourceConfiguration.getDefaultConfiguration());
 
 							PlaylistTracks = (List<?>) Playlist.get("Playlist Items"); // list of tracks in a playlist
 
@@ -180,7 +181,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 
 										URI tURI2 = new URI(track.get("Location").toString());
 										File refFile = new File(URLDecoder.decode(tURI2.toURL().getFile(), "UTF-8"));
-										RealFile file = new RealFile(refFile, name);
+										RealFile file = new RealFile(refFile, name, DLNAResourceConfiguration.getDefaultConfiguration());
 
 										// ARTISTS FOLDER - Put the track into the artist's album folder and the artist's "All tracks" folder
 										{
@@ -201,16 +202,16 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 											}
 
 											if (individualArtistFolder == null) {
-												individualArtistFolder = new VirtualFolder(artistName, null);
+												individualArtistFolder = new VirtualFolder(artistName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 												virtualFolderArtists.addChild(individualArtistFolder);
-												individualArtistAllTracksFolder = new VirtualFolder(Messages.getString("PMS.11"), null);
+												individualArtistAllTracksFolder = new VirtualFolder(Messages.getString("PMS.11"), null, DLNAResourceConfiguration.getDefaultConfiguration());
 												individualArtistFolder.addChild(individualArtistAllTracksFolder);
 											} else {
 												individualArtistAllTracksFolder = (VirtualFolder)individualArtistFolder.getChildren().get(0);
 											}
 
 											if (individualArtistAlbumFolder == null) {
-												individualArtistAlbumFolder = new VirtualFolder(albumName, null);
+												individualArtistAlbumFolder = new VirtualFolder(albumName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 												individualArtistFolder.addChild(individualArtistAlbumFolder);
 											}
 
@@ -231,7 +232,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 												}
 											}
 											if (individualAlbumFolder == null) {
-												individualAlbumFolder = new VirtualFolder(albumName, null);
+												individualAlbumFolder = new VirtualFolder(albumName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 												virtualFolderAlbums.addChild(individualAlbumFolder);
 											}
 											individualAlbumFolder.addChild(file.clone());
@@ -247,7 +248,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 												}
 											}
 											if (individualGenreFolder == null) {
-												individualGenreFolder = new VirtualFolder(genreName, null);
+												individualGenreFolder = new VirtualFolder(genreName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 												virtualFolderGenres.addChild(individualGenreFolder);
 											}
 											individualGenreFolder.addChild(file.clone());
@@ -294,7 +295,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 
 						} else {
 							// Add all playlists
-							VirtualFolder pf = new VirtualFolder(Playlist.get("Name").toString(), null);
+							VirtualFolder pf = new VirtualFolder(Playlist.get("Name").toString(), null, DLNAResourceConfiguration.getDefaultConfiguration());
 							PlaylistTracks = (List<?>) Playlist.get("Playlist Items"); // list of tracks in a playlist
 
 							if (PlaylistTracks != null) {
@@ -314,7 +315,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 											name = String.format(Messages.getString("RootFolder.1"), name);
 
 										URI tURI2 = new URI(track.get("Location").toString());
-										RealFile file = new RealFile(new File(URLDecoder.decode(tURI2.toURL().getFile(), "UTF-8")), name);
+										RealFile file = new RealFile(new File(URLDecoder.decode(tURI2.toURL().getFile(), "UTF-8")), name, DLNAResourceConfiguration.getDefaultConfiguration());
 										pf.addChild(file);
 									}
 								}
@@ -328,7 +329,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 							} else {
 								// User playlist or playlist folder
 								if (playlistsFolder == null) {
-									playlistsFolder = new VirtualFolder("Playlists", null);
+									playlistsFolder = new VirtualFolder("Playlists", null, DLNAResourceConfiguration.getDefaultConfiguration());
 									res.addChild(playlistsFolder);
 								}
 								playlistsFolder.addChild(pf);

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
@@ -98,7 +99,7 @@ public class TmdbRatingPlugin implements FileDetailPlugin {
 
 	@Override
     public DLNAResource getResource() {
-	    VirtualFolder vf = new VirtualFolder(displayName, null);
+	    VirtualFolder vf = new VirtualFolder(displayName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 	    for(int i = 20 ; i >= 0; i--){
 		    vf.addChild(new RatingResource(video, ((float)i) / 2));
 	    }

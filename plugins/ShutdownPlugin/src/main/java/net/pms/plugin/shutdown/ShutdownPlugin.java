@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
@@ -75,7 +76,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	@Override
 	public DLNAResource getDLNAResource() {
 		// Create computer shutdown folder.
-		DLNAResource shutdownFolder = new VirtualFolder(rootFolderName, null);
+		DLNAResource shutdownFolder = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
 
 		// Add power off menu item
 		shutdownFolder.addChild(getPowerOffAction());
@@ -91,7 +92,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * @return The virtual video action.
 	 */
 	private DLNAResource getPowerOffAction() {
-		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.poweroff"), true) {
+		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.poweroff"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
 			/**
 			 * This method is called when the user selects the menu item.
 			 * @return Always returns true.
@@ -144,7 +145,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * @return The virtual video action.
 	 */
 	private DLNAResource getRestartAction() {
-		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.restart"), true) {
+		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.restart"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
 			/**
 			 * This method is called when the user selects the menu item.
 			 * @return Always returns true.

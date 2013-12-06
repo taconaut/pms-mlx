@@ -21,6 +21,7 @@ package net.pms.medialibrary.scanner;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAResource;
 
@@ -35,6 +36,7 @@ import net.pms.dlna.DLNAResource;
 public class FileScannerDlnaResource extends DLNAResource {
 
 	public FileScannerDlnaResource() {
+		super(DLNAResourceConfiguration.getDefaultConfiguration());
 		setDefaultRenderer(RendererConfiguration.getRendererConfigurationByUA("FileParsingRenderer"));
 	}
 

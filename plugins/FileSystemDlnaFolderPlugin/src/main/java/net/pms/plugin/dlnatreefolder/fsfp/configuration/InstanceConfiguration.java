@@ -21,14 +21,14 @@ package net.pms.plugin.dlnatreefolder.fsfp.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.pms.configuration.BaseConfiguration;
+import net.pms.configuration.DLNAResourceConfiguration;
 
 /**
  * Holds the configuration for an instance of the plugin
  * 
  * @author pw
  */
-public class InstanceConfiguration extends BaseConfiguration {
+public class InstanceConfiguration extends DLNAResourceConfiguration {
 
 	/**
 	 * Sets the folder paths.

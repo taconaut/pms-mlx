@@ -89,7 +89,7 @@ public class GlobalConfigurationPanel extends JPanel {
 	public void applyConfig() {		
 		cbGenerateThumbs.setSelected(globalConfig.isThumbnailGenerationEnabled());
 		cbDvdIsoThumbs.setSelected(globalConfig.isDvdIsoThumbnailsEnabled());
-		cbImageThumbs.setSelected(globalConfig.getImageThumbnailsEnabled());
+		cbImageThumbs.setSelected(globalConfig.isImageThumbnailsEnabled());
 		((KeyedComboBoxModel) cbAudioThumbs.getModel()).setSelectedKey(String.valueOf(globalConfig.getAudioThumbnailMethod()));
 		tfDefaultThumbFolder.setText(globalConfig.getAlternateThumbFolder());
 		cbBrowseArchives.setSelected(globalConfig.isBrowseArchives());
