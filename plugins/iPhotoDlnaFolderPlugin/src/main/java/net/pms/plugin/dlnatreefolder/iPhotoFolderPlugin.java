@@ -200,7 +200,7 @@ public class iPhotoFolderPlugin implements DlnaTreeFolderPlugin {
 	}
 
 	@Override
-	public void saveConfiguration() {
+	public void saveGlobalConfiguration() {
 	}
 
 	@Override

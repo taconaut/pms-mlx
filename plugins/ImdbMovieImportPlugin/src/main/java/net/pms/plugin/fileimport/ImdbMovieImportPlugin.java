@@ -433,7 +433,7 @@ public class ImdbMovieImportPlugin implements FileImportPlugin {
 	}
 
 	@Override
-	public void saveConfiguration() {
+	public void saveGlobalConfiguration() {
 		if(pGlobalConfiguration != null) {
 			pGlobalConfiguration.updateConfiguration(globalConfig);
 			try {

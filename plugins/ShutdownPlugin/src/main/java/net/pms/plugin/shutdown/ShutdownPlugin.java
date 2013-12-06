@@ -266,7 +266,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void saveConfiguration() {
+	public void saveGlobalConfiguration() {
 		// Do nothing
 	}
 

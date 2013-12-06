@@ -486,7 +486,7 @@ public class iTunesFolderPlugin implements DlnaTreeFolderPlugin {
 	}
 
 	@Override
-	public void saveConfiguration() {
+	public void saveGlobalConfiguration() {
 	}
 
 	@Override

@@ -105,7 +105,7 @@ public class PluginDetailDialog extends JDialog {
 		switch(actionType) {
 		case OK:
 			try {
-				plugin.saveConfiguration();
+				plugin.saveGlobalConfiguration();
 			} catch(Throwable t) {
 				//catch throwable for every external call to avoid having a plugin crash pms
 				log.error(String.format("Failed to get save configuration for plugin '%s'", plugin == null ? "null" : plugin.getName()), t);

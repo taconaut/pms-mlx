@@ -33,8 +33,8 @@ import net.pms.dlna.DLNAResource;
 import net.pms.plugin.dlnatreefolder.fsfp.configuration.GlobalConfiguration;
 import net.pms.plugin.dlnatreefolder.fsfp.configuration.InstanceConfiguration;
 import net.pms.plugin.dlnatreefolder.fsfp.dlna.FileSystemResource;
-import net.pms.plugin.dlnatreefolder.fsfp.gui.GlobalConfigurationPanel;
-import net.pms.plugin.dlnatreefolder.fsfp.gui.InstanceConfigurationPanel;
+import net.pms.plugin.dlnatreefolder.fsfp.gui.DLNAResourceConfigurationPanel;
+import net.pms.plugin.dlnatreefolder.fsfp.gui.instanceconfiguration.InstanceConfigurationPanel;
 import net.pms.plugins.DlnaTreeFolderPlugin;
 import net.pms.util.PmsProperties;
 
@@ -44,6 +44,7 @@ import net.pms.util.PmsProperties;
  */
 public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	private static final Logger logger = LoggerFactory.getLogger(FileSystemFolderPlugin.class);
+	private boolean isNewConfiguration = true;
 	
 	/** Resource used for localization */
 	public static final ResourceBundle messages = ResourceBundle.getBundle("net.pms.plugin.dlnatreefolder.fsfp.lang.messages");
@@ -77,13 +78,28 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	
 	/** GUI */
 	private InstanceConfigurationPanel pInstanceConfiguration;
-	private GlobalConfigurationPanel pGlobalConfiguration;
+	private static DLNAResourceConfigurationPanel pGlobalConfiguration;
+	
+	public FileSystemFolderPlugin() {
+	}
 
 	/* (non-Javadoc)
 	 * @see net.pms.plugins.DlnaTreeFolderPlugin#getInstanceConfigurationPanel()
 	 */
 	@Override
 	public JPanel getInstanceConfigurationPanel() {
+		// Lazy-initialize the panel
+		if(pInstanceConfiguration == null) {
+			pInstanceConfiguration = new InstanceConfigurationPanel();
+		}
+		
+		if(isNewConfiguration) {
+			// Apply the global configuration for new configurations
+			pInstanceConfiguration.applyModelToGui(globalConfig);
+		} else {
+			// Use the instance configuration if available
+			pInstanceConfiguration.applyModelToGui(instanceConfig);
+		}
 		return pInstanceConfiguration;
 	}
 
@@ -93,7 +109,7 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	@Override
 	public DLNAResource getDLNAResource() {
 		if(fileSystemResource == null){
-			fileSystemResource = new FileSystemResource(rootFolderName, instanceConfig.getFolderPaths(), instanceConfig != null ? instanceConfig : globalConfig);
+			fileSystemResource = new FileSystemResource(rootFolderName, instanceConfig != null ? instanceConfig.getFolderPaths() : null, instanceConfig != null ? instanceConfig : globalConfig);
 		}
 		
 		return fileSystemResource;
@@ -120,8 +136,7 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	 */
 	@Override
 	public void loadInstanceConfiguration(String configFilePath) throws IOException {
-		instanceConfig.load(configFilePath);
-		pInstanceConfiguration.setFolders(instanceConfig.getFolderPaths());
+		isNewConfiguration = !instanceConfig.load(configFilePath);
 	}
 
 	/* (non-Javadoc)
@@ -129,8 +144,9 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	 */
 	@Override
 	public void saveInstanceConfiguration(String configFilePath) throws IOException {
-		instanceConfig.setFolderPaths(pInstanceConfiguration.getFolders());
+		pInstanceConfiguration.applyGuiToModel(instanceConfig);
 		instanceConfig.save(configFilePath);
+		isNewConfiguration = false;
 	}
 
 	/* (non-Javadoc)
@@ -194,10 +210,12 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	 */
 	@Override
 	public JComponent getGlobalConfigurationPanel() {
+		// Lazy-initialize the static panel shared by all instances
 		if(pGlobalConfiguration == null ) {
-			pGlobalConfiguration = new GlobalConfigurationPanel(globalConfig);
+			pGlobalConfiguration = new DLNAResourceConfigurationPanel();
 		}
-		pGlobalConfiguration.applyConfig();
+		
+		pGlobalConfiguration.applyModelToGui(globalConfig);
 		return pGlobalConfiguration;
 	}
 
@@ -231,16 +249,15 @@ public class FileSystemFolderPlugin implements DlnaTreeFolderPlugin {
 	@Override
 	public void initialize() {
 		instanceConfig = new InstanceConfiguration();
-		pInstanceConfiguration = new InstanceConfigurationPanel();
 	}
 
 	/* (non-Javadoc)
 	 * @see net.pms.plugins.PluginBase#saveConfiguration()
 	 */
 	@Override
-	public void saveConfiguration() {
+	public void saveGlobalConfiguration() {
 		if(pGlobalConfiguration != null) {
-			pGlobalConfiguration.updateConfiguration(globalConfig);
+			pGlobalConfiguration.applyGuiToModel(globalConfig);
 			try {
 				globalConfig.save();
 			} catch (IOException e) {

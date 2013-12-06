@@ -76,16 +76,19 @@ public class BaseConfiguration {
 	 * Saves the properties to the specified file path.
 	 *
 	 * @param propertiesFilePath the file to load the properties from
+	 * @return 
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public void load(String propertiesFilePath) throws IOException {
+	public boolean load(String propertiesFilePath) throws IOException {
 		if(new File(propertiesFilePath).exists()) {
 			if (log.isDebugEnabled()) log.debug("Restoring configuration from " + propertiesFilePath);
 			FileInputStream configStream = new FileInputStream(propertiesFilePath);
 			properties.load(configStream);
 			log.info("Loaded configuration from " + propertiesFilePath);
+			return true;
 		} else {
 			log.debug("No configuration file found at " + propertiesFilePath);
+			return false;
 		}
 	}
 
