@@ -1,7 +1,6 @@
 package net.pms.dlna.virtual;
 
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.*;
 
 import java.io.File;
@@ -16,12 +15,12 @@ public class MediaLibraryFolder extends VirtualFolder {
 	private int expectedOutputs[];
 	private DLNAMediaDatabase database;
 
-	public MediaLibraryFolder(String name, String sql, int expectedOutput, DLNAResourceConfiguration configuration) {
-		this(name, new String[]{sql}, new int[]{expectedOutput}, configuration);
+	public MediaLibraryFolder(String name, String sql, int expectedOutput) {
+		this(name, new String[]{sql}, new int[]{expectedOutput});
 	}
 
-	public MediaLibraryFolder(String name, String sql[], int expectedOutput[], DLNAResourceConfiguration configuration) {
-		super(name, null, configuration);
+	public MediaLibraryFolder(String name, String sql[], int expectedOutput[]) {
+		super(name, null);
 		this.sqls = sql;
 		this.expectedOutputs = expectedOutput;
 		this.database = PMS.get().getDatabase();
@@ -41,21 +40,21 @@ public class MediaLibraryFolder extends VirtualFolder {
 					ArrayList<File> list = database.getFiles(sql);
 					if (list != null) {
 						for (File f : list) {
-							addChild(new RealFile(f, getDLNAResourceConfiguration()));
+							addChild(new RealFile(f));
 						}
 					}
 				} else if (expectedOutput == PLAYLISTS) {
 					ArrayList<File> list = database.getFiles(sql);
 					if (list != null) {
 						for (File f : list) {
-							addChild(new PlaylistFolder(f, getDLNAResourceConfiguration()));
+							addChild(new PlaylistFolder(f));
 						}
 					}
 				} else if (expectedOutput == ISOS) {
 					ArrayList<File> list = database.getFiles(sql);
 					if (list != null) {
 						for (File f : list) {
-							addChild(new DVDISOFile(f, getDLNAResourceConfiguration()));
+							addChild(new DVDISOFile(f));
 						}
 					}
 				} else if (expectedOutput == TEXTS) {
@@ -66,7 +65,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 							int expectedOutputs2[] = new int[expectedOutputs.length - 1];
 							System.arraycopy(sqls, 1, sqls2, 0, sqls2.length);
 							System.arraycopy(expectedOutputs, 1, expectedOutputs2, 0, expectedOutputs2.length);
-							addChild(new MediaLibraryFolder(s, sqls2, expectedOutputs2, getDLNAResourceConfiguration()));
+							addChild(new MediaLibraryFolder(s, sqls2, expectedOutputs2));
 						}
 					}
 				}
@@ -194,11 +193,11 @@ public class MediaLibraryFolder extends VirtualFolder {
 
 		for (File f : addedFiles) {
 			if (expectedOutput == FILES) {
-				addChild(new RealFile(f, getDLNAResourceConfiguration()));
+				addChild(new RealFile(f));
 			} else if (expectedOutput == PLAYLISTS) {
-				addChild(new PlaylistFolder(f, getDLNAResourceConfiguration()));
+				addChild(new PlaylistFolder(f));
 			} else if (expectedOutput == ISOS) {
-				addChild(new DVDISOFile(f, getDLNAResourceConfiguration()));
+				addChild(new DVDISOFile(f));
 			}
 		}
 
@@ -208,7 +207,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 				int expectedOutputs2[] = new int[expectedOutputs.length - 1];
 				System.arraycopy(sqls, 1, sqls2, 0, sqls2.length);
 				System.arraycopy(expectedOutputs, 1, expectedOutputs2, 0, expectedOutputs2.length);
-				addChild(new MediaLibraryFolder(f, sqls2, expectedOutputs2, getDLNAResourceConfiguration()));
+				addChild(new MediaLibraryFolder(f, sqls2, expectedOutputs2));
 			}
 		}
 

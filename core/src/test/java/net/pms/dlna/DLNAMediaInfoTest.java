@@ -18,8 +18,6 @@
  */
 package net.pms.dlna;
 
-import net.pms.configuration.DLNAResourceConfiguration;
-
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -27,7 +25,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class DLNAMediaInfoTest {
 	@Test
 	public void testIsAspectRatioMismatch() throws Exception {
-		DLNAMediaInfo media = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
+		DLNAMediaInfo media = new DLNAMediaInfo();
 		media.setAspectRatioContainer("16:9");
 		media.setAspectRatioVideoTrack("16:9");
 		assertThat(media.isAspectRatioMismatch()).isFalse();

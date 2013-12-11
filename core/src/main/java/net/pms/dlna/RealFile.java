@@ -19,15 +19,12 @@
 package net.pms.dlna;
 
 import com.sun.jna.Platform;
-
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.util.FileUtil;
 import net.pms.util.ProcessUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +36,12 @@ public class RealFile extends MapFile {
 	private static final Logger logger = LoggerFactory.getLogger(RealFile.class);
 	private static final PmsConfiguration configuration = PMS.getConfiguration();
 
-	public RealFile(File file, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public RealFile(File file) {
 		getConf().getFiles().add(file);
 		setLastModified(file.lastModified());
 	}
 
-	public RealFile(File file, String name, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public RealFile(File file, String name) {
 		getConf().getFiles().add(file);
 		getConf().setName(name);
 		setLastModified(file.lastModified());
@@ -187,7 +182,7 @@ public class RealFile extends MapFile {
 
 			if (!found) {
 				if (getMedia() == null) {
-					setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
+					setMedia(new DLNAMediaInfo());
 				}
 
 				found = !getMedia().isMediaparsed() && !getMedia().isParsing();
@@ -248,8 +243,8 @@ public class RealFile extends MapFile {
 					break;
 				}
 
-				if (StringUtils.isNotBlank(getDLNAResourceConfiguration().getAlternateThumbFolder())) {
-					thumbFolder = new File(getDLNAResourceConfiguration().getAlternateThumbFolder());
+				if (StringUtils.isNotBlank(configuration.getAlternateThumbFolder())) {
+					thumbFolder = new File(configuration.getAlternateThumbFolder());
 
 					if (!thumbFolder.isDirectory()) {
 						thumbFolder = null;
@@ -289,7 +284,7 @@ public class RealFile extends MapFile {
 
 	@Override
 	protected String getThumbnailURL() {
-		if (getType() == Format.IMAGE && !getDLNAResourceConfiguration().isImageThumbnailsEnabled()) {
+		if (getType() == Format.IMAGE && !configuration.getImageThumbnailsEnabled()) {
 			return null;
 		}
 		StringBuilder sb = new StringBuilder();

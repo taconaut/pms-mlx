@@ -114,7 +114,7 @@ public abstract class BaseWrapper implements PluginBase {
 	 * @see net.pms.plugins.PluginBase#saveConfiguration()
 	 */
 	@Override
-	public void saveGlobalConfiguration() {
+	public void saveConfiguration() {
 	}
 	
 	/* (non-Javadoc)

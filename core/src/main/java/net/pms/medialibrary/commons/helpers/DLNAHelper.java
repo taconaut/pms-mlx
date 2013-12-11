@@ -27,7 +27,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.FileTranscodeVirtualFolder;
@@ -38,7 +37,7 @@ public class DLNAHelper {
 	private static final Logger log = LoggerFactory.getLogger(DLNAHelper.class);
 
 	public static DLNAMediaInfo getMedia(DOVideoFileInfo video) {		
-		DLNAMediaInfo dbMedia = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
+		DLNAMediaInfo dbMedia = new DLNAMediaInfo();
 		dbMedia.setDuration(video.getDurationSec());
 		dbMedia.setBitrate(video.getBitrate());
 		dbMedia.setWidth(video.getWidth());
@@ -138,7 +137,7 @@ public class DLNAHelper {
 	}
 
 	public static void addMultipleFiles(DLNAResource parent, RealFile child, RealFile originalFile) {
-		FileTranscodeVirtualFolder rootFolder = new FileTranscodeVirtualFolder("", null, DLNAResourceConfiguration.getDefaultConfiguration());
+		FileTranscodeVirtualFolder rootFolder = new FileTranscodeVirtualFolder("", null);
 		rootFolder.setParent(parent);
 		rootFolder.addChild(originalFile.clone());
 		rootFolder.resolve();

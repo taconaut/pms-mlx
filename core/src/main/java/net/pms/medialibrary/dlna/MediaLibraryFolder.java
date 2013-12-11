@@ -26,7 +26,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.CueFolder;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DVDISOFile;
@@ -59,7 +58,7 @@ public class MediaLibraryFolder extends VirtualFolder {
 	 * @param folder the folder
 	 */
 	public MediaLibraryFolder(DOMediaLibraryFolder folder) {
-		super(folder.getName(), null, DLNAResourceConfiguration.getDefaultConfiguration());
+		super(folder.getName(), null);
 
 		setFolder(folder);
 	}
@@ -250,15 +249,15 @@ public class MediaLibraryFolder extends VirtualFolder {
 				addChild(fileToAdd);			
 			} else {
 				if (f.getName().toLowerCase().endsWith(".zip") || f.getName().toLowerCase().endsWith(".cbz")) {
-					addChild(new ZippedFile(f, getDLNAResourceConfiguration()));
+					addChild(new ZippedFile(f));
 				} else if (f.getName().toLowerCase().endsWith(".rar") || f.getName().toLowerCase().endsWith(".cbr")) {
-					addChild(new RarredFile(f, getDLNAResourceConfiguration()));
+					addChild(new RarredFile(f));
 				} else if ((f.getName().toLowerCase().endsWith(".iso") || f.getName().toLowerCase().endsWith(".img")) || (f.isDirectory() && f.getName().toUpperCase().equals("VIDEO_TS"))) {
-					addChild(new DVDISOFile(f, getDLNAResourceConfiguration()));
+					addChild(new DVDISOFile(f));
 				} else if (f.getName().toLowerCase().endsWith(".m3u") || f.getName().toLowerCase().endsWith(".m3u8") || f.getName().toLowerCase().endsWith(".pls")) {
-					addChild(new PlaylistFolder(f, getDLNAResourceConfiguration()));
+					addChild(new PlaylistFolder(f));
 				} else if (f.getName().toLowerCase().endsWith(".cue")) {
-					addChild(new CueFolder(f, getDLNAResourceConfiguration()));
+					addChild(new CueFolder(f));
 				} else {
 					addChild(fileToAdd);
 				}

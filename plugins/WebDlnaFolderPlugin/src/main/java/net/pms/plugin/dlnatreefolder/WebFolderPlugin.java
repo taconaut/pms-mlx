@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.ImagesFeed;
@@ -82,7 +81,7 @@ public class WebFolderPlugin implements DlnaTreeFolderPlugin {
 		}
 		
 		File webConf = new File(instanceConfig.getFilePath());
-		DLNAResource res = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
+		DLNAResource res = new VirtualFolder(rootFolderName, null);
 		
 		if (webConf.exists()) {
 			try {
@@ -106,7 +105,7 @@ public class WebFolderPlugin implements DlnaTreeFolderPlugin {
 										String folder = st.nextToken();
 										parent = currentRoot.searchByName(folder);
 										if (parent == null) {
-											parent = new VirtualFolder(folder, "", DLNAResourceConfiguration.getDefaultConfiguration());
+											parent = new VirtualFolder(folder, "");
 											currentRoot.addChild(parent);
 										}
 										currentRoot = parent;
@@ -114,15 +113,15 @@ public class WebFolderPlugin implements DlnaTreeFolderPlugin {
 								}
 								if (parent == null) parent = res;
 								if (keys[0].equals("imagefeed")) {
-									parent.addChild(new ImagesFeed(values[0], DLNAResourceConfiguration.getDefaultConfiguration()));
+									parent.addChild(new ImagesFeed(values[0]));
 								} else if (keys[0].equals("videofeed")) {
-									parent.addChild(new VideosFeed(values[0], DLNAResourceConfiguration.getDefaultConfiguration()));
+									parent.addChild(new VideosFeed(values[0]));
 								} else if (keys[0].equals("audiofeed")) {
-									parent.addChild(new AudiosFeed(values[0], DLNAResourceConfiguration.getDefaultConfiguration()));
+									parent.addChild(new AudiosFeed(values[0]));
 								} else if (keys[0].equals("audiostream")) {
-									parent.addChild(new WebAudioStream(values[0], values[1], values[2], DLNAResourceConfiguration.getDefaultConfiguration()));
+									parent.addChild(new WebAudioStream(values[0], values[1], values[2]));
 								} else if (keys[0].equals("videostream")) {
-									parent.addChild(new WebVideoStream(values[0], values[1], values[2], DLNAResourceConfiguration.getDefaultConfiguration()));
+									parent.addChild(new WebVideoStream(values[0], values[1], values[2]));
 								}
 							}
 
@@ -244,7 +243,7 @@ public class WebFolderPlugin implements DlnaTreeFolderPlugin {
 	}
 
 	@Override
-	public void saveGlobalConfiguration() {
+	public void saveConfiguration() {
 	}
 
 	@Override

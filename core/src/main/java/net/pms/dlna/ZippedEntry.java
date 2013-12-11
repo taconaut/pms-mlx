@@ -18,10 +18,8 @@
  */
 package net.pms.dlna;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
 import net.pms.util.FileUtil;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +48,7 @@ public class ZippedEntry extends DLNAResource implements IPushOutput {
 		return super.getThumbnailURL();
 	}
 
-	public ZippedEntry(File file, String zeName, long length, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public ZippedEntry(File file, String zeName, long length) {
 		this.zeName = zeName;
 		this.file = file;
 		this.length = length;
@@ -148,7 +145,7 @@ public class ZippedEntry extends DLNAResource implements IPushOutput {
 
 		if (!found) {
 			if (getMedia() == null) {
-				setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
+				setMedia(new DLNAMediaInfo());
 			}
 
 			found = !getMedia().isMediaparsed() && !getMedia().isParsing();

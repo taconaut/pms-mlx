@@ -112,7 +112,7 @@ public interface PluginBase {
 	 * @see #getGlobalConfigurationPanel()
 	 * 
 	 */
-	public void saveGlobalConfiguration();
+	public void saveConfiguration();
 
 	/**
 	 * Checks if is plugin available. If this method returns true, all features

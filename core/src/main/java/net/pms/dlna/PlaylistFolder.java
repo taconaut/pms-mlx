@@ -1,9 +1,8 @@
 package net.pms.dlna;
 
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
+import net.pms.configuration.PmsConfiguration;
 import net.pms.formats.Format;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +11,7 @@ import java.util.*;
 
 public class PlaylistFolder extends DLNAResource {
 	private static final Logger logger = LoggerFactory.getLogger(PlaylistFolder.class);
+	private static final PmsConfiguration configuration = PMS.getConfiguration();
 	private File playlistfile;
 	private boolean valid = true;
 
@@ -19,8 +19,7 @@ public class PlaylistFolder extends DLNAResource {
 		return playlistfile;
 	}
 
-	public PlaylistFolder(File f, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public PlaylistFolder(File f) {
 		playlistfile = f;
 		setLastModified(playlistfile.lastModified());
 	}
@@ -159,11 +158,11 @@ public class PlaylistFolder extends DLNAResource {
 					File en2 = new File(fileName);
 
 					if (en1.exists()) {
-						addChild(new RealFile(en1, entry.title, getDLNAResourceConfiguration()));
+						addChild(new RealFile(en1, entry.title));
 						valid = true;
 					} else {
 						if (en2.exists()) {
-							addChild(new RealFile(en2, entry.title, getDLNAResourceConfiguration()));
+							addChild(new RealFile(en2, entry.title));
 							valid = true;
 						}
 					}
@@ -172,7 +171,7 @@ public class PlaylistFolder extends DLNAResource {
 
 			PMS.get().storeFileInCache(playlistfile, Format.PLAYLIST);
 
-			if (getDLNAResourceConfiguration().getSortMethod() == 5) {
+			if (configuration.getSortMethod() == 5) {
 				Collections.shuffle(getChildren());
 			}
 

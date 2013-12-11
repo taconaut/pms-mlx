@@ -18,18 +18,17 @@
  */
 package net.pms.dlna;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
 
 // FIXME (breaking change): rename AudioFeed
 public class AudiosFeed extends Feed {
 	@Override
 	protected void manageItem() {
-		WebAudioStream fi = new WebAudioStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL(), getDLNAResourceConfiguration());
+		WebAudioStream fi = new WebAudioStream(getTempItemTitle(), getTempItemLink(), getTempItemThumbURL());
 		addChild(fi);
 	}
 
-	public AudiosFeed(String url, DLNAResourceConfiguration configuration) {
-		super("" + System.currentTimeMillis(), url, Format.AUDIO, configuration);
+	public AudiosFeed(String url) {
+		super("" + System.currentTimeMillis(), url, Format.AUDIO);
 	}
 }

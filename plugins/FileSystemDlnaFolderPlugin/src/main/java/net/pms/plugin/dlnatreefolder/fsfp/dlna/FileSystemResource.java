@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pms.configuration.DLNAResourceConfiguration;
+import net.pms.PMS;
 import net.pms.dlna.CueFolder;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DVDISOFile;
@@ -62,8 +62,8 @@ public class FileSystemResource extends VirtualFolder {
 	 * @param name the name that will show up on the renderer
 	 * @param folderPaths the paths of the folders to share
 	 */
-	public FileSystemResource(String name, List<String> folderPaths, DLNAResourceConfiguration configuration) {
-	    super(name, null, configuration);
+	public FileSystemResource(String name, List<String> folderPaths) {
+	    super(name, null);
 	    setFolderPaths(folderPaths);
     }
 	
@@ -228,7 +228,7 @@ public class FileSystemResource extends VirtualFolder {
 			if(isFirstUse){
 				discoverable.add(f);
 			} else {
-				addChild(new RealFile(f, getDLNAResourceConfiguration()));
+				addChild(new RealFile(f));
 			}
 		}
 
@@ -283,25 +283,25 @@ public class FileSystemResource extends VirtualFolder {
 		List<File> rootFolders = Arrays.asList(File.listRoots());
 		if ((f.isFile() || f.isDirectory()) && (!f.isHidden() || rootFolders.contains(f))) {
 			if (f.getName().toLowerCase().endsWith(".zip") || f.getName().toLowerCase().endsWith(".cbz")) {
-				addChild(new ZippedFile(f, getDLNAResourceConfiguration()));
+				addChild(new ZippedFile(f));
 			} else if (f.getName().toLowerCase().endsWith(".rar") || f.getName().toLowerCase().endsWith(".cbr")) {
-				addChild(new RarredFile(f, getDLNAResourceConfiguration()));
+				addChild(new RarredFile(f));
 			} else if ((f.getName().toLowerCase().endsWith(".iso") || f.getName().toLowerCase().endsWith(".img")) || (f.isDirectory() && f.getName().toUpperCase().equals("VIDEO_TS"))) {
-				addChild(new DVDISOFile(f, getDLNAResourceConfiguration()));
+				addChild(new DVDISOFile(f));
 			} else if (f.getName().toLowerCase().endsWith(".m3u") || f.getName().toLowerCase().endsWith(".m3u8") || f.getName().toLowerCase().endsWith(".pls")) {
-				addChild(new PlaylistFolder(f, getDLNAResourceConfiguration()));
+				addChild(new PlaylistFolder(f));
 			} else if (f.getName().toLowerCase().endsWith(".cue")) {
-				addChild(new CueFolder(f, getDLNAResourceConfiguration()));
+				addChild(new CueFolder(f));
 			} else {
 				
 				/* Optionally ignore empty directories */
-				if (f.isDirectory() && getDLNAResourceConfiguration().isHideEmptyFolders() && !isFolderRelevant(f)) {					
+				if (f.isDirectory() && PMS.getConfiguration().isHideEmptyFolders() && !isFolderRelevant(f)) {					
 					if(logger.isInfoEnabled()) logger.info("Ignoring empty/non relevant directory: " + f.getName());
 				}
 				
 				/* Otherwise add the file */
 				else {
-					RealFile file = new RealFile(f, getDLNAResourceConfiguration());
+					RealFile file = new RealFile(f);
 					addChild(file);
 				}
 			}
@@ -317,7 +317,7 @@ public class FileSystemResource extends VirtualFolder {
 	private boolean isFolderRelevant(File f) {
 		boolean isRelevant = false;
 
-		if (f.isDirectory() && getDLNAResourceConfiguration().isHideEmptyFolders()) {
+		if (f.isDirectory() && PMS.getConfiguration().isHideEmptyFolders()) {
 			File[] children = f.listFiles();
 
 			// listFiles() returns null if "this abstract pathname does not denote a directory, or if an I/O error occurs".
@@ -353,7 +353,7 @@ public class FileSystemResource extends VirtualFolder {
 	 */
 	private boolean isFileRelevant(File f) {
 		String fileName = f.getName().toLowerCase();
-		return (getDLNAResourceConfiguration().isBrowseArchives() && (fileName.endsWith(".zip") || fileName.endsWith(".cbz") ||
+		return (PMS.getConfiguration().isArchiveBrowsing() && (fileName.endsWith(".zip") || fileName.endsWith(".cbz") ||
 			fileName.endsWith(".rar") || fileName.endsWith(".cbr"))) ||
 			fileName.endsWith(".iso") || fileName.endsWith(".img") || 
 			fileName.endsWith(".m3u") || fileName.endsWith(".m3u8") || fileName.endsWith(".pls") || fileName.endsWith(".cue");

@@ -20,13 +20,11 @@ package net.pms.dlna;
 
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +42,12 @@ public class FileTranscodeVirtualFolder extends VirtualFolder {
 
 	// FIXME unused
 	@Deprecated
-	public FileTranscodeVirtualFolder(String name, String thumbnailIcon, boolean copy, DLNAResourceConfiguration configuration) {
-		super(name, thumbnailIcon, configuration);
+	public FileTranscodeVirtualFolder(String name, String thumbnailIcon, boolean copy) {
+		super(name, thumbnailIcon);
 	}
 
-	public FileTranscodeVirtualFolder(String name, String thumbnailIcon, DLNAResourceConfiguration configuration) { // XXX thumbnailIcon is always null
-		super(name, thumbnailIcon, configuration);
+	public FileTranscodeVirtualFolder(String name, String thumbnailIcon) { // XXX thumbnailIcon is always null
+		super(name, thumbnailIcon);
 	}
 
 	/**
@@ -172,7 +170,7 @@ public class FileTranscodeVirtualFolder extends VirtualFolder {
 					dlna.getDisplayName()
 				),
 				null,
-				chapterInterval, getDLNAResourceConfiguration()
+				chapterInterval
 			);
 			DLNAResource copy = dlna.clone();
 			copy.setNoName(true);

@@ -21,18 +21,22 @@ package net.pms.util;
 
 import java.io.File;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.WebStream;
 import net.pms.formats.Format;
+import net.pms.formats.JPG;
+import net.pms.formats.MP3;
+import net.pms.formats.MPG;
+import net.pms.formats.WEB;
 import static net.pms.util.PlayerUtil.*;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-
 import org.junit.Before;
 import org.junit.Test;
+
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -54,17 +58,17 @@ public class PlayerUtilTest {
 		// initialise the fixtures
 		// XXX we need to call isValid() to call the (protected) resolveFormat()
 		// method, which is needed to initialise the format
-		image = new RealFile(new File("test.jpg"), DLNAResourceConfiguration.getDefaultConfiguration());
+		image = new RealFile(new File("test.jpg"));
 		image.isValid();
-		audio = new RealFile(new File("test.mp3"), DLNAResourceConfiguration.getDefaultConfiguration());
+		audio = new RealFile(new File("test.mp3"));
 		audio.isValid();
-		video = new RealFile(new File("test.mpg"), DLNAResourceConfiguration.getDefaultConfiguration());
+		video = new RealFile(new File("test.mpg"));
 		video.isValid();
-		webImage = new WebStream("", "http://example.com/test.jpg", "", Format.IMAGE, DLNAResourceConfiguration.getDefaultConfiguration());
+		webImage = new WebStream("", "http://example.com/test.jpg", "", Format.IMAGE);
 		webImage.isValid();
-		webAudio = new WebStream("", "http://example.com/test.mp3", "", Format.AUDIO, DLNAResourceConfiguration.getDefaultConfiguration());
+		webAudio = new WebStream("", "http://example.com/test.mp3", "", Format.AUDIO);
 		webAudio.isValid();
-		webVideo = new WebStream("", "http://example.com/test.mpg", "", Format.VIDEO, DLNAResourceConfiguration.getDefaultConfiguration());
+		webVideo = new WebStream("", "http://example.com/test.mpg", "", Format.VIDEO);
 		webVideo.isValid();
 	}
 

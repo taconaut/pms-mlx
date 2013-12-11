@@ -25,7 +25,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
@@ -76,7 +75,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	@Override
 	public DLNAResource getDLNAResource() {
 		// Create computer shutdown folder.
-		DLNAResource shutdownFolder = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
+		DLNAResource shutdownFolder = new VirtualFolder(rootFolderName, null);
 
 		// Add power off menu item
 		shutdownFolder.addChild(getPowerOffAction());
@@ -92,7 +91,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * @return The virtual video action.
 	 */
 	private DLNAResource getPowerOffAction() {
-		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.poweroff"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
+		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.poweroff"), true) {
 			/**
 			 * This method is called when the user selects the menu item.
 			 * @return Always returns true.
@@ -145,7 +144,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * @return The virtual video action.
 	 */
 	private DLNAResource getRestartAction() {
-		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.restart"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
+		DLNAResource action = new VirtualVideoAction(RESOURCE_BUNDLE.getString("shutdownplugin.menu.restart"), true) {
 			/**
 			 * This method is called when the user selects the menu item.
 			 * @return Always returns true.
@@ -266,7 +265,7 @@ public class ShutdownPlugin implements DlnaTreeFolderPlugin {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void saveGlobalConfiguration() {
+	public void saveConfiguration() {
 		// Do nothing
 	}
 

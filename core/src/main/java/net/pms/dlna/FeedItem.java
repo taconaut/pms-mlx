@@ -21,8 +21,6 @@ package net.pms.dlna;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.pms.configuration.DLNAResourceConfiguration;
-
 public class FeedItem extends DLNAResource {
 	@Override
 	protected String getThumbnailURL() {
@@ -50,8 +48,8 @@ public class FeedItem extends DLNAResource {
 	private String thumbURL;
 	private long length;
 
-	public FeedItem(String title, String itemURL, String thumbURL, DLNAMediaInfo media, int type, DLNAResourceConfiguration configuration) {
-		super(type, configuration);
+	public FeedItem(String title, String itemURL, String thumbURL, DLNAMediaInfo media, int type) {
+		super(type);
 		this.title = title;
 		this.itemURL = itemURL;
 		this.thumbURL = thumbURL;

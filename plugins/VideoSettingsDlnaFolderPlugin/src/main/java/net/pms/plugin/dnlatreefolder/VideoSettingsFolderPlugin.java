@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
@@ -46,11 +45,11 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 	public DLNAResource getDLNAResource() {
 		final PmsConfiguration configuration = PMS.getConfiguration();
 		
-		VirtualFolder vf = new VirtualFolder(rootFolderName, null, DLNAResourceConfiguration.getDefaultConfiguration());
-		VirtualFolder vfSub = new VirtualFolder(Messages.getString("PMS.8"), null, DLNAResourceConfiguration.getDefaultConfiguration());
+		VirtualFolder vf = new VirtualFolder(rootFolderName, null);
+		VirtualFolder vfSub = new VirtualFolder(Messages.getString("PMS.8"), null);
 		vf.addChild(vfSub);
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.3"), configuration.isMencoderNoOutOfSync(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.3"), configuration.isMencoderNoOutOfSync()) {
 			@Override
 			public boolean enable() {
 				configuration.setMencoderNoOutOfSync(!configuration.isMencoderNoOutOfSync());
@@ -58,7 +57,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction("  !!-- Fix 23.976/25fps A/V Mismatch --!!", configuration.isFix25FPSAvMismatch(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction("  !!-- Fix 23.976/25fps A/V Mismatch --!!", configuration.isFix25FPSAvMismatch()) {
 			@Override
 			public boolean enable() {
 				configuration.setMencoderForceFps(!configuration.isFix25FPSAvMismatch());
@@ -67,7 +66,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.4"), configuration.isMencoderYadif(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.4"), configuration.isMencoderYadif()) {
 			@Override
 			public boolean enable() {
 				configuration.setMencoderYadif(!configuration.isMencoderYadif());
@@ -76,7 +75,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vfSub.addChild(new VirtualVideoAction(Messages.getString("TrTab2.51"), configuration.isDisableSubtitles(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vfSub.addChild(new VirtualVideoAction(Messages.getString("TrTab2.51"), configuration.isDisableSubtitles()) {
 			@Override
 			public boolean enable() {
 				boolean oldValue = configuration.isDisableSubtitles();
@@ -86,7 +85,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vfSub.addChild(new VirtualVideoAction(Messages.getString("PMS.6"), configuration.isAutoloadExternalSubtitles(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vfSub.addChild(new VirtualVideoAction(Messages.getString("PMS.6"), configuration.isAutoloadExternalSubtitles()) {
 			@Override
 			public boolean enable() {
 				boolean oldValue = configuration.isAutoloadExternalSubtitles();
@@ -96,7 +95,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vfSub.addChild(new VirtualVideoAction(Messages.getString("MEncoderVideo.36"), configuration.isMencoderAssDefaultStyle(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vfSub.addChild(new VirtualVideoAction(Messages.getString("MEncoderVideo.36"), configuration.isMencoderAssDefaultStyle()) {
 			@Override
 			public boolean enable() {
 				boolean oldValue = configuration.isMencoderAssDefaultStyle();
@@ -106,7 +105,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.7"), configuration.getSkipLoopFilterEnabled(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.7"), configuration.getSkipLoopFilterEnabled()) {
 			@Override
 			public boolean enable() {
 				configuration.setSkipLoopFilterEnabled(!configuration.getSkipLoopFilterEnabled());
@@ -114,7 +113,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("TrTab2.28"), configuration.isAudioEmbedDtsInPcm(), DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("TrTab2.28"), configuration.isAudioEmbedDtsInPcm()) {
 			@Override
 			public boolean enable() {
 				configuration.setAudioEmbedDtsInPcm(!configuration.isAudioEmbedDtsInPcm());
@@ -122,7 +121,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.27"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("PMS.27"), true) {
 			@Override
 			public boolean enable() {
 				try {
@@ -134,7 +133,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 			}
 		});
 
-		vf.addChild(new VirtualVideoAction(Messages.getString("LooksFrame.12"), true, DLNAResourceConfiguration.getDefaultConfiguration()) {
+		vf.addChild(new VirtualVideoAction(Messages.getString("LooksFrame.12"), true) {
 			@Override
 			public boolean enable() {
 				PMS.get().reset();
@@ -222,7 +221,7 @@ public class VideoSettingsFolderPlugin implements DlnaTreeFolderPlugin {
 	}
 
 	@Override
-	public void saveGlobalConfiguration() {
+	public void saveConfiguration() {
 	}
 
 	@Override

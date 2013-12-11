@@ -18,7 +18,6 @@
  */
 package net.pms.dlna;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
 
 public class ImagesFeed extends Feed {
@@ -26,13 +25,13 @@ public class ImagesFeed extends Feed {
 	protected void manageItem() {
 		// Picasa Web Albums Support
 		if (getTempFeedLink() != null && getTempCategory() != null && getTempCategory().endsWith("user") && getUrl().toLowerCase().indexOf("picasaweb.google") > -1) {
-			addChild(new ImagesFeed(getTempFeedLink().replace("data/entry/base", "data/feed/base"), getDLNAResourceConfiguration()));
+			addChild(new ImagesFeed(getTempFeedLink().replace("data/entry/base", "data/feed/base")));
 		} else {
 			super.manageItem();
 		}
 	}
 
-	public ImagesFeed(String url, DLNAResourceConfiguration configuration) {
-		super("" + System.currentTimeMillis(), url, Format.IMAGE, configuration);
+	public ImagesFeed(String url) {
+		super("" + System.currentTimeMillis(), url, Format.IMAGE);
 	}
 }

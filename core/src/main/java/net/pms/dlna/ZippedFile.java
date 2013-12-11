@@ -18,9 +18,7 @@
  */
 package net.pms.dlna;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.formats.Format;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,7 @@ public class ZippedFile extends DLNAResource {
 	private File file;
 	private ZipFile zip;
 
-	public ZippedFile(File file, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public ZippedFile(File file) {
 		this.file = file;
 		setLastModified(file.lastModified());
 
@@ -47,7 +44,7 @@ public class ZippedFile extends DLNAResource {
 
 			while (enm.hasMoreElements()) {
 				ZipEntry ze = enm.nextElement();
-				addChild(new ZippedEntry(file, ze.getName(), ze.getSize(), getDLNAResourceConfiguration()));
+				addChild(new ZippedEntry(file, ze.getName(), ze.getSize()));
 			}
 
 			zip.close();

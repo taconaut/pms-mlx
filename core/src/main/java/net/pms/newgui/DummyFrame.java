@@ -54,6 +54,10 @@ public class DummyFrame implements IFrame {
 	@Override
 	public void serverReady() {
 	}
+	
+	@Override
+	public void setScanLibraryEnabled(boolean flag) {
+	}
 
 	@Override
 	public void save() {

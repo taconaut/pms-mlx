@@ -351,7 +351,7 @@ public class TheTVDBImportPlugin implements FileImportPlugin {
     }
 
     @Override
-    public void saveGlobalConfiguration() {
+    public void saveConfiguration() {
 		if(pGlobalConfiguration != null) {
 			pGlobalConfiguration.updateConfiguration(globalConfig);
 			try {

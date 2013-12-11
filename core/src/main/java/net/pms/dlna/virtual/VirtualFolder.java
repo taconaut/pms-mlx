@@ -18,7 +18,6 @@
  */
 package net.pms.dlna.virtual;
 
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.dlna.DLNAResource;
 import net.pms.network.HTTPResource;
 
@@ -40,8 +39,7 @@ public class VirtualFolder extends DLNAResource {
 	 *        path. Use null if none is available or desired.
 	 * @see #addChild(DLNAResource)
 	 */
-	public VirtualFolder(String name, String thumbnailIcon, DLNAResourceConfiguration configuration) {
-		super(configuration);
+	public VirtualFolder(String name, String thumbnailIcon) {
 		this.name = name;
 		this.thumbnailIcon = thumbnailIcon;
 		if (thumbnailIcon != null && thumbnailIcon.toLowerCase().endsWith(".png")) {

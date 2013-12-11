@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2013  Ph.Waeber
+ * Copyright (C) 2012  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package net.pms.plugin.dlnatreefolder.fsfp.gui.instanceconfiguration;
+package net.pms.plugin.dlnatreefolder.fsfp.gui;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -31,14 +31,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.pms.plugin.dlnatreefolder.FileSystemFolderPlugin;
-import net.pms.plugin.dlnatreefolder.fsfp.configuration.InstanceConfiguration;
-import net.pms.plugin.dlnatreefolder.fsfp.gui.FolderEntryPanel;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class FolderConfigurationPanel extends JPanel {
+/**
+ * The configuration panel for the {@link FileSystemFolderPlugin}.
+ */
+public class InstanceConfigurationPanel extends JPanel {
 	private static final long serialVersionUID = -2950360909291954353L;
 	private List<FolderEntryPanel> sharedFolders = new ArrayList<FolderEntryPanel>();
 	
@@ -46,31 +47,21 @@ public class FolderConfigurationPanel extends JPanel {
 	private JPanel pNoSharedFoldersSet;
 
 	/**
+	 * Instantiates a new configuration panel without any shared folders
+	 */
+	public InstanceConfigurationPanel() {
+		this(new ArrayList<String>());
+	}
+
+	/**
 	 * Instantiates a new configuration panel with shared folders
 	 *
-	 * @param instanceConfiguration the folder paths
+	 * @param folderPaths the folder paths
 	 */
-	public FolderConfigurationPanel() {
+	public InstanceConfigurationPanel(List<String> folderPaths) {
 		setLayout(new GridLayout());
 		init();
-	}
-
-	/**
-	 * Apply the configuration from the GUI to the model (instanceConfig).
-	 *
-	 * @param instanceConfig the instance configuration
-	 */
-	public void applyGuiToModel(InstanceConfiguration instanceConfig) {
-		instanceConfig.setFolderPaths(getFolders());
-	}
-
-	/**
-	 * Apply the model (instanceConfig) to the GUI.
-	 *
-	 * @param instanceConfig the instance configuration
-	 */
-	public void applyModelToGui(InstanceConfiguration instanceConfig) {
-		setFolders(instanceConfig.getFolderPaths());
+		rebuildPanel();
 	}
 
 	/**
@@ -78,7 +69,7 @@ public class FolderConfigurationPanel extends JPanel {
 	 *
 	 * @return the folders
 	 */
-	private List<String> getFolders() {
+	public List<String> getFolders() {
 		List<String> folders = new ArrayList<String>();
 		for (FolderEntryPanel fe : sharedFolders) {
 			if (!folders.contains(fe.getFolderPath())) {
@@ -93,7 +84,7 @@ public class FolderConfigurationPanel extends JPanel {
 	 *
 	 * @param folderPaths the new folders
 	 */
-	private void setFolders(List<String> folderPaths) {
+	public void setFolders(List<String> folderPaths) {
 		sharedFolders.clear();
 		rebuildPanel();
 		for (String folderPath : folderPaths) {
@@ -103,14 +94,14 @@ public class FolderConfigurationPanel extends JPanel {
 
 	/**
 	 * Initializes the graphical components
-	 * @param instanceConfiguration 
 	 */
 	private void init() {
 		pNoSharedFoldersSet = new JPanel();
 		pNoSharedFoldersSet.setLayout(new GridLayout());
-		pNoSharedFoldersSet.add(new JLabel(FileSystemFolderPlugin.messages.getString("FolderConfigurationPanel.1")));
+		pNoSharedFoldersSet.add(new JLabel(FileSystemFolderPlugin.messages.getString("InstanceConfigurationPanel.1")));
 
-		bAddFolder = new JButton(FileSystemFolderPlugin.messages.getString("FolderConfigurationPanel.2"));
+		bAddFolder = new JButton(FileSystemFolderPlugin.messages.getString("InstanceConfigurationPanel.2"));
+		rebuildPanel();
 		bAddFolder.addActionListener(new ActionListener() {
 
 			@Override
@@ -127,7 +118,7 @@ public class FolderConfigurationPanel extends JPanel {
 	 */
 	private void addFolderEntry(String folderPath) {
 		if (sharedFolders.size() >= 20) {
-			JOptionPane.showMessageDialog(this, FileSystemFolderPlugin.messages.getString("FolderConfigurationPanel.3"));
+			JOptionPane.showMessageDialog(this, FileSystemFolderPlugin.messages.getString("InstanceConfigurationPanel.3"));
 			return;
 		}
 
@@ -184,5 +175,4 @@ public class FolderConfigurationPanel extends JPanel {
 		add(builder.getPanel());
 		validate();
 	}
-
 }

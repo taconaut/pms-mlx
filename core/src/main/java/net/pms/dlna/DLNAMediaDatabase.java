@@ -19,15 +19,12 @@
 package net.pms.dlna;
 
 import com.sun.jna.Platform;
-
 import net.pms.Messages;
 import net.pms.PMS;
-import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.formats.Format;
 import net.pms.formats.v2.SubtitleType;
-
 import org.apache.commons.io.FileUtils;
 import org.h2.engine.Constants;
 import org.h2.jdbc.JdbcSQLException;
@@ -40,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.io.File;
 import java.sql.*;
@@ -331,7 +327,7 @@ public class DLNAMediaDatabase implements Runnable {
 			stmt.setTimestamp(2, new Timestamp(modified));
 			rs = stmt.executeQuery();
 			while (rs.next()) {
-				DLNAMediaInfo media = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
+				DLNAMediaInfo media = new DLNAMediaInfo();
 				int id = rs.getInt("ID");
 				media.setDuration(toDouble(rs, "DURATION"));
 				media.setBitrate(rs.getInt("BITRATE"));

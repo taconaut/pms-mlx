@@ -454,7 +454,6 @@ public class DLNAViewTree extends JTree {
 		});
 		d.setMinimumSize(new Dimension(600, 300));
 		d.setModal(true);
-		d.pack();
 		d.setLocation(centerDialogOnScreen(d.getSize()));
 		d.setVisible(true);
 	}
