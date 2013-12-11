@@ -64,7 +64,7 @@ public abstract class VirtualVideoAction extends DLNAResource {
 
 		// Create correct mediaInfo for the embedded .mpg videos
 		// This is needed by Format.isCompatible()
-		DLNAMediaInfo mediaInfo = new DLNAMediaInfo();
+		DLNAMediaInfo mediaInfo = new DLNAMediaInfo(getDLNAResourceConfiguration());
 		mediaInfo.setContainer("mpegps");
 		ArrayList<DLNAMediaAudio> audioCodes = new ArrayList<DLNAMediaAudio>();
 		mediaInfo.setAudioTracksList(audioCodes);

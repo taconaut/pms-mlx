@@ -187,7 +187,7 @@ public class RealFile extends MapFile {
 
 			if (!found) {
 				if (getMedia() == null) {
-					setMedia(new DLNAMediaInfo());
+					setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
 				}
 
 				found = !getMedia().isMediaparsed() && !getMedia().isParsing();

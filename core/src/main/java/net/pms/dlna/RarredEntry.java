@@ -146,7 +146,7 @@ public class RarredEntry extends DLNAResource implements IPushOutput {
 
 		if (!found) {
 			if (getMedia() == null) {
-				setMedia(new DLNAMediaInfo());
+				setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
 			}
 
 			found = !getMedia().isMediaparsed() && !getMedia().isParsing();

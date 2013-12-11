@@ -18,8 +18,6 @@
  */
 package net.pms.configuration;
 
-import java.io.IOException;
-
 public class DLNAResourceConfiguration extends BaseConfiguration {
 	private static final String KEY_isThumbnailGenerationEnabled = "thumbnailGenerationEnabled";
 	private static final String KEY_thumbnailSeekPosSec = "thumbnailSeekPosSec";
@@ -33,32 +31,8 @@ public class DLNAResourceConfiguration extends BaseConfiguration {
 	private static final String KEY_hideEmptyFolders = "hideEmptyFolders";
 	private static final String KEY_sortMethod = "sortMethod";
 	private static final String KEY_browseArchives = "browseArchives";
-	private String propertiesFilePath;
 	
-	/**
-	 * Instantiates a new configuration.
-	 */
-	public DLNAResourceConfiguration() {
-		propertiesFilePath = getGlobalConfigurationDirectory() + "FileSystemFolderPlugin.conf";
-	}
-
-	/**
-	 * Save the current configuration
-	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	public void save() throws IOException {
-			save(propertiesFilePath);
-	}
-
-	/**
-	 * Load the last saved configuration
-	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	public void load() throws IOException {
-		load(propertiesFilePath);
-	}
+	private static final DLNAResourceConfiguration defaultConfiguration = new DLNAResourceConfiguration();
 
 	/**
 	 * Checks if thumbnail generation is enabled.
@@ -210,7 +184,7 @@ public class DLNAResourceConfiguration extends BaseConfiguration {
 	 * @return true, if is hide extensions
 	 */
 	public boolean isHideExtensions() {
-		return getValue(KEY_hideExtensions, true);
+		return getValue(KEY_hideExtensions, false);
 	}
 
 	/**
@@ -299,8 +273,6 @@ public class DLNAResourceConfiguration extends BaseConfiguration {
 	 * @return the default configuration
 	 */
 	public static DLNAResourceConfiguration getDefaultConfiguration() {
-		DLNAResourceConfiguration defaultConfig = new DLNAResourceConfiguration();	
-		
-		return defaultConfig;
+		return defaultConfiguration;
 	}
 }

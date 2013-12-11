@@ -38,7 +38,7 @@ public class DLNAHelper {
 	private static final Logger log = LoggerFactory.getLogger(DLNAHelper.class);
 
 	public static DLNAMediaInfo getMedia(DOVideoFileInfo video) {		
-		DLNAMediaInfo dbMedia = new DLNAMediaInfo();
+		DLNAMediaInfo dbMedia = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		dbMedia.setDuration(video.getDurationSec());
 		dbMedia.setBitrate(video.getBitrate());
 		dbMedia.setWidth(video.getWidth());

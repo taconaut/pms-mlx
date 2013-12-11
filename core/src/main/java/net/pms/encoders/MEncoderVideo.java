@@ -61,6 +61,7 @@ import javax.swing.SwingUtilities;
 
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
@@ -305,7 +306,7 @@ public class MEncoderVideo extends Player {
 				while (JOptionPane.showOptionDialog(SwingUtilities.getWindowAncestor((Component) PMS.get().getFrame()),
 					codecPanel, Messages.getString("MEncoderVideo.34"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null) == JOptionPane.OK_OPTION) {
 					String newCodecparam = textArea.getText();
-					DLNAMediaInfo fakemedia = new DLNAMediaInfo();
+					DLNAMediaInfo fakemedia = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 					DLNAMediaAudio audio = new DLNAMediaAudio();
 					audio.setCodecA("ac3");
 					fakemedia.setCodecV("mpeg4");

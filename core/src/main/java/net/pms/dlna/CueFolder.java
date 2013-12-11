@@ -136,7 +136,7 @@ public class CueFolder extends DLNAResource {
 						addedResources.add(realFile);
 
 						if (i > 0 && realFile.getMedia() == null) {
-							realFile.setMedia(new DLNAMediaInfo());
+							realFile.setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
 							realFile.getMedia().setMediaparsed(true);
 						}
 

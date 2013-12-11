@@ -549,7 +549,7 @@ public abstract class DLNAResource extends HTTPResource implements Cloneable, Ru
 
 					if (parserV2 || (child.getFormat().transcodable() && child.getMedia() == null)) {
 						if (!parserV2) {
-							child.setMedia(new DLNAMediaInfo());
+							child.setMedia(new DLNAMediaInfo(getDLNAResourceConfiguration()));
 						}
 
 						// Try to determine a player to use for transcoding.

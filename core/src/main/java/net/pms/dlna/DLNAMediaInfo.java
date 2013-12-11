@@ -400,12 +400,21 @@ public class DLNAMediaInfo implements Cloneable {
 		}
 	}
 
-	public DLNAMediaInfo() {
+	public DLNAMediaInfo(DLNAResourceConfiguration configuration) {
 		setThumbready(true); // this class manages thumbnails by default with the parser_v1 method
+		setDlnaResourceConfiguration(configuration);
+	}
+
+	public void setDlnaResourceConfiguration(DLNAResourceConfiguration configuration) {
+		dlnaResourceConfiguration = configuration;
+	}
+
+	public DLNAResourceConfiguration getDlnaResourceConfiguration() {
+		return dlnaResourceConfiguration;
 	}
 
 	public void generateThumbnail(InputFile input, Format ext, int type) {
-		DLNAMediaInfo forThumbnail = new DLNAMediaInfo();
+		DLNAMediaInfo forThumbnail = new DLNAMediaInfo(dlnaResourceConfiguration);
 		forThumbnail.durationSec = durationSec;
 		forThumbnail.parse(input, ext, type, true);
 		setThumb(forThumbnail.getThumb());

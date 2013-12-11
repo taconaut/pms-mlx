@@ -21,6 +21,7 @@ package net.pms.test.formats;
 
 import ch.qos.logback.classic.LoggerContext;
 import net.pms.PMS;
+import net.pms.configuration.DLNAResourceConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaAudio;
@@ -28,6 +29,7 @@ import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.LibMediaInfoParser;
 import net.pms.formats.*;
 import net.pms.network.HTTPResource;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +94,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct GIF information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("gif");
 		Format format = new GIF();
 		format.match("test.gif");
@@ -112,7 +114,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct JPG information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("png");
 		Format format = new PNG();
 		format.match("test.png");
@@ -132,7 +134,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct JPG information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("tiff");
 		Format format = new TIF();
 		format.match("test.tiff");
@@ -152,7 +154,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct regular two channel MP3 information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("mp3");
 		info.setMimeType(HTTPResource.AUDIO_MP3_TYPEMIME);
 		DLNAMediaAudio audio = new DLNAMediaAudio();
@@ -183,7 +185,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct regular two channel MPG information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("avi");
 		DLNAMediaAudio audio = new DLNAMediaAudio();
 		audio.setCodecA("ac3");
@@ -215,7 +217,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// Construct MKV information
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("mkv");
 		DLNAMediaAudio audio = new DLNAMediaAudio();
 		audio.setCodecA("ac3");
@@ -247,7 +249,7 @@ public class FormatRecognitionTest {
 		assertNotNull("Renderer named \"Playstation 3\" found.", conf);
 
 		// DVRMS: false
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("dvr");
 		Format format = new DVRMS();
 		format.match("test.dvr");
@@ -255,7 +257,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// ISO: false
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("iso");
 		format = new ISO();
 		format.match("test.iso");
@@ -263,7 +265,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// JPG: true
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("jpg");
 		format = new JPG();
 		format.match("test.jpeg");
@@ -271,7 +273,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// M4A: false
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("m4a");
 		format = new M4A();
 		format.match("test.m4a");
@@ -279,7 +281,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// MKV: false
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("mkv");
 		format = new MKV();
 		format.match("test.mkv");
@@ -287,7 +289,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// MP3: true
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("mp3");
 		format = new MP3();
 		format.match("test.mp3");
@@ -295,7 +297,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// MPG: true
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("avi");
 		format = new MPG();
 		format.match("test.mpg");
@@ -303,7 +305,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// OGG: false
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("ogg");
 		format = new OGG();
 		format.match("test.ogg");
@@ -311,7 +313,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// RAW: false
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("raw");
 		format = new RAW();
 		format.match("test.arw");
@@ -319,7 +321,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// WAV: true
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("wav");
 		format = new WAV();
 		format.match("test.wav");
@@ -327,7 +329,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// WEB: type=IMAGE
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("jpg");
 		format = new WEB();
 		format.match("http://test.org/");
@@ -336,7 +338,7 @@ public class FormatRecognitionTest {
 				format.ps3compatible(),	conf.isCompatible(info, format));
 
 		// WEB: type=VIDEO
-		info = new DLNAMediaInfo();
+		info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("avi");
 		format.setType(Format.VIDEO);
 		assertEquals("isCompatible() gives same outcome as ps3compatible() for WEB video",
@@ -376,7 +378,7 @@ public class FormatRecognitionTest {
 		assumeTrue(LibMediaInfoParser.isValid());
 		
 		// Construct media info exactly as VirtualVideoAction does
-		DLNAMediaInfo info = new DLNAMediaInfo();
+		DLNAMediaInfo info = new DLNAMediaInfo(DLNAResourceConfiguration.getDefaultConfiguration());
 		info.setContainer("mpegps");
 		List<DLNAMediaAudio> audioCodes = new ArrayList<DLNAMediaAudio>();
 		info.setAudioTracksList(audioCodes);
