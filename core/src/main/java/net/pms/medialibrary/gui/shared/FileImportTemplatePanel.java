@@ -334,8 +334,8 @@ public class FileImportTemplatePanel extends JPanel {
 	private JTabbedPane buildTabbedPane() {
 		JTabbedPane tp = new JTabbedPane();
 		tp.addTab(Messages.getString("ML.FileType.VIDEO"), new ImageIcon(getClass().getResource("/resources/images/videofolder-16.png")), fippsVideo);
-		tp.addTab(Messages.getString("ML.FileType.AUDIO"), new ImageIcon(getClass().getResource("/resources/images/audiofolder-16.png")), fippsAudio);
-		tp.addTab(Messages.getString("ML.FileType.PICTURES"), new ImageIcon(getClass().getResource("/resources/images/picturesfolder-16.png")), fippsPictures);
+		// tp.addTab(Messages.getString("ML.FileType.AUDIO"), new ImageIcon(getClass().getResource("/resources/images/audiofolder-16.png")), fippsAudio);
+		// tp.addTab(Messages.getString("ML.FileType.PICTURES"), new ImageIcon(getClass().getResource("/resources/images/picturesfolder-16.png")), fippsPictures);
 		
 		return tp;
 	}
