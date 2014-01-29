@@ -85,8 +85,7 @@ class DBVideoFileInfo extends DBFileInfo {
 					" FROM FILE, VIDEO" +
 					" WHERE VIDEO.FILEID = FILE.ID";
 			stmt = conn.prepareStatement(statement);
-			rs = stmt.executeQuery();
-			
+			rs = stmt.executeQuery();			
 			
 			//delete all entries which can't be found
 			while(rs.next()){
@@ -96,6 +95,8 @@ class DBVideoFileInfo extends DBFileInfo {
 				if(!file.exists()){
 					deleteVideo(fileId, conn, stmt);
 					res++;
+					
+					log.debug("Removed video from library while cleaning: " + filePath);
 				}
 			}
 			conn.commit();
