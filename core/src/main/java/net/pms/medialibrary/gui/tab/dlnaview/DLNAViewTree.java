@@ -18,6 +18,7 @@
  */
 package net.pms.medialibrary.gui.tab.dlnaview;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -359,10 +360,12 @@ public class DLNAViewTree extends JTree {
 	private void showInLibraryRequested() {
 		if(getSelectedNode() != null 
 				&& getSelectedNode().getUserObject() instanceof DOMediaLibraryFolder){
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DOMediaLibraryFolder folder = ((DOMediaLibraryFolder)getSelectedNode().getUserObject());
 			if(libraryShowListener != null){
 				libraryShowListener.show(folder.getInheritedFilter(), folder.getFileType());
-			}			
+			}
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));	
 		}
 	}
 

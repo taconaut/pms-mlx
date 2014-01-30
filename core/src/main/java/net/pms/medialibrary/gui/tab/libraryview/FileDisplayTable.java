@@ -37,10 +37,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -64,6 +66,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.list.SelectionInList;
+
 import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
@@ -98,6 +101,7 @@ public class FileDisplayTable extends JPanel {
 	private FileType fileType;
 	private ETable table;
 	private JPopupMenu columnSelectorMenu;
+	private JLabel statusLabel;
 	
 	private JPopupMenu fileEditMenu = new JPopupMenu();
 	
@@ -126,6 +130,26 @@ public class FileDisplayTable extends JPanel {
 
 	public void setContent(List<DOFileInfo> files) {
 		selectionInList.setList(files);
+		
+		// Update the status bar message
+		int nbItems = files.size();
+		double totalSeconds = 0;
+		long totalSize = 0;
+		for(DOFileInfo fileInfo : files) {
+			totalSize += fileInfo.getSize();
+			
+			if(fileInfo instanceof DOVideoFileInfo) {
+				DOVideoFileInfo videoFileInfo = (DOVideoFileInfo) fileInfo;
+				totalSeconds += videoFileInfo.getDurationSec();
+			}
+		}
+		
+		String statusMsg = "";
+		if(nbItems > 0) {
+			statusMsg = String.format(Messages.getString("ML.FileDisplayTable.VideoStatusMessage"), nbItems, GUIHelper.formatSecondsToDisplayString((int)totalSeconds), GUIHelper.formatSizeToDisplayString(totalSize));
+		}
+		
+		statusLabel.setText(statusMsg);
 	}
 	
 	private void refreshQuickTags() {
@@ -147,7 +171,12 @@ public class FileDisplayTable extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setPreferredSize(table.getPreferredSize());
-		add(scrollPane);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		add(scrollPane, BorderLayout.CENTER);
+		
+		statusLabel = new JLabel();
+		statusLabel.setHorizontalAlignment(JLabel.CENTER);
+		add(statusLabel, BorderLayout.SOUTH);
 	}
 	
 	private void initTable() {

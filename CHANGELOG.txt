@@ -1,7 +1,18 @@
 Changelog:
 ==========
 
-pms-mlx 1.0 - 2013-??-??
+pms-mlx 1.1 - 2014-??-??
+
+	Language Updates:
+		- Improved German translation (thanks, chach!)
+		
+	GUI:
+		- Added status bar to library view showing the number of files being displayed with the play length and the size on disk
+		
+	Misc:
+		- Add log message on debug level when removing a video from the library while cleaning the library.
+
+pms-mlx 1.0 - 2013-12-04
 
 	Plugins:
 		- TMDb file import:
