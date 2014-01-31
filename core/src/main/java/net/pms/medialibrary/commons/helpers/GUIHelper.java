@@ -92,6 +92,10 @@ public class GUIHelper {
 	 * @return the formatted string
 	 */
 	public static String formatSecondsToDisplayString(int secs) {
+		if(secs == 0){
+			return "0s";
+		}
+		
 		int days = (int)TimeUnit.SECONDS.toDays(secs);
 		long hours = TimeUnit.SECONDS.toHours(secs) - (days *24);
 		long minutes = TimeUnit.SECONDS.toMinutes(secs) - (TimeUnit.SECONDS.toHours(secs)* 60);
@@ -101,13 +105,13 @@ public class GUIHelper {
 		if(days > 0) {
 			formattedString += String.format(" %sd", days);
 		}
-		if(hours > 0) {
+		if(hours > 0 || !formattedString.equals("")) {
 			formattedString += String.format(" %02dh", hours);
 		}
-		if(minutes > 0) {
+		if(minutes > 0 || !formattedString.equals("")) {
 			formattedString += String.format(" %02dm", minutes);
 		}
-		if(seconds > 0) {
+		if(seconds > 0 || !formattedString.equals("")) {
 			formattedString += String.format(" %02ds", seconds);
 		}
 		
@@ -122,6 +126,10 @@ public class GUIHelper {
 	 * @return the string
 	 */
 	public static String formatSizeToDisplayString(long bytes) {
+		if(bytes == 0) {
+			return "0B";
+		}
+		
 		// long bytes = sizeKb * 1024;
 	    int exp = (int) (Math.log(bytes) / Math.log(1024));
 	    String pre = String.valueOf("KMGTPE".charAt(exp - 1));

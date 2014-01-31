@@ -55,6 +55,8 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
@@ -110,14 +112,35 @@ public class FileDisplayTable extends JPanel {
 	private int colMoveToIndex;
 	private int colMoveFromIndex;
 	
-	private SelectionInList<DOFileInfo> selectionInList = new SelectionInList<DOFileInfo>();
+	private SelectionInList<DOFileInfo> selectionInList;
 	private List<DOQuickTagEntry> quickTags;
 
 	public FileDisplayTable(FileType fileType) {
 		super(new BorderLayout());
+		
+		selectionInList = new SelectionInList<DOFileInfo>();
+		selectionInList.addListDataListener(new ListDataListener() {
+			
+			@Override
+			public void intervalRemoved(ListDataEvent arg0) {
+				refreshStatusMessage();
+			}
+			
+			@Override
+			public void intervalAdded(ListDataEvent arg0) {
+				refreshStatusMessage();
+			}
+			
+			@Override
+			public void contentsChanged(ListDataEvent arg0) {
+				refreshStatusMessage();
+			}
+		});
+		
 		setFileType(fileType);
 		refreshQuickTags();
 		init();
+		refreshStatusMessage();
 	}
 
 	public void setFileType(FileType fileType) {
@@ -130,12 +153,17 @@ public class FileDisplayTable extends JPanel {
 
 	public void setContent(List<DOFileInfo> files) {
 		selectionInList.setList(files);
-		
-		// Update the status bar message
-		int nbItems = files.size();
+	}
+	
+	private void refreshQuickTags() {
+		quickTags = MediaLibraryStorage.getInstance().getQuickTagEntries();
+	}
+	
+	private void refreshStatusMessage() {
+		int nbItems = selectionInList.getSize();
 		double totalSeconds = 0;
 		long totalSize = 0;
-		for(DOFileInfo fileInfo : files) {
+		for(DOFileInfo fileInfo : selectionInList.getList()) {
 			totalSize += fileInfo.getSize();
 			
 			if(fileInfo instanceof DOVideoFileInfo) {
@@ -144,16 +172,9 @@ public class FileDisplayTable extends JPanel {
 			}
 		}
 		
-		String statusMsg = "";
-		if(nbItems > 0) {
-			statusMsg = String.format(Messages.getString("ML.FileDisplayTable.VideoStatusMessage"), nbItems, GUIHelper.formatSecondsToDisplayString((int)totalSeconds), GUIHelper.formatSizeToDisplayString(totalSize));
-		}
-		
+		String statusMsg = String.format(Messages.getString("ML.FileDisplayTable.VideoStatusMessage"), nbItems, 
+				GUIHelper.formatSecondsToDisplayString((int)totalSeconds), GUIHelper.formatSizeToDisplayString(totalSize));
 		statusLabel.setText(statusMsg);
-	}
-	
-	private void refreshQuickTags() {
-		quickTags = MediaLibraryStorage.getInstance().getQuickTagEntries();
 	}
 
 	private void init() {
@@ -1013,7 +1034,7 @@ public class FileDisplayTable extends JPanel {
 	private void updateTableModel() {
 		isUpdating = true;
 		
-		//rebuild the entire adapter, because their is no way to change the column names after initialization
+		//rebuild the entire adapter, because there is no way to change the column names after initialization
 		//table.removeColumn and table.getColumnModel().removeColumn have no effect
 		table.setModel(new FileDisplayTableAdapter(selectionInList, getFileType()));										
 		for(DOTableColumnConfiguration cConf : FileDisplayTableAdapter.getColumnConfigurations(getFileType())){
