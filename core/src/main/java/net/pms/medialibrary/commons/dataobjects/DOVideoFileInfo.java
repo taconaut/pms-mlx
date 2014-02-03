@@ -119,15 +119,15 @@ public class DOVideoFileInfo extends DOFileInfo {
 				
 				@Override
 				public int compare(DLNAMediaAudio o1, DLNAMediaAudio o2) {
-					if(o1.getLangFullName() == null && o2.getLangFullName() == null) {
+					if((o1 == null || o1.getLangFullName() == null) && (o2 == null || o2.getLangFullName() == null)) {
 						return 0;
 					}
 					
-					if(o1.getLangFullName() == null) {
+					if(o1 == null || o1.getLangFullName() == null) {
 						return 1;
 					}
 					
-					if(o2.getLangFullName() == null) {
+					if(o2 == null || o2.getLangFullName() == null) {
 						return -1;
 					}
 					
@@ -151,15 +151,15 @@ public class DOVideoFileInfo extends DOFileInfo {
 
 				@Override
 				public int compare(DLNAMediaSubtitle o1, DLNAMediaSubtitle o2) {
-					if(o1.getLangFullName() == null && o2.getLangFullName() == null) {
+					if((o1 == null || o1.getLangFullName() == null) && (o2 == null || o2.getLangFullName() == null)) {
 						return 0;
 					}
 					
-					if(o1.getLangFullName() == null) {
+					if(o1 == null || o1.getLangFullName() == null) {
 						return 1;
 					}
 					
-					if(o2.getLangFullName() == null) {
+					if(o2 == null || o2.getLangFullName() == null) {
 						return -1;
 					}
 					

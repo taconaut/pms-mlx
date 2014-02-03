@@ -11,6 +11,7 @@ pms-mlx 1.1 - 2014-??-??
 		
 	Misc:
 		- Add log message on debug level when removing a video from the library while cleaning the library.
+		- Fixed usage of %audio_languages and %subtitle_languages if a language or subtitle has no full name set
 
 pms-mlx 1.0 - 2013-12-04
 
