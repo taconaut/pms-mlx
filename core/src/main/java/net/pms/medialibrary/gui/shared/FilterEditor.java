@@ -199,9 +199,13 @@ public class FilterEditor extends JPanel {
 			String conName = entry.getName();
 			String equation = tfEquation.getText();
 
-			equation = removeConditionFromEquation(conName, equation);
+			if(conditionPanelsList.size() == 1) {
+				equation = "";
+			} else {
+				equation = removeConditionFromEquation(conName, equation).trim();
+			}
 
-			tfEquation.setText(equation.trim());
+			tfEquation.setText(equation);
 
 			// remove the condition from the list
 			conditionPanelsList.remove(entry);
