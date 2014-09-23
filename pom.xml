@@ -28,7 +28,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>github.com.taconaut</groupId>
 	<artifactId>pms</artifactId>
-	<version>1.90.2-mlx-1.0.1-SNAPSHOT</version>
+	<version>1.90.2-mlx-1.1.0</version>
 	<packaging>pom</packaging>
 	<name>PMS</name>
 	<url>http://www.ps3mediaserver.org/</url>

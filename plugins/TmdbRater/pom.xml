@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>github.com.taconaut</groupId>
 		<artifactId>pms-plugins</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.0.2</version>
 	</parent>
 
 	<dependencies>
