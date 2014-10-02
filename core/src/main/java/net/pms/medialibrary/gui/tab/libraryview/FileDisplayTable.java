@@ -966,51 +966,62 @@ public class FileDisplayTable extends JPanel {
 		for(ConditionTypeCBItem ctItem : sortedItems) {
 			DOTableColumnConfiguration cConf = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType(), ctItem.getConditionType());
 			boolean isVisible = cConf != null;
-			JCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(ctItem, isVisible);
-			mi.addActionListener(new ActionListener() {				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-						JCustomCheckBoxMenuItem mi = (JCustomCheckBoxMenuItem) e.getSource();
-						ConditionType conditionType = ((ConditionTypeCBItem)mi.getUserObject()).getConditionType();
-						
-						if(mi.isSelected()){
-							//add the column
-							int colIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
-							int rowWidth = 75;
+			if(ctItem.getConditionType() == ConditionType.FILE_CONTAINS_TAG) {
+				// Special case for file tags: Group all available tags in sub-menu items
+				JMenuItem mi = new JMenuItem(ctItem.toString());
+				JMenu tagsMenu = new JMenu();
+//				tagsMenu.add(new JCustomCheckBoxMenuItem("Bla", false));
+//				tagsMenu.add(new JCustomCheckBoxMenuItem("Bli", true));
+				
+				mi.add(tagsMenu);
+				columnSelectorMenu.add(mi);	
+			} else {			
+				JCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(ctItem, isVisible);
+				mi.addActionListener(new ActionListener() {				
+					@Override
+					public void actionPerformed(ActionEvent e) {
+							JCustomCheckBoxMenuItem mi = (JCustomCheckBoxMenuItem) e.getSource();
+							ConditionType conditionType = ((ConditionTypeCBItem)mi.getUserObject()).getConditionType();
 							
-							TableColumn newCol = new TableColumn();
-							newCol.setHeaderValue(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()));
-							newCol.setWidth(rowWidth);
-							newCol.setModelIndex(colIndex);
-
-							//insert the column into the db before triggering the update to load the data properly
-							MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, colIndex, rowWidth), fileType);
-
-							updateTableModel();
-						} else {
-							//remove the column
-							if(table.getColumnCount() > 1){
-								for(int i = 0; i < table.getColumnCount(); i++){
-									TableColumn c = table.getColumn(table.getColumnName(i));
-
-									if(c.getHeaderValue().equals(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()))) {
-										//delete the column from the db before triggering the update to remove the row properly
-										MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, c.getModelIndex(), 0), fileType);
-
-										updateTableModel();
-										
-										break;
-									}
-								}
+							if(mi.isSelected()){
+								//add the column
+								int colIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
+								int rowWidth = 75;
+								
+								TableColumn newCol = new TableColumn();
+								newCol.setHeaderValue(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()));
+								newCol.setWidth(rowWidth);
+								newCol.setModelIndex(colIndex);
+	
+								//insert the column into the db before triggering the update to load the data properly
+								MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, colIndex, rowWidth), fileType);
+	
+								updateTableModel();
 							} else {
-								//don't allow to remove the last column
-								mi.setSelected(true);
+								//remove the column
+								if(table.getColumnCount() > 1){
+									for(int i = 0; i < table.getColumnCount(); i++){
+										TableColumn c = table.getColumn(table.getColumnName(i));
+	
+										if(c.getHeaderValue().equals(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()))) {
+											//delete the column from the db before triggering the update to remove the row properly
+											MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, c.getModelIndex(), 0), fileType);
+	
+											updateTableModel();
+											
+											break;
+										}
+									}
+								} else {
+									//don't allow to remove the last column
+									mi.setSelected(true);
+								}
 							}
-						}
-				}
-			});
-			
-			columnSelectorMenu.add(mi);	
+					}
+				});
+				
+				columnSelectorMenu.add(mi);	
+			}
 		}
 		
 		//add some invisible menu items to fill up the remaining spaces if required
