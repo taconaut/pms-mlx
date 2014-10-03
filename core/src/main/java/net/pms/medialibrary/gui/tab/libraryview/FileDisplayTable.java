@@ -1119,8 +1119,9 @@ public class FileDisplayTable extends JPanel {
 
 	private void showAllColumns() {
 		List<DOTableColumnConfiguration> configuredColumns = MediaLibraryStorage.getInstance().getTableColumnConfigurations(getFileType());
+		
 		for(ConditionType ct : ConditionType.values()){
-			//don't show an entry for the type unkown
+			//don't show an entry for the type unknown
 			if(ct == ConditionType.UNKNOWN){
 				continue;
 			}
@@ -1129,29 +1130,38 @@ public class FileDisplayTable extends JPanel {
 			if((getFileType() == FileType.FILE && ct.toString().startsWith("FILE"))
 					|| (getFileType() == FileType.VIDEO && (ct.toString().startsWith("FILE") || ct.toString().startsWith("VIDEO")))
 					|| (getFileType() == FileType.AUDIO && (ct.toString().startsWith("FILE") || ct.toString().startsWith("AUDIO")))
-					|| (getFileType() == FileType.PICTURES && (ct.toString().startsWith("FILE") || ct.toString().startsWith("IMAGE")))){
-				boolean alreadyConfigured = false;
-				
-				//only add columns which aren't displayed yet
-				for(DOTableColumnConfiguration cConf : configuredColumns){
-					if(cConf.getConditionType() == ct){
-						alreadyConfigured = true;
-						break;
+					|| (getFileType() == FileType.PICTURES && (ct.toString().startsWith("FILE") || ct.toString().startsWith("IMAGE")))) {
+				if(ct == ConditionType.FILE_CONTAINS_TAG) {
+					// Special case for tags
+					for(String tagName : FolderHelper.getHelper().getExistingTags(getFileType())) {
+						addColumnIfNotExist(configuredColumns, ct, tagName);
 					}
-				}
-				
-				if(!alreadyConfigured) {
-					int columnWidth = DEFAULT_COLUMN_WIDTH;
-					int columnIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
-					MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(ct, null, columnIndex, columnWidth), getFileType());
+				} else {
+					addColumnIfNotExist(configuredColumns, ct, null);
 				}
 			}
 		}
 		
-		// TODO: Add all tag columns
-		
 		refreshColumnSelectorMenu();
 		updateTableModel();
+	}
+	
+	private void addColumnIfNotExist(List<DOTableColumnConfiguration> configuredColumns, ConditionType conditionType, String tagName) {
+		boolean alreadyConfigured = false;
+		
+		//only add columns which aren't displayed yet
+		for(DOTableColumnConfiguration cConf : configuredColumns){
+			if(cConf.getConditionType() == conditionType && (tagName == null || cConf.getTagName().equals(tagName))){
+				alreadyConfigured = true;
+				break;
+			}
+		}
+		
+		if(!alreadyConfigured) {
+			int columnWidth = DEFAULT_COLUMN_WIDTH;
+			int columnIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
+			MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, tagName, columnIndex, columnWidth), getFileType());
+		}
 	}
 	
 	private void hideAllColumns() {
