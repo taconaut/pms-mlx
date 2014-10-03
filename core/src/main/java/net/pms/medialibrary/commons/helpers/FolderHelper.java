@@ -43,7 +43,7 @@ public class FolderHelper {
 	public HashMap<ConditionType, ConditionOperatorCBItem[]> typeOperators;
 	private static FolderHelper staticHelper;
 	
-	public FolderHelper(){
+	private FolderHelper(){
 		init();
 	}
 	

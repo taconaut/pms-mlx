@@ -44,7 +44,7 @@ class DBTableColumn extends DBFileInfo {
 		super(cp);
     }
 
-	List<DOTableColumnConfiguration> getTableColumnConfiguration(FileType fileType) throws StorageException {
+	List<DOTableColumnConfiguration> getTableColumnConfigurations(FileType fileType) throws StorageException {
 		ArrayList<DOTableColumnConfiguration> res = new ArrayList<DOTableColumnConfiguration>();
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -52,7 +52,7 @@ class DBTableColumn extends DBFileInfo {
 			
 		try {
 			conn = cp.getConnection();
-			stmt = conn.prepareStatement("SELECT CONDITIONTYPE, COLUMNINDEX, WIDTH"
+			stmt = conn.prepareStatement("SELECT CONDITIONTYPE, TAGNAME, COLUMNINDEX, WIDTH"
 					+ " FROM TABLECOLUMNCONFIGURATION"
 					+ " WHERE FILETYPE = ?" 
 					+ " ORDER BY COLUMNINDEX ASC");
@@ -68,9 +68,10 @@ class DBTableColumn extends DBFileInfo {
 					log.warn(String.format("Failed to add column of type %s. This is probably a leftover from an update", rs.getString(1)));
 					continue;
 				}
-				int columnIndex = rs.getInt(2);
-				int width = rs.getInt(3);
-				res.add( new DOTableColumnConfiguration(ct, columnIndex, width));
+				String tagName = rs.getString(2);
+				int columnIndex = rs.getInt(3);
+				int width = rs.getInt(4);
+				res.add( new DOTableColumnConfiguration(ct, tagName, columnIndex, width));
 			}
 		} catch (SQLException se) {
 			throw new StorageException(String.format("Failed to get table column configuration for fileType=%s", fileType), se);
@@ -86,16 +87,17 @@ class DBTableColumn extends DBFileInfo {
 			
 		try {
 			conn = cp.getConnection();
-			stmt = conn.prepareStatement("INSERT INTO TABLECOLUMNCONFIGURATION (COLUMNINDEX, WIDTH, FILETYPE, CONDITIONTYPE) VALUES (?, ?, ?, ?)");
+			stmt = conn.prepareStatement("INSERT INTO TABLECOLUMNCONFIGURATION (COLUMNINDEX, WIDTH, FILETYPE, CONDITIONTYPE, TAGNAME) VALUES (?, ?, ?, ?, ?)");
 			stmt.clearParameters();
 			stmt.setInt(1, c.getColumnIndex());
 			stmt.setInt(2, c.getWidth());
 			stmt.setString(3, fileType.toString());
 			stmt.setString(4, c.getConditionType().toString());
+			stmt.setString(5, c.getTagName());
 			stmt.executeUpdate();
 		} catch (SQLException se) {
-			throw new StorageException(String.format("Failed to insert table column configuration for columnIndex=%s, width=%s, fileType=%s, conditionType=%s", 
-					c.getColumnIndex(), c.getWidth(), fileType, c.getConditionType()), se);
+			throw new StorageException(String.format("Failed to insert table column configuration for columnIndex=%s, width=%s, fileType=%s, conditionType=%s, tagName=%s", 
+					c.getColumnIndex(), c.getWidth(), fileType, c.getConditionType(), c.getTagName()), se);
 		} finally {
 			close(conn, stmt);
 		}
@@ -123,22 +125,23 @@ class DBTableColumn extends DBFileInfo {
 		}
 	}
 
-	public void updateTableColumnConfiguration(ConditionType ct, int width, FileType fileType) throws StorageException {
+	public void updateTableColumnConfiguration(ConditionType ct, String tagName, int width, FileType fileType) throws StorageException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 			
 		try {
 			conn = cp.getConnection();
 			stmt = conn.prepareStatement("UPDATE TABLECOLUMNCONFIGURATION"
-					+ " SET WIDTH = ? WHERE FILETYPE = ? AND CONDITIONTYPE = ?");
+					+ " SET WIDTH = ? WHERE FILETYPE = ? AND CONDITIONTYPE = ? AND TAGNAME = ?");
 			stmt.clearParameters();
 			stmt.setInt(1, width);
 			stmt.setString(2, fileType.toString());
 			stmt.setString(3, ct.toString());
+			stmt.setString(4, tagName);
 			stmt.executeUpdate();
 		} catch (SQLException se) {
-			throw new StorageException(String.format("Failed to update table column width for conditionType=%s, width=%s, fileType=%s", 
-					ct, width, fileType), se);
+			throw new StorageException(String.format("Failed to update table column width for conditionType=%s, tagName='%s' width=%s, fileType=%s", 
+					ct, tagName, width, fileType), se);
 		} finally {
 			close(conn, stmt);
 		}
@@ -152,7 +155,7 @@ class DBTableColumn extends DBFileInfo {
 			
 		try {
 			conn = cp.getConnection();
-			stmt = conn.prepareStatement("SELECT CONDITIONTYPE, WIDTH"
+			stmt = conn.prepareStatement("SELECT CONDITIONTYPE, TAGNAME, WIDTH"
 					+ " FROM TABLECOLUMNCONFIGURATION"
 					+ " WHERE FILETYPE = ? AND COLUMNINDEX = ?");
 			stmt.setString(1, fileType.toString());
@@ -161,8 +164,9 @@ class DBTableColumn extends DBFileInfo {
 			
 			if(rs.next()){
 				ConditionType ct = Enum.valueOf(ConditionType.class, rs.getString(1));
-				int width = rs.getInt(2);
-				res = new DOTableColumnConfiguration(ct, columnIndex, width);
+				String tagName = rs.getString(2);
+				int width = rs.getInt(3);
+				res = new DOTableColumnConfiguration(ct, tagName, columnIndex, width);
 			}
 		} catch (SQLException se) {
 			throw new StorageException(String.format("Failed to get table column configuration for fileType=%s, columnIndex=%s", fileType, columnIndex), se);
@@ -172,7 +176,7 @@ class DBTableColumn extends DBFileInfo {
 		return res;
 	}
 
-	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct) throws StorageException {
+	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct, String tagName) throws StorageException {
 		DOTableColumnConfiguration res = null;
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -182,22 +186,27 @@ class DBTableColumn extends DBFileInfo {
 			conn = cp.getConnection();
 			stmt = conn.prepareStatement("SELECT COLUMNINDEX, WIDTH"
 					+ " FROM TABLECOLUMNCONFIGURATION"
-					+ " WHERE FILETYPE = ? AND CONDITIONTYPE = ?");
+					+ " WHERE FILETYPE = ? AND CONDITIONTYPE = ? AND TAGNAME = ?");
 			stmt.setString(1, fileType.toString());
 			stmt.setString(2, ct.toString());
+			stmt.setString(3, tagName);
 			rs = stmt.executeQuery();
 				
 			if(rs.next()){
 				int columnIndex = rs.getInt(1);
 				int width = rs.getInt(2);
-				res = new DOTableColumnConfiguration(ct, columnIndex, width);
+				res = new DOTableColumnConfiguration(ct, tagName, columnIndex, width);
 			}
 		} catch (SQLException se) {
-			throw new StorageException(String.format("Failed to get table column configuration for fileType=%s, conditionType=%s", fileType, ct), se);
+			throw new StorageException(String.format("Failed to get table column configuration for fileType=%s, conditionType=%s, tagName=%", fileType, ct, tagName), se);
 		} finally {
 			close(conn, stmt, rs);
 		}
 		return res;
+	}
+
+	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct) throws StorageException {
+		return getTableColumnConfiguration(fileType, ct, "");
 	}
 
 	public void clearTableColumnConfiguration(FileType fileType) throws StorageException {

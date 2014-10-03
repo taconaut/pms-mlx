@@ -138,7 +138,7 @@ class DisplayPanel extends JPanel {
 	private JPanel                           pTemplate;
 	private JPopupMenu                       treeContextMenu;
 
-	private FolderHelper                     folderHelper       = new FolderHelper();
+	private FolderHelper                     folderHelper       = FolderHelper.getHelper();
 	private boolean                          isCreatingTemplate = false;
 	private boolean                          isEditingTemplate  = false;
 

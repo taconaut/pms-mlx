@@ -23,16 +23,18 @@ import net.pms.medialibrary.commons.enumarations.ConditionType;
 
 public class DOTableColumnConfiguration {
 	private ConditionType conditionType;
+	private String tagName;
 	private int columnIndex;
 	private int width;
 	
 	public DOTableColumnConfiguration(){
-		this(ConditionType.UNKNOWN, 0, 75);
+		this(ConditionType.UNKNOWN, null, 0, 75);
 	}
 
-	public DOTableColumnConfiguration(ConditionType conditionType,
+	public DOTableColumnConfiguration(ConditionType conditionType, String tagName,
 			int columnIndex, int width) {
 		setConditionType(conditionType);
+		setTagName(tagName);
 		setColumnIndex(columnIndex);
 		setWidth(width);
 	}
@@ -53,6 +55,15 @@ public class DOTableColumnConfiguration {
 		return conditionType;
 	}
 
+	public String getTagName() {
+		if(tagName == null) tagName = "";
+		return tagName;
+	}
+
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
+	}
+
 	public void setWidth(int width) {
 		this.width = width;
 	}
@@ -63,7 +74,9 @@ public class DOTableColumnConfiguration {
 
 	@Override
 	public String toString() {
-		return Messages.getString("ML.Condition.Header.Type." + conditionType.toString());
+		return (getTagName() == "") ? 
+				Messages.getString("ML.Condition.Header.Type." + conditionType.toString()) :
+				String.format("%s (%s)", getTagName(), Messages.getString("ML.Condition.Header.TagSuffix"));
 	}
 	
 	@Override
@@ -74,7 +87,8 @@ public class DOTableColumnConfiguration {
 		
 		DOTableColumnConfiguration compObj = (DOTableColumnConfiguration)obj;
 		if(getColumnIndex() == compObj.getColumnIndex()
-				&& getConditionType() == compObj.getConditionType()){
+			&& getConditionType() == compObj.getConditionType()
+			&& getTagName().equals(compObj.getTagName())){
 			return true;
 		}
 		
@@ -85,6 +99,7 @@ public class DOTableColumnConfiguration {
 	public int hashCode() {
 		int res = 65 * getColumnIndex();
 		res += 65 * getConditionType().hashCode();
+		res += 65 * getTagName().hashCode();
 		
 		return res;
 	}

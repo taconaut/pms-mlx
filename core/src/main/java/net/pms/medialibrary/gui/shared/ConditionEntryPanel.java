@@ -63,7 +63,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ConditionEntryPanel implements ActionListener {
     private FileType fileType = FileType.UNKNOWN;
-	private FolderHelper folderHelper = new FolderHelper();
+	private FolderHelper folderHelper = FolderHelper.getHelper();
 	private ConditionValueType currentValueType = ConditionValueType.UNKNOWN;
 	
 	private JComboBox cbConditionType;

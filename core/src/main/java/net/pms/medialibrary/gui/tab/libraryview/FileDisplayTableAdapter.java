@@ -28,6 +28,8 @@ import java.util.Map;
 
 import javax.swing.ListModel;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.pms.Messages;
 import net.pms.dlna.DLNAMediaAudio;
 import net.pms.dlna.DLNAMediaSubtitle;
@@ -42,7 +44,6 @@ import net.pms.medialibrary.commons.enumarations.ConditionValueType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.helpers.DLNAHelper;
 import net.pms.medialibrary.commons.helpers.FolderHelper;
-import net.pms.medialibrary.commons.helpers.GUIHelper;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
@@ -52,7 +53,7 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 	private static Map<FileType, DOTableColumnConfiguration[]> columnConfigurations = new HashMap<FileType, DOTableColumnConfiguration[]>();
 	private FileType fileType;
 
-	public FileDisplayTableAdapter(ListModel listModel, FileType fileType) {
+	public FileDisplayTableAdapter(ListModel<DOFileInfo> listModel, FileType fileType) {
 		super(listModel, getColumnNames(fileType, true));
 		setFileType(fileType);
 	}
@@ -81,24 +82,13 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 		Object res = null;
 		
 		if(res == null){
-			StringBuilder sb;
 			switch(cd.getConditionType()){
 				case FILE_CONTAINS_TAG:
-					List<String> keys = GUIHelper.asSortedList(file.getTags().keySet());
-					sb = new StringBuilder();
-					for(String key : keys){
-						List<String> tagValues = file.getTags().get(key);
+					List<String> tagValues = file.getTags().get(cd.getTagName());
+					if(tagValues != null) {
 						Collections.sort(tagValues);
-						sb.append(key);
-						sb.append("=");
-						sb.append(tagValues);
-						sb.append(", ");
+						res = StringUtils.join(tagValues, ", ");
 					}
-					String tmpRes = sb.toString();
-					if(tmpRes.length() > 0){
-						tmpRes = tmpRes.substring(0, tmpRes.length() - 2);
-					}
-					res = tmpRes;
 					break;
 				case FILE_DATEINSERTEDDB:
 					res = file.getDateInsertedDb();
@@ -459,7 +449,7 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 	
 	public static DOTableColumnConfiguration[] getColumnConfigurations(FileType fileType) {
 		if(!columnConfigurations.containsKey(fileType)) {
-			List<DOTableColumnConfiguration> columnConfigsList = MediaLibraryStorage.getInstance().getTableColumnConfiguration(fileType);
+			List<DOTableColumnConfiguration> columnConfigsList = MediaLibraryStorage.getInstance().getTableColumnConfigurations(fileType);
 			columnConfigurations.put(fileType, columnConfigsList.toArray(new DOTableColumnConfiguration[columnConfigsList.size()]));
 		}
 		return columnConfigurations.get(fileType);

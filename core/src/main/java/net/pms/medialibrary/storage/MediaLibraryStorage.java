@@ -226,10 +226,44 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	 *********************************************/
 	
 	@Override
-	public List<DOTableColumnConfiguration> getTableColumnConfiguration(FileType fileType) {
+	public List<DOTableColumnConfiguration> getTableColumnConfigurations(FileType fileType) {
 		List<DOTableColumnConfiguration> res = null;
 		try {
-			res = dbTableColumn.getTableColumnConfiguration(fileType);
+			res = dbTableColumn.getTableColumnConfigurations(fileType);
+		} catch (StorageException e) {
+			log.error("Storage error (get)", e);
+		}
+		return res;
+	}
+
+	@Override
+	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, int columnIndex) {
+		DOTableColumnConfiguration res = null;
+		try {
+			res = dbTableColumn.getTableColumnConfiguration(fileType, columnIndex);
+		} catch (StorageException e) {
+			log.error("Storage error (get)", e);
+		}
+		return res;
+	}
+
+	@Override
+	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct) {
+		DOTableColumnConfiguration res = null;
+		try {
+			res = dbTableColumn.getTableColumnConfiguration(fileType, ct);
+		} catch (StorageException e) {
+			log.error("Storage error (get)", e);
+		}
+		return res;
+	}
+
+	@Override
+	public DOTableColumnConfiguration getTableColumnConfiguration(
+			FileType fileType, ConditionType ct, String tagName) {
+		DOTableColumnConfiguration res = null;
+		try {
+			res = dbTableColumn.getTableColumnConfiguration(fileType, ct, tagName);
 		} catch (StorageException e) {
 			log.error("Storage error (get)", e);
 		}
@@ -240,7 +274,7 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	public void insertTableColumnConfiguration(DOTableColumnConfiguration c, FileType fileType) {
 		try {
 			dbTableColumn.insertTableColumnConfiguration(c, fileType);
-			if(log.isDebugEnabled()) log.debug(String.format("Inserted table column configuration. %s, index=%s, width=%s", c.getConditionType(), c.getColumnIndex(), c.getWidth()));
+			if(log.isDebugEnabled()) log.debug(String.format("Inserted table column configuration. %s, tag='%s' index=%s, width=%s", c.getConditionType(), c.getTagName(), c.getColumnIndex(), c.getWidth()));
 		} catch (StorageException e) {
 			log.error("Storage error (insert)", e);
 		}
@@ -257,10 +291,10 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	}
 
 	@Override
-	public void updateTableColumnWidth(ConditionType ct, int width, FileType fileType) {
+	public void updateTableColumnWidth(ConditionType ct, String tagName, int width, FileType fileType) {
 		try {
-			dbTableColumn.updateTableColumnConfiguration(ct, width, fileType);
-			if(log.isDebugEnabled()) log.debug(String.format("Updated table column width for conditionType=%s, fileType=%s, width=%s", ct, fileType, width));
+			dbTableColumn.updateTableColumnConfiguration(ct, tagName, width, fileType);
+			if(log.isDebugEnabled()) log.debug(String.format("Updated table column width for conditionType=%s, tagName=%s, fileType=%s, width=%s", ct, tagName, fileType, width));
 		} catch (StorageException e) {
 			log.error("Storage error (update)", e);
 		}
@@ -270,7 +304,7 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	public void deleteTableColumnConfiguration(DOTableColumnConfiguration cConf, FileType fileType) {
 		try {
 			//get the existing columns
-			List<DOTableColumnConfiguration> existingColumns = getTableColumnConfiguration(fileType);
+			List<DOTableColumnConfiguration> existingColumns = getTableColumnConfigurations(fileType);
 			
 			//clear the existing columns
 			dbTableColumn.clearTableColumnConfiguration(fileType);
@@ -291,7 +325,7 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	}
 
 	@Override
-	public void deleteAllTableColumnConfiguration(FileType fileType) {
+	public void deleteAllTableColumnConfigurations(FileType fileType) {
 		try {
 			//clear the existing columns
 			dbTableColumn.deleteAllTableColumnConfiguration(fileType);
@@ -306,7 +340,7 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	public void moveTableColumnConfiguration(int fromIndex, int toIndex, FileType fileType) {
 		try {
 			//get the existing columns
-			List<DOTableColumnConfiguration> existingColumns = getTableColumnConfiguration(fileType);
+			List<DOTableColumnConfiguration> existingColumns = getTableColumnConfigurations(fileType);
 			
 			//get the column to move
 			DOTableColumnConfiguration cMove = null;
@@ -328,15 +362,15 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 					continue;
 				} else if(index == toIndex) {
 					//insert the moved column
-					dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(cMove.getConditionType(), index++, cMove.getWidth()), fileType);
+					dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(cMove.getConditionType(), cMove.getTagName(), index++, cMove.getWidth()), fileType);
 				}
 				
-				dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(c.getConditionType(), index++, c.getWidth()), fileType);
+				dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(c.getConditionType(), c.getTagName(), index++, c.getWidth()), fileType);
 			}
 			
 			//special case where the column moves to the last position
 			if(toIndex == index) {
-				dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(cMove.getConditionType(), index++, cMove.getWidth()), fileType);				
+				dbTableColumn.insertTableColumnConfiguration(new DOTableColumnConfiguration(cMove.getConditionType(), cMove.getTagName(), index++, cMove.getWidth()), fileType);				
 			}
 			
 			if(log.isDebugEnabled()) log.debug(String.format("Moved table column configuration for file type=%s, from=%s, to=%s", fileType, fromIndex, toIndex));
@@ -346,35 +380,13 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	}
 
 	@Override
-	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, int columnIndex) {
-		DOTableColumnConfiguration res = null;
-		try {
-			res = dbTableColumn.getTableColumnConfiguration(fileType, columnIndex);
-		} catch (StorageException e) {
-			log.error("Storage error (get)", e);
-		}
-		return res;
-	}
-
-	@Override
-	public void clearTableColumnConfiguration(FileType fileType) {
+	public void clearTableColumnConfigurations(FileType fileType) {
 		try {
 			dbTableColumn.clearTableColumnConfiguration(fileType);
 			if(log.isDebugEnabled()) log.debug(String.format("Deleted all column configurations for file type=%s", fileType));
 		} catch (StorageException e) {
 			log.error("Storage error (delete)", e);
 		}
-	}
-
-	@Override
-	public DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct) {
-		DOTableColumnConfiguration res = null;
-		try {
-			res = dbTableColumn.getTableColumnConfiguration(fileType, ct);
-		} catch (StorageException e) {
-			log.error("Storage error (get)", e);
-		}
-		return res;
 	}
 
 	@Override

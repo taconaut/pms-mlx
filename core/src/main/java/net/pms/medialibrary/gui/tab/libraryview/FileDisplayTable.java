@@ -80,6 +80,7 @@ import net.pms.medialibrary.commons.dataobjects.comboboxitems.ConditionTypeCBIte
 import net.pms.medialibrary.commons.enumarations.ConditionType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.helpers.FileImportHelper;
+import net.pms.medialibrary.commons.helpers.FolderHelper;
 import net.pms.medialibrary.commons.helpers.GUIHelper;
 import net.pms.medialibrary.commons.interfaces.FileEditLinkedList;
 import net.pms.medialibrary.commons.interfaces.IProgress;
@@ -99,6 +100,7 @@ public class FileDisplayTable extends JPanel {
 	private static final long serialVersionUID = -3062848510551753642L;
 	private static final Logger log = LoggerFactory.getLogger(FileDisplayTable.class);
 	private final int MAX_MENUITEMS_PER_COLUMN = 20;
+	private final int DEFAULT_COLUMN_WIDTH = 75;
 	
 	private FileType fileType;
 	private ETable table;
@@ -260,11 +262,10 @@ public class FileDisplayTable extends JPanel {
 						TableColumn c = (TableColumn) e.getSource();
 						if(!isUpdating && e.getPropertyName().equals("preferredWidth")) {
 							//store the width of the column when it changes
-							for(ConditionType ct : ConditionType.values()) {
-								if(c.getHeaderValue().equals(Messages.getString("ML.Condition.Header.Type." + ct.toString()))) {
-									MediaLibraryStorage.getInstance().updateTableColumnWidth(ct, c.getWidth(), fileType);
-									break;
-								}
+							String columnName = (String) c.getHeaderValue();
+							DOTableColumnConfiguration columnConfiguration = getColumnConfigurationForName(columnName);
+							if(columnConfiguration != null) {
+								MediaLibraryStorage.getInstance().updateTableColumnWidth(columnConfiguration.getConditionType(), columnConfiguration.getTagName(), c.getWidth(), getFileType());
 							}
 						}
 					}
@@ -521,6 +522,23 @@ public class FileDisplayTable extends JPanel {
 		table.getDefaultEditor(String.class).addCellEditorListener(cellEditorListener);
 		table.getDefaultEditor(Integer.class).addCellEditorListener(cellEditorListener);
 		table.getDefaultEditor(Boolean.class).addCellEditorListener(cellEditorListener);
+	}
+
+
+	private DOTableColumnConfiguration getColumnConfigurationForName(String columnName) {
+		DOTableColumnConfiguration result = null;
+		if(columnName != null) {
+			List<DOTableColumnConfiguration> columnConfigurations = MediaLibraryStorage.getInstance().getTableColumnConfigurations(getFileType());
+			
+			for(DOTableColumnConfiguration columnConfiguration : columnConfigurations){
+				if(columnConfiguration != null && columnConfiguration.toString().equals(columnName)){
+					result = columnConfiguration;
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	private void updateFiles(List<DOFileInfo> updatedFiles) {
@@ -964,19 +982,65 @@ public class FileDisplayTable extends JPanel {
 		
 		//add all elements to menu, attach the listener handling the click event and set them selected if needed
 		for(ConditionTypeCBItem ctItem : sortedItems) {
-			DOTableColumnConfiguration cConf = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType(), ctItem.getConditionType());
-			boolean isVisible = cConf != null;
 			if(ctItem.getConditionType() == ConditionType.FILE_CONTAINS_TAG) {
 				// Special case for file tags: Group all available tags in sub-menu items
-				JMenuItem mi = new JMenuItem(ctItem.toString());
-				JMenu tagsMenu = new JMenu();
-//				tagsMenu.add(new JCustomCheckBoxMenuItem("Bla", false));
-//				tagsMenu.add(new JCustomCheckBoxMenuItem("Bli", true));
+				JMenu tagsMenu = new JMenu(ctItem.toString());
+				columnSelectorMenu.add(tagsMenu);	
 				
-				mi.add(tagsMenu);
-				columnSelectorMenu.add(mi);	
-			} else {			
-				JCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(ctItem, isVisible);
+				// Add all tags for the current file type
+				FolderHelper.getHelper().getExistingTags(getFileType());
+				for(String tagName : FolderHelper.getHelper().getExistingTags(getFileType())) {
+					DOTableColumnConfiguration cConf = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType(), ctItem.getConditionType(), tagName);
+					boolean isSelected = cConf != null;
+					JCustomCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(tagName, isSelected);
+					mi.addActionListener(new ActionListener() {						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							JCustomCheckBoxMenuItem mi = (JCustomCheckBoxMenuItem) e.getSource();
+							ConditionType conditionType = ConditionType.FILE_CONTAINS_TAG;
+							String tagName = mi.getText();
+							
+							if(mi.isSelected()){
+								//add the column
+								int colIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
+								int rowWidth = DEFAULT_COLUMN_WIDTH;
+								DOTableColumnConfiguration columnConfiguration = new DOTableColumnConfiguration(conditionType, tagName, colIndex, rowWidth);
+								
+								TableColumn newCol = new TableColumn();
+								newCol.setHeaderValue(columnConfiguration.toString());
+								newCol.setWidth(rowWidth);
+								newCol.setModelIndex(colIndex);
+	
+								//insert the column into the db before triggering the update to load the data properly
+								MediaLibraryStorage.getInstance().insertTableColumnConfiguration(columnConfiguration, fileType);
+	
+								updateTableModel();
+							} else {
+								//remove the column
+								if(table.getColumnCount() > 1) {
+									List<DOTableColumnConfiguration> columnConfigurations = MediaLibraryStorage.getInstance().getTableColumnConfigurations(getFileType());
+									for(DOTableColumnConfiguration columnConfiguration : columnConfigurations) {
+										if(columnConfiguration.getConditionType() == conditionType && columnConfiguration.getTagName().equals(tagName)) {
+											//delete the column from the db before triggering the update to remove the row properly
+											MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, tagName, columnConfiguration.getColumnIndex(), 0), fileType);
+											updateTableModel();										
+											break;										
+										}
+									}
+								} else {
+									//don't allow to remove the last column
+									mi.setSelected(true);
+								}
+							}
+						}
+					});
+					tagsMenu.add(mi);
+				}
+			} else {
+				DOTableColumnConfiguration cConf = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType(), ctItem.getConditionType());
+				boolean isSelected = cConf != null;
+				
+				JCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(ctItem, isSelected);
 				mi.addActionListener(new ActionListener() {				
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -986,30 +1050,28 @@ public class FileDisplayTable extends JPanel {
 							if(mi.isSelected()){
 								//add the column
 								int colIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
-								int rowWidth = 75;
-								
+								int rowWidth = DEFAULT_COLUMN_WIDTH;
+								DOTableColumnConfiguration columnConfiguration = new DOTableColumnConfiguration(conditionType, null, colIndex, rowWidth);
+
 								TableColumn newCol = new TableColumn();
-								newCol.setHeaderValue(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()));
+								newCol.setHeaderValue(columnConfiguration.toString());
 								newCol.setWidth(rowWidth);
 								newCol.setModelIndex(colIndex);
 	
 								//insert the column into the db before triggering the update to load the data properly
-								MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, colIndex, rowWidth), fileType);
+								MediaLibraryStorage.getInstance().insertTableColumnConfiguration(columnConfiguration, fileType);
 	
 								updateTableModel();
 							} else {
 								//remove the column
-								if(table.getColumnCount() > 1){
-									for(int i = 0; i < table.getColumnCount(); i++){
-										TableColumn c = table.getColumn(table.getColumnName(i));
-	
-										if(c.getHeaderValue().equals(Messages.getString("ML.Condition.Header.Type." + conditionType.toString()))) {
+								if(table.getColumnCount() > 1) {
+									List<DOTableColumnConfiguration> columnConfigurations = MediaLibraryStorage.getInstance().getTableColumnConfigurations(getFileType());
+									for(DOTableColumnConfiguration columnConfiguration : columnConfigurations) {
+										if(columnConfiguration.getConditionType() == conditionType) {
 											//delete the column from the db before triggering the update to remove the row properly
-											MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, c.getModelIndex(), 0), fileType);
-	
-											updateTableModel();
-											
-											break;
+											MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, null, columnConfiguration.getColumnIndex(), 0), fileType);
+											updateTableModel();										
+											break;										
 										}
 									}
 								} else {
@@ -1056,7 +1118,7 @@ public class FileDisplayTable extends JPanel {
 	}
 
 	private void showAllColumns() {
-		List<DOTableColumnConfiguration> configuredColumns = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType());
+		List<DOTableColumnConfiguration> configuredColumns = MediaLibraryStorage.getInstance().getTableColumnConfigurations(getFileType());
 		for(ConditionType ct : ConditionType.values()){
 			//don't show an entry for the type unkown
 			if(ct == ConditionType.UNKNOWN){
@@ -1079,18 +1141,21 @@ public class FileDisplayTable extends JPanel {
 				}
 				
 				if(!alreadyConfigured) {
-					int columnWidth = 75;
+					int columnWidth = DEFAULT_COLUMN_WIDTH;
 					int columnIndex = MediaLibraryStorage.getInstance().getTableConfigurationMaxColumnIndex(getFileType()) + 1;
-					MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(ct, columnIndex, columnWidth), getFileType());
+					MediaLibraryStorage.getInstance().insertTableColumnConfiguration(new DOTableColumnConfiguration(ct, null, columnIndex, columnWidth), getFileType());
 				}
 			}
 		}
+		
+		// TODO: Add all tag columns
+		
 		refreshColumnSelectorMenu();
 		updateTableModel();
 	}
 	
 	private void hideAllColumns() {
-		MediaLibraryStorage.getInstance().deleteAllTableColumnConfiguration(getFileType());
+		MediaLibraryStorage.getInstance().deleteAllTableColumnConfigurations(getFileType());
 		refreshColumnSelectorMenu();
 		updateTableModel();
 	}
