@@ -94,6 +94,10 @@ import net.pms.medialibrary.gui.shared.ETable;
 import net.pms.medialibrary.gui.shared.JCustomCheckBoxMenuItem;
 import net.pms.medialibrary.gui.shared.SpringUtilities;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.NotificationSubscriber;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 import net.pms.plugins.FileImportPlugin;
 
 public class FileDisplayTable extends JPanel {
@@ -180,9 +184,9 @@ public class FileDisplayTable extends JPanel {
 	}
 
 	private void init() {
-		initTable();
-		
+		initTable();		
 		updateTableModel();
+		initNotifications();
 		
 		//configure the context menu for column selection
 		columnSelectorMenu = new JPopupMenu();
@@ -201,7 +205,7 @@ public class FileDisplayTable extends JPanel {
 		statusLabel.setHorizontalAlignment(JLabel.CENTER);
 		add(statusLabel, BorderLayout.SOUTH);
 	}
-	
+
 	private void initTable() {
 		//configure the table
 		table = new ETable();
@@ -523,7 +527,27 @@ public class FileDisplayTable extends JPanel {
 		table.getDefaultEditor(Integer.class).addCellEditorListener(cellEditorListener);
 		table.getDefaultEditor(Boolean.class).addCellEditorListener(cellEditorListener);
 	}
-
+	
+	private void initNotifications() {
+		NotificationCenter.getInstance(DBEvent.class).subscribe(new NotificationSubscriber<DBEvent>() {
+			
+			@Override
+			public void onMessage(DBEvent obj) {
+				if(obj.getType() == Type.FileTagChanged) {
+					// Do refresh tag columns in the UI thread
+					SwingUtilities.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							((FileDisplayTableAdapter) table.getModel()).refreshColumnConfigurations();
+							refreshColumnSelectorMenu();
+							updateTableModel();
+						}
+					});
+				}
+			}
+		});
+	}
 
 	private DOTableColumnConfiguration getColumnConfigurationForName(String columnName) {
 		DOTableColumnConfiguration result = null;
@@ -988,12 +1012,12 @@ public class FileDisplayTable extends JPanel {
 				columnSelectorMenu.add(tagsMenu);	
 				
 				// Add all tags for the current file type
-				FolderHelper.getHelper().getExistingTags(getFileType());
-				for(String tagName : FolderHelper.getHelper().getExistingTags(getFileType())) {
+				FolderHelper.getInstance().getExistingTags(getFileType());
+				for(String tagName : FolderHelper.getInstance().getExistingTags(getFileType())) {
 					DOTableColumnConfiguration cConf = MediaLibraryStorage.getInstance().getTableColumnConfiguration(getFileType(), ctItem.getConditionType(), tagName);
 					boolean isSelected = cConf != null;
 					JCustomCheckBoxMenuItem mi = new JCustomCheckBoxMenuItem(tagName, isSelected);
-					mi.addActionListener(new ActionListener() {						
+					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							JCustomCheckBoxMenuItem mi = (JCustomCheckBoxMenuItem) e.getSource();
@@ -1024,7 +1048,7 @@ public class FileDisplayTable extends JPanel {
 											//delete the column from the db before triggering the update to remove the row properly
 											MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(new DOTableColumnConfiguration(conditionType, tagName, columnConfiguration.getColumnIndex(), 0), fileType);
 											updateTableModel();										
-											break;										
+											break;
 										}
 									}
 								} else {
@@ -1133,7 +1157,7 @@ public class FileDisplayTable extends JPanel {
 					|| (getFileType() == FileType.PICTURES && (ct.toString().startsWith("FILE") || ct.toString().startsWith("IMAGE")))) {
 				if(ct == ConditionType.FILE_CONTAINS_TAG) {
 					// Special case for tags
-					for(String tagName : FolderHelper.getHelper().getExistingTags(getFileType())) {
+					for(String tagName : FolderHelper.getInstance().getExistingTags(getFileType())) {
 						addColumnIfNotExist(configuredColumns, ct, tagName);
 					}
 				} else {

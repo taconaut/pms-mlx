@@ -47,7 +47,7 @@ public class FolderHelper {
 		init();
 	}
 	
-	public static FolderHelper getHelper(){
+	public static FolderHelper getInstance(){
 		if(staticHelper == null){
 			staticHelper = new FolderHelper();
 		}

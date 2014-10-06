@@ -328,7 +328,7 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 
 	@Override
     public Class<?> getColumnClass(int c) {
-		ConditionValueType vt = FolderHelper.getHelper().getConditionValueType(getColumnConditionType(c), ConditionOperator.IS);
+		ConditionValueType vt = FolderHelper.getInstance().getConditionValueType(getColumnConditionType(c), ConditionOperator.IS);
 		
 		Class<?> res = null;
 		switch(vt){
@@ -453,6 +453,33 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 			columnConfigurations.put(fileType, columnConfigsList.toArray(new DOTableColumnConfiguration[columnConfigsList.size()]));
 		}
 		return columnConfigurations.get(fileType);
+	}
+	
+	public void refreshColumnConfigurations() {
+		if(columnConfigurations.containsKey(fileType)) {
+			columnConfigurations.remove(fileType);
+			
+			List<DOTableColumnConfiguration> columnConfigsList = MediaLibraryStorage.getInstance().getTableColumnConfigurations(fileType);
+			
+			// Remove tag columns for which no tag exists anymore
+			List<String> existingTags = FolderHelper.getInstance().getExistingTags(fileType);
+			List<DOTableColumnConfiguration> columnConfigsToRemove = new ArrayList<DOTableColumnConfiguration>();
+			for(DOTableColumnConfiguration columnConfiguration : columnConfigsList) {
+				if(columnConfiguration.getConditionType() == ConditionType.FILE_CONTAINS_TAG) {
+					if(!existingTags.contains(columnConfiguration.getTagName())) {
+						columnConfigsToRemove.add(columnConfiguration);
+					}
+				}
+			}
+			
+			// Delete tag columns for which no configured tag exists anymore
+			for(DOTableColumnConfiguration columnConfiguration : columnConfigsToRemove) {
+				MediaLibraryStorage.getInstance().deleteTableColumnConfiguration(columnConfiguration, fileType);
+				columnConfigsList.remove(columnConfiguration);
+			}
+			
+			columnConfigurations.put(fileType, columnConfigsList.toArray(new DOTableColumnConfiguration[columnConfigsList.size()]));
+		}
 	}
 
 	private static String[] getColumnNames(FileType fileType, boolean reinit) {
