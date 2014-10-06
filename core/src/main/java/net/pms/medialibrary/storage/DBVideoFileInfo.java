@@ -739,11 +739,11 @@ class DBVideoFileInfo extends DBFileInfo {
     		stmt.setString(29, fileInfo.getTrailerUrl());
     		stmt.setString(30, fileInfo.getSortName());
     		stmt.setString(31, fileInfo.getMuxingMode());
-    		stmt.setInt(32, fileInfo.getId());
-    		stmt.setString(33,  fileInfo.getAspectRatioContainer());
-    		stmt.setString(34,  fileInfo.getAspectRatioVideoTrack());
-    		stmt.setByte(35, fileInfo.getReferenceFrameCount());
-    		stmt.setString(36, fileInfo.getAvcLevel());
+    		stmt.setString(32,  fileInfo.getAspectRatioContainer());
+    		stmt.setString(33,  fileInfo.getAspectRatioVideoTrack());
+    		stmt.setByte(34, fileInfo.getReferenceFrameCount());
+    		stmt.setString(35, fileInfo.getAvcLevel());
+    		stmt.setInt(36, fileInfo.getId());
     		stmt.executeUpdate();
 
     		insertOrUpdateVideoPropertyLists(fileInfo, stmt, conn);

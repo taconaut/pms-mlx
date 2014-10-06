@@ -174,13 +174,13 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		PanelBuilder builder;
 		CellConstraints cc = new CellConstraints();
 		
-		FormLayout layout = new FormLayout("3px, r:p, 7px, p, 40px, r:p, 7px, fill:p:grow, 3px", // columns
+		FormLayout layout = new FormLayout("3px, r:p, 7px, p, 30px, r:p, 7px, p, 30px, r:p, 7px, fill:p:grow, 3px", // columns
 		        "3px, p, 3px, p, 3px, p, 3px, p, 3px, p, 15px, p, 3px, p, 3px, p, 3px, p, 3px, p, 7px, p, 3px, p, 3px"); // rows
 		builder = new PanelBuilder(layout);
 		builder.opaque(true);
 		
 		//add file properties
-		JComponent cmp = builder.addSeparator(Messages.getString("ML.VideoFileInfoPanel.lFileProperties"), cc.xyw(2, 2, 7));
+		JComponent cmp = builder.addSeparator(Messages.getString("ML.VideoFileInfoPanel.lFileProperties"), cc.xyw(2, 2, 11));
 		cmp = (JComponent) cmp.getComponent(0);
 		cmp.setFont(cmp.getFont().deriveFont(Font.BOLD));
 		
@@ -203,7 +203,7 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		builder.addLabel(fileInfo.getFilePath(), cc.xyw(4, 10, 5));
 		
 		//add video properties		
-		cmp = builder.addSeparator(Messages.getString("ML.VideoFileInfoPanel.lVideoProperties"), cc.xyw(2, 12, 7));
+		cmp = builder.addSeparator(Messages.getString("ML.VideoFileInfoPanel.lVideoProperties"), cc.xyw(2, 12, 11));
 		cmp = (JComponent) cmp.getComponent(0);
 		cmp.setFont(cmp.getFont().deriveFont(Font.BOLD));
 
@@ -212,12 +212,18 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		
 		builder.add(new JHeader(Messages.getString("ML.VideoFileInfoPane.lResolution")), cc.xy(6, 14));
 		builder.addLabel(String.format("%sx%s", fileInfo.getWidth(), fileInfo.getHeight()),  cc.xy(8, 14));
+		
+		builder.add(new JHeader("AR Container:"), cc.xy(10, 14));
+		builder.addLabel(fileInfo.getAspectRatioContainer(),  cc.xy(12, 14));
 
 		builder.add(new JHeader(ConditionType.VIDEO_CODECV), cc.xy(2, 16));
 		builder.addLabel(fileInfo.getCodecV(),  cc.xy(4, 16));
 
 		builder.add(new JHeader(ConditionType.VIDEO_CONTAINER), cc.xy(6, 16));
 		builder.addLabel(fileInfo.getContainer(), cc.xy(8, 16));
+		
+		builder.add(new JHeader("AR Video:"), cc.xy(10, 16));
+		builder.addLabel(fileInfo.getAspectRatioVideoTrack(),  cc.xy(12, 16));
 
 		builder.add(new JHeader(ConditionType.VIDEO_BITRATE), cc.xy(2, 18));
 		builder.addLabel(String.valueOf(fileInfo.getBitrate() / 1024) + " kbit/s",  cc.xy(4, 18));
@@ -225,8 +231,14 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		builder.add(new JHeader(ConditionType.VIDEO_MIMETYPE), cc.xy(6, 18));
 		builder.addLabel(fileInfo.getMimeType(), cc.xy(8, 18));
 
+		builder.add(new JHeader("RF Count:"), cc.xy(10, 18));
+		builder.addLabel(String.valueOf(fileInfo.getReferenceFrameCount()), cc.xy(12, 18));
+
 		builder.add(new JHeader(ConditionType.VIDEO_FRAMERATE), cc.xy(2, 20));
 		builder.addLabel(fileInfo.getFrameRate(), cc.xy(4, 20));
+
+		builder.add(new JHeader("AVC Level:"), cc.xy(6, 20));
+		builder.addLabel(fileInfo.getAvcLevel(), cc.xy(8, 20));
 
 		builder.add(new JHeader(ConditionType.VIDEO_CONTAINS_VIDEOAUDIO), cc.xy(2, 22));
 		builder.addLabel(fileInfo.getDisplayString("%audio_languages"),  cc.xyw(4, 22, 5));
