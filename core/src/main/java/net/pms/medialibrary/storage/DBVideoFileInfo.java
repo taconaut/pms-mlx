@@ -240,7 +240,8 @@ class DBVideoFileInfo extends DBFileInfo {
 			        + ", VIDEO.ORIGINALNAME, VIDEO.NAME, VIDEO.SORTNAME, VIDEO.TMDBID, VIDEO.IMDBID, VIDEO.OVERVIEW, VIDEO.BUDGET, VIDEO.REVENUE, VIDEO.HOMEPAGEURL, VIDEO.TRAILERURL" 
 			        + ", VIDEO.AGERATINGLEVEL, VIDEO.AGERATINGREASON, VIDEO.RATINGPERCENT, VIDEO.RATINGVOTERS, VIDEO.DIRECTOR, VIDEO.TAGLINE"
 			        + ", VIDEO.ASPECTRATIO, VIDEO.BITRATE, VIDEO.BITSPERPIXEL, VIDEO.CODECV, VIDEO.DURATIONSEC, VIDEO.CONTAINER, VIDEO.DVDTRACK, VIDEO.FRAMERATE"
-			        + ", VIDEO.HEIGHT, VIDEO.MIMETYPE, VIDEO.MODEL, VIDEO.MUXABLE, VIDEO.WIDTH, VIDEO.YEAR, VIDEO.MUXINGMODE, VIDEO.FRAMERATEMODE" // VIDEO
+			        + ", VIDEO.HEIGHT, VIDEO.MIMETYPE, VIDEO.MODEL, VIDEO.MUXABLE, VIDEO.WIDTH, VIDEO.YEAR, VIDEO.MUXINGMODE, VIDEO.FRAMERATEMODE"
+			        + ", VIDEO.ASPECTRATIOCONTAINER, VIDEO.ASPECTRATIOVIDEOTRACK, VIDEO.REFRAMES, VIDEO.AVCLEVEL"// VIDEO
 			        + ", FILEPLAYS.DATEPLAYEND" //last play
 			        + ", VIDEOAUDIO.LANG, VIDEOAUDIO.NRAUDIOCHANNELS, VIDEOAUDIO.SAMPLEFREQ, VIDEOAUDIO.CODECA, VIDEOAUDIO.BITSPERSAMPLE, VIDEOAUDIO.DELAYMS, VIDEOAUDIO.MUXINGMODE, VIDEOAUDIO.BITRATE" //VIDEOAUDIO
 			        + ", SUBTITLES.FILEPATH, SUBTITLES.LANG, SUBTITLES.TYPE" //SUBTITLES
@@ -305,11 +306,15 @@ class DBVideoFileInfo extends DBFileInfo {
 						videoFile.setYear(rs.getInt(pos++));
 						videoFile.setMuxingMode(rs.getString(pos++));
 						videoFile.setFrameRateMode(rs.getString(pos++));
+						videoFile.setAspectRatioContainer(rs.getString(pos++));
+						videoFile.setAspectRatioVideoTrack(rs.getString(pos++));
+						videoFile.setReferenceFrameCount(rs.getByte(pos++));
+						videoFile.setAvcLevel(rs.getString(pos++));
 
 						videos.put(videoFile.getId(), videoFile);
 					}else{
 						//skip the already imported fields if the video with this id is already contained in the list
-						pos = 44;
+						pos = 48;
 						
 						videoFile = videos.get(videoFile.getId());
 					}
@@ -620,8 +625,9 @@ class DBVideoFileInfo extends DBFileInfo {
 
 			stmt = conn.prepareStatement("INSERT INTO VIDEO (FILEID, AGERATINGLEVEL, AGERATINGREASON, RATINGPERCENT, RATINGVOTERS"
 			        + ", DIRECTOR, TAGLINE, ASPECTRATIO, BITRATE, BITSPERPIXEL, CODECV, DURATIONSEC, CONTAINER, DVDTRACK, FRAMERATE, MIMETYPE, MODEL, MUXABLE"
-			        + ", WIDTH, YEAR, HEIGHT, ORIGINALNAME, NAME, TMDBID, IMDBID, OVERVIEW, BUDGET, REVENUE, HOMEPAGEURL, TRAILERURL, SORTNAME, MUXINGMODE)"
-			        + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			        + ", WIDTH, YEAR, HEIGHT, ORIGINALNAME, NAME, TMDBID, IMDBID, OVERVIEW, BUDGET, REVENUE, HOMEPAGEURL, TRAILERURL, SORTNAME, MUXINGMODE"
+			        + ", ASPECTRATIOCONTAINER, ASPECTRATIOVIDEOTRACK, REFRAMES, AVCLEVEL)"
+			        + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.clearParameters();
 			stmt.setInt(1, fileInfo.getId());
 			stmt.setString(2, fileInfo.getAgeRating().getLevel());
@@ -656,6 +662,10 @@ class DBVideoFileInfo extends DBFileInfo {
 			stmt.setString(30, fileInfo.getTrailerUrl());
 			stmt.setString(31, fileInfo.getSortName());
 			stmt.setString(32, fileInfo.getMuxingMode());
+			stmt.setString(33,  fileInfo.getAspectRatioContainer());
+			stmt.setString(34,  fileInfo.getAspectRatioVideoTrack());
+			stmt.setByte(35, fileInfo.getReferenceFrameCount());
+			stmt.setString(36, fileInfo.getAvcLevel());
 			stmt.executeUpdate();
 
 			insertOrUpdateVideoPropertyLists(fileInfo, stmt, conn);
@@ -694,6 +704,7 @@ class DBVideoFileInfo extends DBFileInfo {
     		stmt = conn.prepareStatement("UPDATE VIDEO SET AGERATINGLEVEL = ?, AGERATINGREASON = ?, RATINGPERCENT = ?, RATINGVOTERS = ?"
     		        + ", DIRECTOR = ?, TAGLINE = ?, ASPECTRATIO = ?, BITRATE = ?, BITSPERPIXEL = ?, CODECV = ?, DURATIONSEC = ?, CONTAINER = ?, DVDTRACK = ?, FRAMERATE = ?, MIMETYPE = ?, MODEL = ?, MUXABLE = ?"
     		        + ", WIDTH = ?, YEAR = ?, HEIGHT = ?, ORIGINALNAME = ?, NAME = ?, TMDBID = ?, IMDBID = ?, OVERVIEW = ?, BUDGET = ?, REVENUE = ?, HOMEPAGEURL = ?, TRAILERURL = ?, SORTNAME = ?, MUXINGMODE = ?"
+    		        + ", ASPECTRATIOCONTAINER = ?, ASPECTRATIOVIDEOTRACK = ?, REFRAMES = ?, AVCLEVEL = ?"
     		        + " WHERE FILEID = ?");
     		stmt.clearParameters();
     		stmt.setString(1, fileInfo.getAgeRating().getLevel());
@@ -729,6 +740,10 @@ class DBVideoFileInfo extends DBFileInfo {
     		stmt.setString(30, fileInfo.getSortName());
     		stmt.setString(31, fileInfo.getMuxingMode());
     		stmt.setInt(32, fileInfo.getId());
+    		stmt.setString(33,  fileInfo.getAspectRatioContainer());
+    		stmt.setString(34,  fileInfo.getAspectRatioVideoTrack());
+    		stmt.setByte(35, fileInfo.getReferenceFrameCount());
+    		stmt.setString(36, fileInfo.getAvcLevel());
     		stmt.executeUpdate();
 
     		insertOrUpdateVideoPropertyLists(fileInfo, stmt, conn);

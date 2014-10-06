@@ -64,6 +64,10 @@ public class DOVideoFileInfo extends DOFileInfo {
 	private List<DLNAMediaAudio> audioCodes = new ArrayList<DLNAMediaAudio>();
 	private List<DLNAMediaSubtitle> subtitlesCodes = new ArrayList<DLNAMediaSubtitle>();
 	private String frameRateMode;
+	private String aspectRatioContainer;
+	private String aspectRatioVideoTrack;
+	private byte referenceFrameCount;
+	private String avcLevel;
 	
 	public DOVideoFileInfo() {
 		setType(FileType.VIDEO);
@@ -571,6 +575,41 @@ public class DOVideoFileInfo extends DOFileInfo {
 	public String getFrameRateMode() {
 		if(frameRateMode == null) frameRateMode = "";
 		return frameRateMode;
+	}
+
+	public void setAspectRatioContainer(String aspectRatioContainer) {
+		this.aspectRatioContainer = aspectRatioContainer;
+	}
+
+	public String getAspectRatioContainer() {
+		if(aspectRatioContainer == null) aspectRatioContainer = "";
+		return aspectRatioContainer;
+	}
+
+	public void setAspectRatioVideoTrack(String aspectRatioVideoTrack) {
+		this.aspectRatioVideoTrack = aspectRatioVideoTrack;
+	}
+
+	public String getAspectRatioVideoTrack() {
+		if(aspectRatioVideoTrack == null) aspectRatioVideoTrack = "";
+		return aspectRatioVideoTrack;
+	}
+
+	public void setReferenceFrameCount(byte referenceFrameCount) {
+		this.referenceFrameCount = referenceFrameCount;
+	}
+
+	public byte getReferenceFrameCount() {
+		return referenceFrameCount;
+	}
+
+	public String getAvcLevel() {
+		if(avcLevel == null) avcLevel = "";
+		return avcLevel;
+	}
+
+	public void setAvcLevel(String avcLevel) {
+		this.avcLevel = avcLevel;
 	}
 	
 	public void mergePropertiesAndTags(DOFileInfo fileInfo) {
