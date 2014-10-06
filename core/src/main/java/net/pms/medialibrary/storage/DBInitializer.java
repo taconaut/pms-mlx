@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 class DBInitializer extends DBBase {
 	private static final Logger log = LoggerFactory.getLogger(DBInitializer.class);
 
-	private final String DB_VERSION = "1.0";
+	private final String DB_VERSION = "1.1";
 	
 	private String name;
 	private IMediaLibraryStorage storage;
@@ -623,28 +623,15 @@ class DBInitializer extends DBBase {
 	
 	private void insertDefaultLibraryViewColumns(){
 		//video
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_ISACTIF, 0, 36), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FOLDERPATH, 1, 245), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FILENAME, 2, 160), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_NAME, 3, 160), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_WIDTH, 4, 42), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_HEIGHT, 5, 48), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_DURATIONSEC, 6, 57), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_DATEINSERTEDDB, 7, 164), FileType.VIDEO);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_PLAYCOUNT, 8, 49), FileType.VIDEO);
-		
-		//files
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_ISACTIF, 0, 36), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FOLDERPATH, 1, 245), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FILENAME, 2, 160), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_DATEINSERTEDDB, 3, 100), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_PLAYCOUNT, 4, 42), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILEPLAYS_DATEPLAYEND, 5, 100), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_DATELASTUPDATEDDB, 6, 100), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_DATEMODIFIEDOS, 7, 100), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_SIZEBYTE, 8, 53), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_TYPE, 9, 53), FileType.FILE);
-		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_CONTAINS_TAG, 10, 100), FileType.FILE);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_ISACTIF, null, 0, 36), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FOLDERPATH, null, 1, 245), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_FILENAME, null, 2, 160), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_NAME, null, 3, 160), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_WIDTH, null, 4, 42), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_HEIGHT, null, 5, 48), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.VIDEO_DURATIONSEC, null, 6, 57), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_DATEINSERTEDDB, null, 7, 164), FileType.VIDEO);
+		insertTableColumnConfiguration(new DOTableColumnConfiguration(ConditionType.FILE_PLAYCOUNT, null, 8, 49), FileType.VIDEO);
 		
 		if(log.isInfoEnabled()) log.info("Default library view columns inserted");
 	}
@@ -685,6 +672,10 @@ class DBInitializer extends DBBase {
 		if(realStorageVersion.equals("0.9")){
 			updateDb09_10();
 			realStorageVersion = "1.0";
+		}
+		if(realStorageVersion.equals("1.0")){
+			updateDb10_11();
+			realStorageVersion = "1.1";
 		}
 	}
 
@@ -1011,6 +1002,33 @@ class DBInitializer extends DBBase {
 			close(conn, stmt);
     	}
 	}
+
+	private void updateDb10_11() {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		
+		try {
+			conn = cp.getConnection();
+			
+			//do updates			
+			stmt = conn.prepareStatement("ALTER TABLE TABLECOLUMNCONFIGURATION ADD TAGNAME VARCHAR_IGNORECASE(512) NOT NULL DEFAULT ''");
+			stmt.executeUpdate();
+
+			stmt = conn.prepareStatement("ALTER TABLE TABLECOLUMNCONFIGURATION DROP CONSTRAINT PK_TABLECOLUMNCONFIGURATION");
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("ALTER TABLE TABLECOLUMNCONFIGURATION add CONSTRAINT PK_TABLECOLUMNCONFIGURATION PRIMARY KEY (FILETYPE, CONDITIONTYPE, TAGNAME)");
+			stmt.executeUpdate();
+			
+			//update db version
+			storage.setMetaDataValue(MetaDataKeys.VERSION.toString(), "1.1");
+			if(log.isInfoEnabled()) log.info("Updated DB from version 1.0 to 1.1");
+		} catch (SQLException se) {
+			log.error("Failed to update DB from version 1.0 to 1.1", se);
+		} finally {
+			close(conn, stmt);
+    	}
+	}
 	
 	private void insertTableColumnConfiguration(DOTableColumnConfiguration c, FileType fileType) {
 		Connection conn = null;
@@ -1018,16 +1036,17 @@ class DBInitializer extends DBBase {
 			
 		try {
 			conn = cp.getConnection();
-			stmt = conn.prepareStatement("INSERT INTO TABLECOLUMNCONFIGURATION (COLUMNINDEX, WIDTH, FILETYPE, CONDITIONTYPE) VALUES (?, ?, ?, ?)");
+			stmt = conn.prepareStatement("INSERT INTO TABLECOLUMNCONFIGURATION (COLUMNINDEX, WIDTH, FILETYPE, CONDITIONTYPE, TAGNAME) VALUES (?, ?, ?, ?, ?)");
 			stmt.clearParameters();
 			stmt.setInt(1, c.getColumnIndex());
 			stmt.setInt(2, c.getWidth());
 			stmt.setString(3, fileType.toString());
 			stmt.setString(4, c.getConditionType().toString());
+			stmt.setString(4, c.getTagName());
 			stmt.executeUpdate();
 		} catch (SQLException se) {
-			log.error(String.format("Failed to insert TABLECOLUMNCONFIGURATION for columnIndex=%s, width=%s, fileType=%s, conditionType=%s", 
-					c.getColumnIndex(), c.getWidth(), fileType, c.getConditionType()), se);
+			log.error(String.format("Failed to insert TABLECOLUMNCONFIGURATION for columnIndex=%s, width=%s, fileType=%s, conditionType=%s, tagName=%s", 
+					c.getColumnIndex(), c.getWidth(), fileType, c.getConditionType(), c.getTagName()), se);
 		} finally {
 			close(conn, stmt);
 		}

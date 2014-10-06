@@ -131,7 +131,7 @@ public class FolderDialog extends JDialog {
 		tfName.setText(folder.getName());
 
 		//Folder Type		
-		cbFileType = new JComboBox(FolderHelper.getHelper().getAllFileTypeCBItems());
+		cbFileType = new JComboBox(FolderHelper.getInstance().getAllFileTypeCBItems());
 
 		cbFileType.addActionListener(new ActionListener() {
 			@Override
@@ -152,7 +152,7 @@ public class FolderDialog extends JDialog {
 				tabs.setFileType(ft);
 				folder.setFileType(ft);
 
-				selectedFileType = FolderHelper.getHelper().getFileTypeCBItem(ft);
+				selectedFileType = FolderHelper.getInstance().getFileTypeCBItem(ft);
 			}
 		});
 		lFolderType = new JLabel(Messages.getString("ML.FolderDialog.FolderType"));
@@ -216,7 +216,7 @@ public class FolderDialog extends JDialog {
 		pButtons.add(buttonApply);
 		pButtons.add(buttonCancel);
 		
-		selectedFileType = FolderHelper.getHelper().getFileTypeCBItem(folder.getFileType());
+		selectedFileType = FolderHelper.getInstance().getFileTypeCBItem(folder.getFileType());
 		cbFileType.setSelectedItem(selectedFileType);
 		
 		rebuildPanel();

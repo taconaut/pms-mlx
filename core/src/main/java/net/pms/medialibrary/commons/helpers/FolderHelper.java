@@ -43,11 +43,11 @@ public class FolderHelper {
 	public HashMap<ConditionType, ConditionOperatorCBItem[]> typeOperators;
 	private static FolderHelper staticHelper;
 	
-	public FolderHelper(){
+	private FolderHelper(){
 		init();
 	}
 	
-	public static FolderHelper getHelper(){
+	public static FolderHelper getInstance(){
 		if(staticHelper == null){
 			staticHelper = new FolderHelper();
 		}

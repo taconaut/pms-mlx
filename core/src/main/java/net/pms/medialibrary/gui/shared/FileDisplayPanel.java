@@ -117,7 +117,7 @@ public class FileDisplayPanel extends JPanel {
 
 		isUpdating = true;
 		cbMaskHelp.removeAllItems();
-		for (ConditionTypeCBItem item : FolderHelper.getHelper().getMaskConditionTypes(Arrays.asList(fileType))) {
+		for (ConditionTypeCBItem item : FolderHelper.getInstance().getMaskConditionTypes(Arrays.asList(fileType))) {
 			cbMaskHelp.addItem(item);
 		}
 		isUpdating = false;
@@ -297,7 +297,7 @@ public class FileDisplayPanel extends JPanel {
 	private JPanel getDisplayNameMaskPanel(String displaynameMask) {
 		lMask = new JLabel(Messages.getString("ML.FileDisplayPanel.lMask"));
 		tfDisplaynameMask = new JTextField(displaynameMask);
-		cbMaskHelp = new JComboBox(FolderHelper.getHelper().getMaskConditionTypes(Arrays.asList(fileType)));
+		cbMaskHelp = new JComboBox(FolderHelper.getInstance().getMaskConditionTypes(Arrays.asList(fileType)));
 		cbMaskHelp.addActionListener(new ActionListener() {
 
 			@Override
@@ -305,7 +305,7 @@ public class FileDisplayPanel extends JPanel {
 				if (!isUpdating && cbMaskHelp.getSelectedItem() != null && cbMaskHelp.getSelectedItem() instanceof ConditionTypeCBItem) {
 					StringBuffer text = new StringBuffer(tfDisplaynameMask.getText());
 					int finalCaretPosition = 0;
-					String insertItem = FolderHelper.getHelper().getDisplayNameMaskSubstitute(((ConditionTypeCBItem) cbMaskHelp.getSelectedItem()).getConditionType());
+					String insertItem = FolderHelper.getInstance().getDisplayNameMaskSubstitute(((ConditionTypeCBItem) cbMaskHelp.getSelectedItem()).getConditionType());
 
 					if (tfDisplaynameMask.getSelectedText() != null) {
 						// replace text

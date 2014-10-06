@@ -73,11 +73,11 @@ public class ConditionsViewer extends JDialog{
 			}
 			
 			builder.addLabel(c.getName() , cc.xy(2, i));
-			builder.addLabel(FolderHelper.getHelper().getConditionTypeCBItem(c.getType()).getDisplayName(), cc.xy(4, i));
+			builder.addLabel(FolderHelper.getInstance().getConditionTypeCBItem(c.getType()).getDisplayName(), cc.xy(4, i));
 			builder.addLabel(coString, cc.xy(6, i));
 			String cStr = c.getCondition();
 			if(c.getUnit() != ConditionUnit.UNKNOWN){
-				cStr += " " + FolderHelper.getHelper().getConditionUnitCBItem(c.getUnit()).getDisplayName();
+				cStr += " " + FolderHelper.getInstance().getConditionUnitCBItem(c.getUnit()).getDisplayName();
 			}
 			builder.addLabel(cStr, cc.xy(8, i));
 			i++;

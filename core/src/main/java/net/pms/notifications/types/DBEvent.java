@@ -42,6 +42,7 @@ public class DBEvent {
 		Clean,
 		ClearVideo,
 		ClearAudio,
-		ClearPictures
+		ClearPictures,
+		FileTagChanged
 	}
 }

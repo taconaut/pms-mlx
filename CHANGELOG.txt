@@ -3,10 +3,13 @@ Changelog:
 
 pms-mlx 1.2 - ???
 
+  GUI:
+    - In the library view a column can now be added for all existing tags
+
 	Plugins:
 		- Web folder:
 			- Reload folders on renderer when the configured web.conf file has changed
-			
+      
 pms-mlx 1.1 - 2014-09-23
 
 	Language Updates:

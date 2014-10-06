@@ -49,6 +49,8 @@ import net.pms.medialibrary.commons.enumarations.ConditionValueType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.SortOption;
 import net.pms.medialibrary.commons.exceptions.StorageException;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.types.DBEvent;
 
 class DBFileInfo extends DBBase {
 	private static final Logger log = LoggerFactory.getLogger(DBFileInfo.class);
@@ -171,6 +173,8 @@ class DBFileInfo extends DBBase {
 		stmt = conn.prepareStatement("DELETE FROM FILE WHERE ID = ?");
 		stmt.setLong(1, id);
 		stmt.execute();
+
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(DBEvent.Type.FileTagChanged));
 	}
 
 	protected void insertFileInfo(DOFileInfo fileInfo, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException {		
@@ -325,6 +329,7 @@ class DBFileInfo extends DBBase {
 			}
 		}
 		
+		NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(DBEvent.Type.FileTagChanged));
 	}
 	
 	List<DOFileInfo> getFileInfo(DOFilter filter, boolean sortAscending, final ConditionType sortField, int maxResults, SortOption sortOption) throws StorageException {

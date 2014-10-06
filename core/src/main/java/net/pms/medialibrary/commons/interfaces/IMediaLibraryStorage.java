@@ -47,17 +47,18 @@ public interface IMediaLibraryStorage {
 	boolean isFunctional();
 	
 	//Table column configurations
-	List<DOTableColumnConfiguration> getTableColumnConfiguration(FileType fileType);
+	List<DOTableColumnConfiguration> getTableColumnConfigurations(FileType fileType);
+	DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct);
+	DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct, String tagName);
+	DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, int columnIndex);
+	int getTableConfigurationMaxColumnIndex(FileType fileType);
 	void insertTableColumnConfiguration(DOTableColumnConfiguration c, FileType fileType);
 	void updateTableColumnConfiguration(DOTableColumnConfiguration c, FileType fileType);
-	void updateTableColumnWidth(ConditionType ct, int width, FileType fileType);
-	DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, int columnIndex);
-	void clearTableColumnConfiguration(FileType fileType);
-	DOTableColumnConfiguration getTableColumnConfiguration(FileType fileType, ConditionType ct);
-	int getTableConfigurationMaxColumnIndex(FileType fileType);
-	void deleteTableColumnConfiguration(DOTableColumnConfiguration doTableColumnConfiguration, FileType fileType);
-	void deleteAllTableColumnConfiguration(FileType fileType);
+	void updateTableColumnWidth(ConditionType ct, String tagName, int width, FileType fileType);
 	void moveTableColumnConfiguration(int fromIndex, int toIndex, FileType fileType);
+	void clearTableColumnConfigurations(FileType fileType);
+	void deleteTableColumnConfiguration(DOTableColumnConfiguration doTableColumnConfiguration, FileType fileType);
+	void deleteAllTableColumnConfigurations(FileType fileType);
 	
 	//FileInfo (global for video, audio and pictures)
 	void deleteAllFileInfo();	

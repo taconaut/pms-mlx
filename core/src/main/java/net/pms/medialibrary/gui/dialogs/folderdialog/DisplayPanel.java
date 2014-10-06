@@ -138,7 +138,7 @@ class DisplayPanel extends JPanel {
 	private JPanel                           pTemplate;
 	private JPopupMenu                       treeContextMenu;
 
-	private FolderHelper                     folderHelper       = new FolderHelper();
+	private FolderHelper                     folderHelper       = FolderHelper.getInstance();
 	private boolean                          isCreatingTemplate = false;
 	private boolean                          isEditingTemplate  = false;
 
@@ -181,7 +181,7 @@ class DisplayPanel extends JPanel {
 		// update sort type combo box
 		Object selectedItem = cbSortType.getSelectedItem();
 		cbSortType.removeAllItems();
-		for (ConditionTypeCBItem item : FolderHelper.getHelper().getSortByConditionTypes(Arrays.asList(fileType))) {
+		for (ConditionTypeCBItem item : FolderHelper.getInstance().getSortByConditionTypes(Arrays.asList(fileType))) {
 			cbSortType.addItem(item);
 		}
 		cbSortType.setSelectedItem(selectedItem);
@@ -325,7 +325,7 @@ class DisplayPanel extends JPanel {
 		rbSortDesc = new JRadioButton(Messages.getString("ML.DisplayPanel.rbSortDesc"));
 		bgSort.add(rbSortAsc);
 		bgSort.add(rbSortDesc);
-		cbSortType = new JComboBox(FolderHelper.getHelper().getSortByConditionTypes(Arrays.asList(folder.getFileType())));
+		cbSortType = new JComboBox(FolderHelper.getInstance().getSortByConditionTypes(Arrays.asList(folder.getFileType())));
 		cbInheritSort = new JCheckBox(Messages.getString("ML.DisplayPanel.cbInheritSort"));
 		cbInheritSort.addActionListener(new ActionListener() {
 
