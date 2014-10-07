@@ -73,7 +73,7 @@
 
 	<ciManagement>
 		<system>Jenkins</system>
-		<url>http://pms.smoeller.de/job/pms-mlx%20(trunk)/</url>
+		<url>http://ps3mediaserver-ci.hopto.org:9999/job/pms-mlx%20trunk</url>
 	</ciManagement>
 
 	<parent>
