@@ -2,7 +2,7 @@
 
 by shagrath
 
-[![Build Status](http://pms.smoeller.de/buildStatus/icon?job=pms-mlx%20%28trunk%29)](http://pms.smoeller.de/job/pms-mlx%20%28trunk%29/)
+[![Build Status](http://ps3mediaserver-ci.hopto.org:9999/job/pms-mlx%20trunk/badge/icon)](http://ps3mediaserver-ci.hopto.org:9999/job/pms-mlx%20trunk)
 
 - [Links](#links)
 - [Thanks](#thanks)
