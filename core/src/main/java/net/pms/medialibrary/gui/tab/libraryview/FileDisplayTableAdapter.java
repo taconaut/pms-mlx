@@ -53,7 +53,7 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 	private static Map<FileType, DOTableColumnConfiguration[]> columnConfigurations = new HashMap<FileType, DOTableColumnConfiguration[]>();
 	private FileType fileType;
 
-	public FileDisplayTableAdapter(ListModel<DOFileInfo> listModel, FileType fileType) {
+	public FileDisplayTableAdapter(ListModel listModel, FileType fileType) {
 		super(listModel, getColumnNames(fileType, true));
 		setFileType(fileType);
 	}
