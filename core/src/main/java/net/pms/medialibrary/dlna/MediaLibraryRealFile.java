@@ -156,7 +156,7 @@ public class MediaLibraryRealFile extends RealFile {
 				case PICTURES:
 					break;
 				case VIDEO:
-					setMedia(DLNAHelper.getMedia((DOVideoFileInfo) fileInfo));
+					setMedia(DLNAHelper.getMediaForVideo((DOVideoFileInfo) fileInfo));
 					break;
 			default:
 				log.warn(String.format("Unhandled file type received (%s). This should never happen!", fileType));

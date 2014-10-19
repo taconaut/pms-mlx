@@ -222,6 +222,10 @@ public class FullDataCollector {
 				fi.setWidth(mi.getWidth());
 				fi.setMuxingMode(mi.getMuxingMode());
 				fi.setFrameRateMode(mi.getFrameRateMode());
+				fi.setAspectRatioContainer(mi.getAspectRatioContainer());
+				fi.setAspectRatioVideoTrack(mi.getAspectRatioVideoTrack());
+				fi.setReferenceFrameCount(mi.getReferenceFrameCount());
+				fi.setAvcLevel(mi.getAvcLevel());
 				if(mi.getSubtitleTracksList() != null) fi.setSubtitlesCodes(mi.getSubtitleTracksList());
 				if(mi.getAudioTracksList() != null) fi.setAudioCodes(mi.getAudioTracksList());
 			}catch(Exception ex){

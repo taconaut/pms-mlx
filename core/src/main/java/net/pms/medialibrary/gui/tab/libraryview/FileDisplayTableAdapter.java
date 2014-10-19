@@ -282,8 +282,14 @@ public class FileDisplayTableAdapter extends AbstractTableAdapter<DOFileInfo> {
 				case VIDEO_YEAR:
 					res = video.getYear();
 					break;
-			default:
-				break;
+				case VIDEO_AVCLEVEL:
+					res = video.getAvcLevel();
+					break;
+				case VIDEO_REFERENCEFRAMECOUNT:
+					res = video.getReferenceFrameCount();
+					break;
+				default:
+					break;
 			}
 		}
 		

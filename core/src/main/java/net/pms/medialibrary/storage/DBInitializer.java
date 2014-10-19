@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 class DBInitializer extends DBBase {
 	private static final Logger log = LoggerFactory.getLogger(DBInitializer.class);
 
-	private final String DB_VERSION = "1.1";
+	private final String DB_VERSION = "1.2";
 	
 	private String name;
 	private IMediaLibraryStorage storage;
@@ -265,6 +265,10 @@ class DBInitializer extends DBBase {
 			sb.append(", YEAR              INT");
 			sb.append(", MUXINGMODE        VARCHAR2(32)");
 			sb.append(", FRAMERATEMODE     VARCHAR2(16)");
+			sb.append(", ASPECTRATIOCONTAINER VARCHAR2(6)");
+			sb.append(", ASPECTRATIOVIDEOTRACK VARCHAR2(6)");
+			sb.append(", REFRAMES          TINYINT");
+			sb.append(", AVCLEVEL          VARCHAR2(3)");
 			sb.append(", CONSTRAINT PK_VIDEO PRIMARY KEY (ID))");
 			stmt.executeUpdate(sb.toString());
 			stmt.executeUpdate("CREATE INDEX IDX_VIDEO_RATINGPERCENT ON VIDEO (RATINGPERCENT asc);");
@@ -557,8 +561,9 @@ class DBInitializer extends DBBase {
 			sb.append(", CONDITIONTYPE  VARCHAR(256)");
 			sb.append(", COLUMNINDEX    INT");
 			sb.append(", WIDTH          INT");
+			sb.append(", TAGNAME        VARCHAR_IGNORECASE(512) NOT NULL DEFAULT ''");
 			sb.append(", CONSTRAINT UC_TABLECOLUMNCONFIGURATION UNIQUE (FILETYPE, COLUMNINDEX)");
-			sb.append(", CONSTRAINT PK_TABLECOLUMNCONFIGURATION PRIMARY KEY (FILETYPE, CONDITIONTYPE))");
+			sb.append(", CONSTRAINT PK_TABLECOLUMNCONFIGURATION PRIMARY KEY (FILETYPE, CONDITIONTYPE, TAGNAME))");
 			stmt.executeUpdate(sb.toString());
 			if(log.isDebugEnabled()) log.debug("Table TABLECOLUMNCONFIGURATION created");
 
@@ -676,6 +681,10 @@ class DBInitializer extends DBBase {
 		if(realStorageVersion.equals("1.0")){
 			updateDb10_11();
 			realStorageVersion = "1.1";
+		}
+		if(realStorageVersion.equals("1.1")){
+			updateDb11_12();
+			realStorageVersion = "1.2";
 		}
 	}
 
@@ -1029,6 +1038,36 @@ class DBInitializer extends DBBase {
 			close(conn, stmt);
     	}
 	}
+
+	private void updateDb11_12() {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		
+		try {
+			conn = cp.getConnection();
+			
+			//do updates			
+			stmt = conn.prepareStatement("ALTER TABLE VIDEO ADD ASPECTRATIOCONTAINER VARCHAR2(6)");
+			stmt.executeUpdate();
+
+			stmt = conn.prepareStatement("ALTER TABLE VIDEO ADD ASPECTRATIOVIDEOTRACK VARCHAR2(6)");
+			stmt.executeUpdate();
+
+			stmt = conn.prepareStatement("ALTER TABLE VIDEO ADD REFRAMES TINYINT");
+			stmt.executeUpdate();
+
+			stmt = conn.prepareStatement("ALTER TABLE VIDEO ADD AVCLEVEL VARCHAR2(3)");
+			stmt.executeUpdate();
+			
+			//update db version
+			storage.setMetaDataValue(MetaDataKeys.VERSION.toString(), "1.2");
+			if(log.isInfoEnabled()) log.info("Updated DB from version 1.1 to 1.2");
+		} catch (SQLException se) {
+			log.error("Failed to update DB from version 1.1 to 1.2", se);
+		} finally {
+			close(conn, stmt);
+    	}
+	}
 	
 	private void insertTableColumnConfiguration(DOTableColumnConfiguration c, FileType fileType) {
 		Connection conn = null;
@@ -1042,7 +1081,7 @@ class DBInitializer extends DBBase {
 			stmt.setInt(2, c.getWidth());
 			stmt.setString(3, fileType.toString());
 			stmt.setString(4, c.getConditionType().toString());
-			stmt.setString(4, c.getTagName());
+			stmt.setString(5, c.getTagName());
 			stmt.executeUpdate();
 		} catch (SQLException se) {
 			log.error(String.format("Failed to insert TABLECOLUMNCONFIGURATION for columnIndex=%s, width=%s, fileType=%s, conditionType=%s, tagName=%s", 

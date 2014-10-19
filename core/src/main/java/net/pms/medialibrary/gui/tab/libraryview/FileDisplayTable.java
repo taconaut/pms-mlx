@@ -1131,11 +1131,18 @@ public class FileDisplayTable extends JPanel {
 	private void updateTableModel() {
 		isUpdating = true;
 		
+		int selectedRow = table.getSelectedRow();
+		
 		//rebuild the entire adapter, because there is no way to change the column names after initialization
 		//table.removeColumn and table.getColumnModel().removeColumn have no effect
 		table.setModel(new FileDisplayTableAdapter(selectionInList, getFileType()));										
 		for(DOTableColumnConfiguration cConf : FileDisplayTableAdapter.getColumnConfigurations(getFileType())){
 			table.getColumn(cConf.toString()).setPreferredWidth(cConf.getWidth());
+		}
+		
+		// Restore the selected row after having lost it due to the update of the model
+		if(selectedRow > -1){
+			table.setRowSelectionInterval(selectedRow, selectedRow);
 		}
 		
 		isUpdating = false;

@@ -175,7 +175,7 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		CellConstraints cc = new CellConstraints();
 		
 		FormLayout layout = new FormLayout("3px, r:p, 7px, p, 40px, r:p, 7px, fill:p:grow, 3px", // columns
-		        "3px, p, 3px, p, 3px, p, 3px, p, 3px, p, 15px, p, 3px, p, 3px, p, 3px, p, 3px, p, 7px, p, 3px, p, 3px"); // rows
+		        "3px, p, 3px, p, 3px, p, 3px, p, 3px, p, 15px, p, 3px, p, 3px, p, 3px, p, 3px, p, 3px, p, 7px, p, 3px, p, 3px"); // rows
 		builder = new PanelBuilder(layout);
 		builder.opaque(true);
 		
@@ -184,21 +184,25 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		cmp = (JComponent) cmp.getComponent(0);
 		cmp.setFont(cmp.getFont().deriveFont(Font.BOLD));
 		
+		// Line 1
 		builder.add(new JHeader(Messages.getString("ML.Condition.Type.FILE_SIZEBYTE") + ":"), cc.xy(2, 4));
 		builder.addLabel((fileInfo.getSize() / (1024 * 1024)) + Messages.getString("ML.Condition.Unit.FILESIZE_MEGABYTE"), cc.xy(4, 4));
 
 		builder.add(new JHeader(ConditionType.FILE_DATEINSERTEDDB), cc.xy(6, 4));
 		builder.addLabel(new SimpleDateFormat().format(fileInfo.getDateInsertedDb()), cc.xy(8, 4));
 
+		// Line 2
 		builder.add(new JHeader(ConditionType.FILEPLAYS_DATEPLAYEND), cc.xy(2, 6));
 		builder.addLabel(fileInfo.getPlayHistory().size() > 0 ? new SimpleDateFormat().format(fileInfo.getPlayHistory().get(0)) : Messages.getString("ML.Condition.NeverPlayed"), cc.xy(4, 6));
 
 		builder.add(new JHeader(ConditionType.FILE_DATELASTUPDATEDDB), cc.xy(6, 6));
 		builder.addLabel(new SimpleDateFormat().format(fileInfo.getDateLastUpdatedDb()), cc.xy(8, 6));
 		
+		// Line 3
 		builder.add(new JHeader(ConditionType.FILE_PLAYCOUNT), cc.xy(2, 8));
 		builder.addLabel(String.valueOf(fileInfo.getPlayCount()), cc.xy(4, 8));
 
+		// Line 4
 		builder.add(new JHeader(Messages.getString("ML.VideoFileInfoPanel.lFilePath")), cc.xy(2, 10));
 		builder.addLabel(fileInfo.getFilePath(), cc.xyw(4, 10, 5));
 		
@@ -207,32 +211,45 @@ public class VideoFileInfoPanel extends JPanel implements IFilePropertiesEditor 
 		cmp = (JComponent) cmp.getComponent(0);
 		cmp.setFont(cmp.getFont().deriveFont(Font.BOLD));
 
+		// Line 1
 		builder.add(new JHeader(ConditionType.VIDEO_DURATIONSEC), cc.xy(2, 14));
 		builder.addLabel(DLNAHelper.formatSecToHHMMSS((int)fileInfo.getDurationSec()), cc.xy(4, 14));
 		
 		builder.add(new JHeader(Messages.getString("ML.VideoFileInfoPane.lResolution")), cc.xy(6, 14));
 		builder.addLabel(String.format("%sx%s", fileInfo.getWidth(), fileInfo.getHeight()),  cc.xy(8, 14));
 
+		// Line 2
 		builder.add(new JHeader(ConditionType.VIDEO_CODECV), cc.xy(2, 16));
 		builder.addLabel(fileInfo.getCodecV(),  cc.xy(4, 16));
 
 		builder.add(new JHeader(ConditionType.VIDEO_CONTAINER), cc.xy(6, 16));
 		builder.addLabel(fileInfo.getContainer(), cc.xy(8, 16));
 
+		// Line 3
 		builder.add(new JHeader(ConditionType.VIDEO_BITRATE), cc.xy(2, 18));
 		builder.addLabel(String.valueOf(fileInfo.getBitrate() / 1024) + " kbit/s",  cc.xy(4, 18));
 
 		builder.add(new JHeader(ConditionType.VIDEO_MIMETYPE), cc.xy(6, 18));
 		builder.addLabel(fileInfo.getMimeType(), cc.xy(8, 18));
 
+		// Line 4
 		builder.add(new JHeader(ConditionType.VIDEO_FRAMERATE), cc.xy(2, 20));
 		builder.addLabel(fileInfo.getFrameRate(), cc.xy(4, 20));
 
-		builder.add(new JHeader(ConditionType.VIDEO_CONTAINS_VIDEOAUDIO), cc.xy(2, 22));
-		builder.addLabel(fileInfo.getDisplayString("%audio_languages"),  cc.xyw(4, 22, 5));
+		builder.add(new JHeader(ConditionType.VIDEO_AVCLEVEL), cc.xy(6, 20));
+		builder.addLabel(fileInfo.getAvcLevel(), cc.xy(8, 20));
 
-		builder.add(new JHeader(ConditionType.VIDEO_CONTAINS_SUBTITLES), cc.xy(2, 24));
-		builder.addLabel(fileInfo.getDisplayString("%subtitle_languages"),  cc.xyw(4, 24, 5));
+		// Line 5
+		builder.add(new JHeader(ConditionType.VIDEO_REFERENCEFRAMECOUNT), cc.xy(2, 22));
+		builder.addLabel(String.valueOf(fileInfo.getReferenceFrameCount()), cc.xy(4, 22));
+
+		// Line 6
+		builder.add(new JHeader(ConditionType.VIDEO_CONTAINS_VIDEOAUDIO), cc.xy(2, 24));
+		builder.addLabel(fileInfo.getDisplayString("%audio_languages"),  cc.xyw(4, 24, 5));
+
+		// Line 7
+		builder.add(new JHeader(ConditionType.VIDEO_CONTAINS_SUBTITLES), cc.xy(2, 26));
+		builder.addLabel(fileInfo.getDisplayString("%subtitle_languages"),  cc.xyw(4, 26, 5));
 
 		JScrollPane sp = new JScrollPane(builder.getPanel());
 		sp.setBorder(BorderFactory.createEmptyBorder());

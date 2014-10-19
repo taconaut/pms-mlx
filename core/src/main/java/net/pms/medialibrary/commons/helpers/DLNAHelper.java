@@ -36,7 +36,7 @@ import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
 public class DLNAHelper {
 	private static final Logger log = LoggerFactory.getLogger(DLNAHelper.class);
 
-	public static DLNAMediaInfo getMedia(DOVideoFileInfo video) {		
+	public static DLNAMediaInfo getMediaForVideo(DOVideoFileInfo video) {		
 		DLNAMediaInfo dbMedia = new DLNAMediaInfo();
 		dbMedia.setDuration(video.getDurationSec());
 		dbMedia.setBitrate(video.getBitrate());
@@ -46,6 +46,10 @@ public class DLNAHelper {
 		dbMedia.setCodecV(video.getCodecV());
 		dbMedia.setFrameRate(video.getFrameRate());
 		dbMedia.setAspect(video.getAspectRatio() == null || video.getAspectRatio().equals("") ? null : video.getAspectRatio());
+		dbMedia.setAspectRatioContainer(video.getAspectRatioContainer());
+		dbMedia.setAspectRatioVideoTrack(video.getAspectRatioVideoTrack());
+		dbMedia.setReferenceFrameCount(video.getReferenceFrameCount());
+		dbMedia.setAvcLevel(video.getAvcLevel());
 		dbMedia.setBitsPerPixel(video.getBitsPerPixel());
 		dbMedia.setThumb(getThumb(video.getThumbnailPath()));
 		dbMedia.setContainer(video.getContainer());

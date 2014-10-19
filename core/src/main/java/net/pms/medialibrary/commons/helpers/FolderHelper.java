@@ -630,6 +630,7 @@ public class FolderHelper {
 	    		|| conditionType == ConditionType.VIDEO_CONTAINS_SUBTITLES
 	    		|| conditionType == ConditionType.VIDEO_CONTAINS_GENRE
 	    		|| conditionType == ConditionType.VIDEO_MUXINGMODE
+	    	    || conditionType == ConditionType.VIDEO_AVCLEVEL
 	    		|| conditionType == ConditionType.AUDIO_SONGNAME
 	    		|| conditionType == ConditionType.AUDIO_ARTIST
 	    		|| conditionType == ConditionType.AUDIO_ALBUM
@@ -657,6 +658,7 @@ public class FolderHelper {
 	    		|| conditionType == ConditionType.VIDEO_RATINGVOTERS
 	    		|| conditionType == ConditionType.VIDEO_WIDTH
 	    		|| conditionType == ConditionType.VIDEO_DVDTRACK
+	    	    || conditionType == ConditionType.VIDEO_REFERENCEFRAMECOUNT
 	    		|| conditionType == ConditionType.AUDIO_YEAR
 	    		|| conditionType == ConditionType.AUDIO_TRACK){
 	    	cvt = ConditionValueType.INTEGER;	    	
