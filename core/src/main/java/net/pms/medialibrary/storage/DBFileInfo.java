@@ -178,8 +178,8 @@ class DBFileInfo extends DBBase {
 	}
 
 	protected void insertFileInfo(DOFileInfo fileInfo, Connection conn, PreparedStatement stmt, ResultSet rs) throws SQLException {		
-		stmt = conn.prepareStatement("INSERT INTO FILE (FOLDERPATH, FILENAME, TYPE, DATELASTUPDATEDDB, DATEINSERTEDDB, DATEMODIFIEDOS, THUMBNAILPATH, SIZEBYTE, PLAYCOUNT, ENABLED)"
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		stmt = conn.prepareStatement("INSERT INTO FILE (FOLDERPATH, FILENAME, TYPE, DATELASTUPDATEDDB, DATEINSERTEDDB, DATEMODIFIEDOS, THUMBNAILPATH, SIZEBYTE, PLAYCOUNT, ENABLED, FILEIMPORTVERSION)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 		stmt.setString(1, fileInfo.getFolderPath());
 		stmt.setString(2, fileInfo.getFileName());
 		stmt.setString(3, fileInfo.getType().toString());
@@ -190,6 +190,7 @@ class DBFileInfo extends DBBase {
 		stmt.setLong(8, fileInfo.getSize());
 		stmt.setInt(9, fileInfo.getPlayCount());
 		stmt.setBoolean(10, fileInfo.isActive());
+		stmt.setInt(11, fileInfo.getFileImportVersion());
 		stmt.executeUpdate();
 		
 		rs = stmt.getGeneratedKeys();
@@ -231,7 +232,7 @@ class DBFileInfo extends DBBase {
 	void updateFileInfo(DOFileInfo fileInfo, Connection conn,
 			PreparedStatement stmt, ResultSet rs) throws SQLException {
 			stmt = conn.prepareStatement("UPDATE FILE SET FOLDERPATH = ?, FILENAME = ?, TYPE = ?, DATELASTUPDATEDDB = ?, DATEINSERTEDDB = ?, DATEMODIFIEDOS = ?,"
-					+ " THUMBNAILPATH = ?, SIZEBYTE = ?, PLAYCOUNT = ?, ENABLED = ?"
+					+ " THUMBNAILPATH = ?, SIZEBYTE = ?, PLAYCOUNT = ?, ENABLED = ?, FILEIMPORTVERSION = ?"
 			        + " WHERE ID = ?");
 			stmt.setString(1, fileInfo.getFolderPath());
 			stmt.setString(2, fileInfo.getFileName());
@@ -243,7 +244,8 @@ class DBFileInfo extends DBBase {
 			stmt.setLong(8, fileInfo.getSize());
 			stmt.setInt(9, fileInfo.getPlayCount());
 			stmt.setBoolean(10, fileInfo.isActive());
-			stmt.setLong(11, fileInfo.getId());
+			stmt.setInt(11, fileInfo.getFileImportVersion());
+			stmt.setLong(12, fileInfo.getId());
 			stmt.executeUpdate();
 			
 			rs = stmt.getGeneratedKeys();
@@ -364,7 +366,7 @@ class DBFileInfo extends DBBase {
 			if(log.isDebugEnabled()) log.debug(String.format("File query clause: WHERE %s ORDER BY %s", whereClause, orderByClause));
 
 			String statement = "SELECT FILE.ID, FILE.FOLDERPATH, FILE.FILENAME, FILE.TYPE, FILE.SIZEBYTE, FILE.DATELASTUPDATEDDB, FILE.DATEINSERTEDDB" 
-			        + ", FILE.DATEMODIFIEDOS, FILE.THUMBNAILPATH, FILE.PLAYCOUNT, FILE.ENABLED" // FILE
+			        + ", FILE.DATEMODIFIEDOS, FILE.THUMBNAILPATH, FILE.PLAYCOUNT, FILE.ENABLED, FILE.FILEIMPORTVERSION" // FILE
 			        + ", FILEPLAYS.DATEPLAYEND" //last play
 			        + ", FILETAGS.KEY, FILETAGS.VALUE" //TAGS
 			        + " FROM FILE" 
@@ -394,6 +396,7 @@ class DBFileInfo extends DBBase {
 						file.setThumbnailPath(rs.getString(pos++));
 						file.setPlayCount(rs.getInt(pos++));
 						file.setActive(rs.getBoolean(pos++));
+						file.setFileImportVersion(rs.getInt(pos++));
 
 						files.put(file.getId(), file);
 					}else{

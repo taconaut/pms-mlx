@@ -236,7 +236,7 @@ class DBVideoFileInfo extends DBFileInfo {
 			if(log.isDebugEnabled()) log.debug(String.format("Video query clause: WHERE %s ORDER BY %s", whereClause, orderByClause));
 
 			String statement = "SELECT FILE.ID, FILE.FOLDERPATH, FILE.FILENAME, FILE.TYPE, FILE.SIZEBYTE, FILE.DATELASTUPDATEDDB, FILE.DATEINSERTEDDB" 
-			        + ", FILE.DATEMODIFIEDOS, FILE.THUMBNAILPATH, FILE.PLAYCOUNT, FILE.ENABLED" // FILE
+			        + ", FILE.DATEMODIFIEDOS, FILE.THUMBNAILPATH, FILE.PLAYCOUNT, FILE.ENABLED, FILE.FILEIMPORTVERSION" // FILE
 			        + ", VIDEO.ORIGINALNAME, VIDEO.NAME, VIDEO.SORTNAME, VIDEO.TMDBID, VIDEO.IMDBID, VIDEO.OVERVIEW, VIDEO.BUDGET, VIDEO.REVENUE, VIDEO.HOMEPAGEURL, VIDEO.TRAILERURL" 
 			        + ", VIDEO.AGERATINGLEVEL, VIDEO.AGERATINGREASON, VIDEO.RATINGPERCENT, VIDEO.RATINGVOTERS, VIDEO.DIRECTOR, VIDEO.TAGLINE"
 			        + ", VIDEO.ASPECTRATIO, VIDEO.BITRATE, VIDEO.BITSPERPIXEL, VIDEO.CODECV, VIDEO.DURATIONSEC, VIDEO.CONTAINER, VIDEO.DVDTRACK, VIDEO.FRAMERATE"
@@ -274,6 +274,7 @@ class DBVideoFileInfo extends DBFileInfo {
 						videoFile.setThumbnailPath(rs.getString(pos++));
 						videoFile.setPlayCount(rs.getInt(pos++));
 						videoFile.setActive(rs.getBoolean(pos++));
+						videoFile.setFileImportVersion(rs.getInt(pos++));
 						
 						videoFile.setOriginalName(rs.getString(pos++));
 						videoFile.setName(rs.getString(pos++));

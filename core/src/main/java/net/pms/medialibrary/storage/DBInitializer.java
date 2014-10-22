@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 class DBInitializer extends DBBase {
 	private static final Logger log = LoggerFactory.getLogger(DBInitializer.class);
 
-	private final String DB_VERSION = "1.2";
+	private final String DB_VERSION = "1.3";
 	
 	private String name;
 	private IMediaLibraryStorage storage;
@@ -219,6 +219,7 @@ class DBInitializer extends DBBase {
 			sb.append(", THUMBNAILPATH     VARCHAR_IGNORECASE(1024)");
 			sb.append(", PLAYCOUNT   	   INT DEFAULT 0");
 			sb.append(", ENABLED           BIT");
+			sb.append(", FILEIMPORTVERSION TINYINT NOT NULL DEFAULT 0");
 			sb.append(", CONSTRAINT PK_FILE PRIMARY KEY (ID)");
 			sb.append(", CONSTRAINT UC_FILEPATH UNIQUE (FOLDERPATH, FILENAME))");
 			stmt.executeUpdate(sb.toString());
@@ -686,6 +687,10 @@ class DBInitializer extends DBBase {
 			updateDb11_12();
 			realStorageVersion = "1.2";
 		}
+		if(realStorageVersion.equals("1.2")){
+			updateDb12_13();
+			realStorageVersion = "1.3";
+		}
 	}
 
 	private void updateDb01_02() {
@@ -1064,6 +1069,27 @@ class DBInitializer extends DBBase {
 			if(log.isInfoEnabled()) log.info("Updated DB from version 1.1 to 1.2");
 		} catch (SQLException se) {
 			log.error("Failed to update DB from version 1.1 to 1.2", se);
+		} finally {
+			close(conn, stmt);
+    	}
+	}
+
+	private void updateDb12_13() {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		
+		try {
+			conn = cp.getConnection();
+			
+			//do updates
+			stmt = conn.prepareStatement("ALTER TABLE FILE ADD FILEIMPORTVERSION TINYINT NOT NULL DEFAULT 0");
+			stmt.executeUpdate();
+			
+			//update db version
+			storage.setMetaDataValue(MetaDataKeys.VERSION.toString(), "1.3");
+			if(log.isInfoEnabled()) log.info("Updated DB from version 1.2 to 1.3");
+		} catch (SQLException se) {
+			log.error("Failed to update DB from version 1.2 to 1.3", se);
 		} finally {
 			close(conn, stmt);
     	}

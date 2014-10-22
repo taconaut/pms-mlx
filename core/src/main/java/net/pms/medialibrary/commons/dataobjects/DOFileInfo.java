@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2008  A.Brochard
+ * Copyright (C) 2013  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -50,6 +50,7 @@ public class DOFileInfo {
 	private long size;
 	private int playCount;
 	private boolean actif;
+	private int fileImportVersion;
 	private List<ActionListener> propertyChangeListeners = new ArrayList<ActionListener>();
 	
 	/**
@@ -424,6 +425,24 @@ public class DOFileInfo {
 	}
 
 	/**
+	 * Gets the file import version.
+	 *
+	 * @return the file import version
+	 */
+	public int getFileImportVersion() {
+		return fileImportVersion;
+	}
+
+	/**
+	 * Sets the file import version.
+	 *
+	 * @param fileImportVersion the file import version
+	 */
+	public void setFileImportVersion(int fileImportVersion) {
+		this.fileImportVersion = fileImportVersion;
+	}
+
+	/**
 	 * Merge properties and tags.
 	 *
 	 * @param fileInfo the file info
@@ -481,6 +500,7 @@ public class DOFileInfo {
 				&& getThumbnailPath().equals(compObj.getThumbnailPath())
 				&& getSize() == compObj.getSize()
 				&& getPlayCount() == compObj.getPlayCount()
+				&& getFileImportVersion() == compObj.getFileImportVersion()
 				//&& getDateLastPlayed().equals(compObj.getDateLastPlayed())
 				){
 			return true;
@@ -506,6 +526,7 @@ public class DOFileInfo {
 		hashCode *= 24 + getSize();
 		hashCode *= 24 + getPlayCount();
 		hashCode *= 24 + (isActive() ? 1 : 2);
+		hashCode *= 24 + getFileImportVersion();
 		//hashCode *= 24 + getDateLastPlayed().hashCode();
 		return hashCode;
 	}
