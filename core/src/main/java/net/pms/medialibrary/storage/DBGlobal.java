@@ -22,7 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
+
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.exceptions.StorageException;
 
 import org.h2.jdbcx.JdbcConnectionPool;

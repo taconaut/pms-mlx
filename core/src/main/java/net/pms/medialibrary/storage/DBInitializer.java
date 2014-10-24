@@ -26,11 +26,12 @@ import java.sql.Statement;
 
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.medialibrary.commons.VersionConstants;
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
 import net.pms.medialibrary.commons.dataobjects.DOTableColumnConfiguration;
 import net.pms.medialibrary.commons.enumarations.ConditionType;
 import net.pms.medialibrary.commons.enumarations.FileType;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.exceptions.StorageException;
 import net.pms.medialibrary.commons.helpers.AutoFolderCreator;
 import net.pms.medialibrary.commons.helpers.ConfigurationHelper;
@@ -43,8 +44,6 @@ import org.slf4j.LoggerFactory;
 
 class DBInitializer extends DBBase {
 	private static final Logger log = LoggerFactory.getLogger(DBInitializer.class);
-
-	private final String DB_VERSION = "1.3";
 	
 	private String name;
 	private IMediaLibraryStorage storage;
@@ -91,25 +90,25 @@ class DBInitializer extends DBBase {
 	void configureDb() {
 		String realStorageVersion = storage.getStorageVersion();
 		if(realStorageVersion == null){
-			if(log.isInfoEnabled()) log.info("Reinitializing DB because the version number could not be found. Create DB version " + DB_VERSION);
+			if(log.isInfoEnabled()) log.info("Reinitializing DB because the version number could not be found. Create DB version " + VersionConstants.DB_VERSION);
 			initDb();			
 		}
-		else if(DB_VERSION.equals(realStorageVersion)){
-			if(log.isInfoEnabled()) log.info(String.format("Database version %s is up and running", DB_VERSION));
+		else if(VersionConstants.DB_VERSION.equals(realStorageVersion)){
+			if(log.isInfoEnabled()) log.info(String.format("Database version %s is up and running", VersionConstants.DB_VERSION));
 		} else {
 			double newestDbVersion;
 			double runningDbVersion;
 			try {
-				newestDbVersion = Double.parseDouble(DB_VERSION);
+				newestDbVersion = Double.parseDouble(VersionConstants.DB_VERSION);
 				runningDbVersion = Double.parseDouble(realStorageVersion);
 				if(!(newestDbVersion > runningDbVersion)){
-					log.info(String.format("Don't update DB. newestDbVersion='%s' or runningDbVersion='%s'", DB_VERSION, realStorageVersion));
+					log.info(String.format("Don't update DB. newestDbVersion='%s' or runningDbVersion='%s'", VersionConstants.DB_VERSION, realStorageVersion));
 				}
 			} catch(Exception ex){
-				log.error(String.format("Failed to parse newestDbVersion='%s' or runningDbVersion='%s'", DB_VERSION, realStorageVersion));
+				log.error(String.format("Failed to parse newestDbVersion='%s' or runningDbVersion='%s'", VersionConstants.DB_VERSION, realStorageVersion));
 			}
 			
-			if(log.isInfoEnabled()) log.info(String.format("Updating DB from version %s to %s", realStorageVersion, DB_VERSION));
+			if(log.isInfoEnabled()) log.info(String.format("Updating DB from version %s to %s", realStorageVersion, VersionConstants.DB_VERSION));
 			updateDb(realStorageVersion);
 		}
     }
@@ -603,7 +602,7 @@ class DBInitializer extends DBBase {
 			dir.mkdirs();
 		}
 		stmt.executeUpdate("INSERT INTO METADATA VALUES ('" + MetaDataKeys.PICTURE_SAVE_FOLDER_PATH + "', '" + pictureSaveFilePath + "')");
-		stmt.executeUpdate("INSERT INTO METADATA (KEY, VALUE) VALUES ('" + MetaDataKeys.VERSION + "', '" + DB_VERSION + "')");
+		stmt.executeUpdate("INSERT INTO METADATA (KEY, VALUE) VALUES ('" + MetaDataKeys.VERSION + "', '" + VersionConstants.DB_VERSION + "')");
 		stmt.executeUpdate("INSERT INTO METADATA (KEY, VALUE) VALUES ('" + MetaDataKeys.MAX_LINE_LENGTH + "', '" + "60" + "')");
 		stmt.executeUpdate("INSERT INTO METADATA (KEY, VALUE) VALUES ('" + MetaDataKeys.MEDIA_LIBRARY_ENABLE + "', 'TRUE')");
 		stmt.executeUpdate("INSERT INTO METADATA (KEY, VALUE) VALUES ('" + MetaDataKeys.OMIT_PREFIXES + "', 'the le la les')");

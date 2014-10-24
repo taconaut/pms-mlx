@@ -315,7 +315,7 @@ class DBVideoFileInfo extends DBFileInfo {
 						videos.put(videoFile.getId(), videoFile);
 					}else{
 						//skip the already imported fields if the video with this id is already contained in the list
-						pos = 48;
+						pos = 49;
 						
 						videoFile = videos.get(videoFile.getId());
 					}

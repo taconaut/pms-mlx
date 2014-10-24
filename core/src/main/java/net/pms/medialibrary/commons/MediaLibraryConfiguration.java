@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.medialibrary.commons.dataobjects.OmitPrefixesConfiguration;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 

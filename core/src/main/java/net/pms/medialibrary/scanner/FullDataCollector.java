@@ -19,44 +19,26 @@
 package net.pms.medialibrary.scanner;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.RealFile;
-import net.pms.formats.FLAC;
-import net.pms.formats.GIF;
-import net.pms.formats.ISO;
-import net.pms.formats.JPG;
-import net.pms.formats.M4A;
-import net.pms.formats.MKV;
-import net.pms.formats.MP3;
-import net.pms.formats.MPG;
-import net.pms.formats.OGG;
-import net.pms.formats.PNG;
-import net.pms.formats.RAW;
-import net.pms.formats.TIF;
+import net.pms.medialibrary.commons.MediaLibraryConfiguration;
+import net.pms.medialibrary.commons.VersionConstants;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOAudioFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOImageFileInfo;
-import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
 import net.pms.medialibrary.commons.enumarations.FileType;
-import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.helpers.FileImportHelper;
 
 public class FullDataCollector {	
 	private static final Logger log = LoggerFactory.getLogger(FullDataCollector.class);
 	private static FullDataCollector instance;
 
-	private List<String> audioFileExtensions;
-	private List<String> videoFileExtensions;
-	private List<String> imageFileExtensions;
 	private String videoCoverSaveFolderPath = "";
 	private static FileScannerDlnaResource dummyParent = new FileScannerDlnaResource();
 	
@@ -76,42 +58,38 @@ public class FullDataCollector {
 			log.error("Failed to create directory " + this.videoCoverSaveFolderPath 
 					+ "for video cover storage", ex);
 		}
-		populateExtensions();
 	}
 
-	public static FullDataCollector getInstance() throws InitialisationException {
-	    if(instance == null){
-	    	throw new InitialisationException("The static configure() method has to be called to initialize the instance before it can be retrieved through the getInstance() method");
-	    }else{
-	    	return instance;
-	    }
+	public static FullDataCollector getInstance() {
+	    return instance;
     }
 
 	public static void configure(String videoCoverSaveFolderPath) {
 	    instance = new FullDataCollector(videoCoverSaveFolderPath);
     }
 	
-	public DOFileInfo get(DOManagedFile mf, boolean importFileProperties) {
+	public DOFileInfo get(FileImportConfiguration importFile) {
 		DOFileInfo retVal = null;
-		int sep = mf.getPath().lastIndexOf(java.io.File.separator) + 1;
-		String folderPath = mf.getPath().substring(0, sep);
-		String fileName = mf.getPath().substring(sep);
-		switch(getMediaType(new File(mf.getPath()))){
+		int sep = importFile.getPath().lastIndexOf(java.io.File.separator) + 1;
+		String folderPath = importFile.getPath().substring(0, sep);
+		String fileName = importFile.getPath().substring(sep);
+		switch(FileImportHelper.getFileType(new File(importFile.getPath()))){
 			case VIDEO:
-				if(mf.isVideoEnabled()){
+				if(importFile.isVideoImportEnabled()){
     				DOVideoFileInfo tmpVideoFileInfo = new DOVideoFileInfo();
     				tmpVideoFileInfo.setFolderPath(folderPath);
     				tmpVideoFileInfo.setFileName(fileName);
     				tmpVideoFileInfo.setType(FileType.VIDEO);
     				
-    				if(importFileProperties) {
+    				if(importFile.isFilePropertiesImportEnabled()) {
 	    				//get the information from pms internal util (mediainfo or ffmpeg)
 	    				populateMovieInfo(tmpVideoFileInfo);
+	    				tmpVideoFileInfo.setFileImportVersion(VersionConstants.VIDEO_FILE_VERSION);
     				}
     				
     				//import the info with configured plugins
-    				if(mf.isPluginImportEnabled()) {
-    					FileImportHelper.updateFileInfo(mf.getFileImportTemplate(), tmpVideoFileInfo);
+    				if(importFile.isPluginImportEnabled()) {
+    					FileImportHelper.updateFileInfo(importFile.getFileImportTemplate(), tmpVideoFileInfo);
     				}
     				
     				if(tmpVideoFileInfo.getName().equals("")) {
@@ -125,21 +103,23 @@ public class FullDataCollector {
 				}
 				break;
 			case AUDIO:
-				if(mf.isAudioEnabled()){
+				if(importFile.isAudioImportEnabled()){
     				DOAudioFileInfo tmpAudioFileInfo = new DOAudioFileInfo();
     				tmpAudioFileInfo.setFolderPath(folderPath);
     				tmpAudioFileInfo.setFileName(fileName);
     				tmpAudioFileInfo.setType(FileType.AUDIO);
+    				tmpAudioFileInfo.setFileImportVersion(VersionConstants.AUDIO_FILE_VERSION);
     				//TODO: Implement
     				retVal = tmpAudioFileInfo;
 				}
 				break;
 			case PICTURES:
-				if(mf.isPicturesEnabled()){
+				if(importFile.isPictureImportEnabled()){
     				DOImageFileInfo tmpImageFileInfo = new DOImageFileInfo();
     				tmpImageFileInfo.setFolderPath(folderPath);
     				tmpImageFileInfo.setFileName(fileName);
     				tmpImageFileInfo.setType(FileType.PICTURES);
+    				tmpImageFileInfo.setFileImportVersion(VersionConstants.PICTURE_FILE_VERSION);
     				//TODO: Implement
     				retVal = tmpImageFileInfo;
 				}
@@ -148,7 +128,7 @@ public class FullDataCollector {
 				break;
 		}
 
-		File f = new File(mf.getPath());
+		File f = new File(importFile.getPath());
 		if (retVal != null) {
 			retVal.setActive(true);
 			if (f != null && f.exists()) {
@@ -158,33 +138,6 @@ public class FullDataCollector {
 				}
 			}
 		}
-		return retVal;
-	}
-	
-	private FileType getMediaType(String fileName){
-		FileType retVal = FileType.UNKNOWN;
-		
-		String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-		if(this.videoFileExtensions.contains(extension)){
-			retVal = FileType.VIDEO;
-		}
-		else if(this.audioFileExtensions.contains(extension)){
-			retVal = FileType.AUDIO;
-		}
-		else if(this.imageFileExtensions.contains(extension)){
-			retVal = FileType.PICTURES;
-		}
-
-		return retVal;
-	}
-	
-	private FileType getMediaType(File file){
-		FileType retVal = FileType.UNKNOWN;
-		
-		if(file.isFile()){
-			retVal = getMediaType(file.getName());
-		}
-
 		return retVal;
 	}
 	
@@ -233,25 +186,4 @@ public class FullDataCollector {
 			}
 		}
 	}
-
-	private void populateExtensions(){
-		this.audioFileExtensions = new ArrayList<String>();
-		this.audioFileExtensions.addAll(Arrays.asList(new M4A().getSupportedExtensions()));
-		this.audioFileExtensions.addAll(Arrays.asList(new MP3().getSupportedExtensions()));
-		this.audioFileExtensions.addAll(Arrays.asList(new OGG().getSupportedExtensions()));
-		this.audioFileExtensions.addAll(Arrays.asList(new FLAC().getSupportedExtensions()));
-
-		this.videoFileExtensions = new ArrayList<String>();
-		this.videoFileExtensions.addAll(Arrays.asList(new MKV().getSupportedExtensions()));
-		this.videoFileExtensions.addAll(Arrays.asList(new ISO().getSupportedExtensions()));
-		this.videoFileExtensions.addAll(Arrays.asList(new MPG().getSupportedExtensions()));
-
-		this.imageFileExtensions = new ArrayList<String>();
-		this.imageFileExtensions.addAll(Arrays.asList(new JPG().getSupportedExtensions()));
-		this.imageFileExtensions.addAll(Arrays.asList(new PNG().getSupportedExtensions()));
-		this.imageFileExtensions.addAll(Arrays.asList(new GIF().getSupportedExtensions()));
-		this.imageFileExtensions.addAll(Arrays.asList(new TIF().getSupportedExtensions()));
-		this.imageFileExtensions.addAll(Arrays.asList(new RAW().getSupportedExtensions()));
-	}
-
 }

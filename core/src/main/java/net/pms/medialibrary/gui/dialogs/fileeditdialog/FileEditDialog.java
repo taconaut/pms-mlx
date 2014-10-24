@@ -229,7 +229,7 @@ public class FileEditDialog extends JDialog {
 			//get the updated file info
 			DOFileInfo ff = getEditingFileInfo();
 			DOFileInfo displayedFileInfo = tpFileEdit.getDisplayedFileInfo();
-			displayedFileInfo.mergePropertiesAndTags(ff);
+			displayedFileInfo.copySetConfigurablePropertiesFrom(ff);
 			FileImportHelper.updateFileInfo(plugin, displayedFileInfo);
 
 			tpFileEdit.setContent(displayedFileInfo);

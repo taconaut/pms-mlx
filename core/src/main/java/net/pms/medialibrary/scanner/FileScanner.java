@@ -35,7 +35,6 @@ import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.DOScanReport;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.ScanState;
-import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.exceptions.ScanStateException;
 import net.pms.medialibrary.commons.interfaces.IFileScannerEventListener;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
@@ -47,7 +46,7 @@ public class FileScanner implements Runnable{
 	private static final Logger log = LoggerFactory.getLogger(FileScanner.class);
 	private static int nbScans = 0;
 	
-	private Queue<DOManagedFile> directoryPaths;
+	private Queue<FileImportConfiguration> directoryPaths;
 	private Thread scanThread;
 	private ScanState scanState = ScanState.IDLE;
 	private int nbScannedItems;
@@ -57,10 +56,10 @@ public class FileScanner implements Runnable{
 	private Object scanThreadPause;
 	private List<IFileScannerEventListener> fileScannerEventListeners;
 	
-	public int updateIntervalDays = 5000;
+	public int updateIntervalDays = 50000;
 	
-	private FileScanner() throws InitialisationException{
-		directoryPaths = new ConcurrentLinkedQueue<DOManagedFile>();
+	private FileScanner() {
+		directoryPaths = new ConcurrentLinkedQueue<FileImportConfiguration>();
 		scanThread = new Thread(this);
 		nbScannedItems = 0;
 		nbItemsToScan = 0;
@@ -70,21 +69,17 @@ public class FileScanner implements Runnable{
 		scanThreadPause = new Object();
 	}
 	
-	private synchronized void enqueueManagedFile(DOManagedFile mf){
+	private synchronized void enqueueManagedFile(FileImportConfiguration mf){
 		directoryPaths.add(mf);
 	}
 	
-	private synchronized DOManagedFile dequeueManagedFile(){
+	private synchronized FileImportConfiguration dequeueImportFile(){
 		return directoryPaths.poll();
 	}
 
-	public static synchronized FileScanner getInstance() throws InitialisationException {
+	public static synchronized FileScanner getInstance() {
 	    if(instance == null){
-	    	try{
-	    		instance = new FileScanner();
-	    	}catch(InitialisationException ex){
-	    		throw new InitialisationException("Both components FullDataCollector and MediaLibraryStorage have to be configured before this method can be called", ex);	    	
-	    	}
+	    	instance = new FileScanner();
 	    }
 	    return instance;
     }
@@ -108,22 +103,17 @@ public class FileScanner implements Runnable{
 						continue;
 					}
 					
-					DOManagedFile tmpFile = new DOManagedFile(mFolder.isWatchEnabled(), currentFile.toString(), 
-							mFolder.isVideoEnabled(), mFolder.isAudioEnabled(), mFolder.isPicturesEnabled(),
-							mFolder.isSubFoldersEnabled(), mFolder.isPluginImportEnabled(), mFolder.getFileImportTemplate());
-					
 					if (currentFile.isFile()) {
-						enqueueManagedFile(tmpFile);
-						synchronized (scanState) {
-							if (scanState != ScanState.STARTING && scanState != ScanState.RUNNING) {
-								changeScanState(ScanState.STARTING);
-								scanThread = new Thread(this);
-								scanThread.setName("scan" + nbScans++);
-								scanThread.start();
-							
-							}
-						}
+						// Enqueue the file
+						FileImportConfiguration fileImportConfiguration = new FileImportConfiguration(mFolder.getPath(), mFolder.getFileImportTemplate(), false, true,
+								mFolder.isPluginImportEnabled(), mFolder.isVideoEnabled(), mFolder.isAudioEnabled(), mFolder.isPicturesEnabled());
+						enqueueManagedFile(fileImportConfiguration);
+						startScan();
 					} else if (currentFile.isDirectory() && mFolder.isSubFoldersEnabled()) {
+						// Scan sub-folders
+						DOManagedFile tmpFile = new DOManagedFile(mFolder.isWatchEnabled(), currentFile.toString(), 
+								mFolder.isVideoEnabled(), mFolder.isAudioEnabled(), mFolder.isPicturesEnabled(),
+								mFolder.isSubFoldersEnabled(), mFolder.isPluginImportEnabled(), mFolder.getFileImportTemplate());
 						scanFolder(tmpFile);
 					}
 				}
@@ -133,40 +123,65 @@ public class FileScanner implements Runnable{
 		}
 	}
 	
-	public boolean scanFile(DOManagedFile managedFile, boolean importFileProperties) {
+	public boolean scanFile(FileImportConfiguration importFile) {
 		boolean fileImported = false;
-		
-		File f = new File(managedFile.getPath());
+
+		File f = new File(importFile.getPath());
 		if (f.isFile()) {
-				//Only update files if they're older then the configured value
-				Date dateLastUpdate = mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath());
-				Calendar comp = Calendar.getInstance();
-				comp.add(Calendar.DATE, -updateIntervalDays);
-				if (dateLastUpdate.before(comp.getTime())) {
-					// retrieve file info
-					DOFileInfo fileInfo = null;
-					try {
-						fileInfo = dataCollector.get(new DOManagedFile(managedFile.isWatchEnabled(), managedFile.getPath().toString(), managedFile.isVideoEnabled(), managedFile.isAudioEnabled(),
-								managedFile.isPicturesEnabled(), managedFile.isSubFoldersEnabled(), managedFile.isPluginImportEnabled(), managedFile.getFileImportTemplate()), importFileProperties);
-					} catch(Throwable t) {
-						log.error("Failed to collect info for " + managedFile.getPath(), t);
-					}
-					// insert file info if we were able to retrieve it
-					if (fileInfo != null) {
-						if(mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath()).equals(new Date(0))){
-							mediaLibraryStorage.insertFileInfo(fileInfo);
-							fileImported = true;
-							for(IFileScannerEventListener l : fileScannerEventListeners){
-								l.itemInserted(FileType.VIDEO);
-							}
-						}
-					} else {
-						if(log.isDebugEnabled()) log.debug("Couldn't read " + f);
-					}
+			// Only update files if they're older then the configured value
+			Date dateLastUpdate = mediaLibraryStorage.getFileInfoLastUpdated(f.getAbsolutePath());
+			Calendar comp = Calendar.getInstance();
+			comp.add(Calendar.DATE, -updateIntervalDays);
+			if (importFile.isForceUpdate() || dateLastUpdate.before(comp.getTime())) {
+				// retrieve file info
+				DOFileInfo fileInfo = null;
+				try {
+					fileInfo = dataCollector.get(importFile);
+				} catch (Throwable t) {
+					log.error("Failed to collect info for " + importFile.getPath(), t);
 				}
+
+				// insert file info if we were able to retrieve it
+				if (fileInfo != null) {
+					if(mediaLibraryStorage.isFileImported(fileInfo.getFilePath())) {
+						// The file has been previously imported.
+						// Get the existing file and set the new properties
+						DOFileInfo currentFileInfo = mediaLibraryStorage.getFileInfo(fileInfo.getFilePath());
+						currentFileInfo.copySetSystemPropertiesFrom(fileInfo);
+						
+						mediaLibraryStorage.updateFileInfo(currentFileInfo);
+					} else {
+						mediaLibraryStorage.insertFileInfo(fileInfo);
+					}
+
+					fileImported = true;
+					for (IFileScannerEventListener l : fileScannerEventListeners) {
+						l.itemInserted(FileType.VIDEO);
+					}
+				} else {
+					if (log.isDebugEnabled())
+						log.debug("Couldn't read " + f);
+				}
+			}
+		}
+
+		return fileImported;
+	}
+	
+	public void updateFilesRequiringFileUpdate(List<FileType> fileTypesToUpdate) {
+		List<String> filePaths = mediaLibraryStorage.getFilePathsRequiringUpdate(fileTypesToUpdate);
+		for(String filePath : filePaths) {
+			
+			File f = new File(filePath);
+			if (!f.isFile()) {
+				log.warn(String.format("File '%s' won't be updated because it couldn't be found", filePath));
+			} else {
+				FileImportConfiguration fileImportConfiguration = new FileImportConfiguration(filePath, null, true, true, false, true, true, true);
+				enqueueManagedFile(fileImportConfiguration);
+			}
 		}
 		
-		return fileImported;
+		startScan();
 	}
 	
 	public void pause() throws ScanStateException{	
@@ -211,10 +226,10 @@ public class FileScanner implements Runnable{
 	public void run() {
 		changeScanState(ScanState.RUNNING);
 		// Handle each directory in the list
-		DOManagedFile mf;
+		FileImportConfiguration importFile;
 		int nbFilesAdded = 0;
 		//Calendar lastGetDate = Calendar.getInstance();
-		while ((mf = dequeueManagedFile()) != null) {
+		while ((importFile = dequeueImportFile()) != null) {
 			// check if we have to pause or stop the thread
 			if (scanState == ScanState.PAUSING) {
 				try {
@@ -241,7 +256,7 @@ public class FileScanner implements Runnable{
 			}
 			
 			// Scan the file
-			if(scanFile(mf, true)) {
+			if(scanFile(importFile)) {
 				nbFilesAdded++;
 			}
 		}
@@ -263,5 +278,16 @@ public class FileScanner implements Runnable{
 				l.scanStateChanged(scanState);
 			}
 		}
+	}
+	
+	private void startScan() {
+		synchronized (scanState) {
+			if (scanState != ScanState.STARTING && scanState != ScanState.RUNNING) {
+				changeScanState(ScanState.STARTING);
+				scanThread = new Thread(this);
+				scanThread.setName("scan" + nbScans++);
+				scanThread.start();
+			}
+		}		
 	}
 }

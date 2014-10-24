@@ -19,6 +19,7 @@
 package net.pms.medialibrary.commons.interfaces;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
@@ -64,15 +65,22 @@ public interface IMediaLibraryStorage {
 	void deleteAllFileInfo();	
 	void insertFileInfo(DOFileInfo fileInfo);
 	void updateFileInfo(DOFileInfo fileInfo);
+	void insertOrUpdateFileInfo(DOFileInfo fileInfo);
 	void deleteFileInfoByFilePath(String filePath);
 	Date getFileInfoLastUpdated(String fileName);
 	long getRootFolderId();
 	void updatePlayCount(long fileId, int playTimeSec, Date datePlayEnd);
 	void updatePlayCount(String filePath, int playTimeSec, Date datePlayEnd);
+	DOFileInfo getFileInfo(String filePath);
 	List<DOFileInfo> getFileInfo(DOFilter filter, boolean sortAscending, ConditionType sortField, int maxResults, SortOption sortOption);
 	List<String> getExistingTags(FileType fileType);
 	List<String> getTagValues(String tagName, boolean isAscending, int minOccurences);
 	void updateFilePath(String folderPath, String oldFileName, String newFileName);
+	boolean isFileImported(String filePath);
+	
+	HashMap<FileType, Integer> getFileCountRequiringUpdate();
+	int getFileCountRequiringUpdate(FileType fileType, int currentFileVersion);
+	List<String> getFilePathsRequiringUpdate(List<FileType> fileTypesToUpdate);
 	
 	//VideoFileInfo
 	void deleteAllVideos();

@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2012  Ph.Waeber
+ * Copyright (C) 2014  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
 
 import net.pms.dlna.DLNAMediaAudio;
 import net.pms.dlna.DLNAMediaSubtitle;
@@ -611,15 +613,20 @@ public class DOVideoFileInfo extends DOFileInfo {
 	public void setAvcLevel(String avcLevel) {
 		this.avcLevel = avcLevel;
 	}
-	
-	public void mergePropertiesAndTags(DOFileInfo fileInfo) {
-		super.mergePropertiesAndTags(fileInfo);
+
+	/* (non-Javadoc)
+	 * @see net.pms.medialibrary.commons.dataobjects.DOFileInfo#copySetConfigurablePropertiesFrom(net.pms.medialibrary.commons.dataobjects.DOFileInfo)
+	 */
+	@Override
+	public void copySetConfigurablePropertiesFrom(DOFileInfo fileInfo) {
+		super.copySetConfigurablePropertiesFrom(fileInfo);
 		
 		if(!(fileInfo instanceof DOVideoFileInfo)) {
 			return;
 		}
 		
 		DOVideoFileInfo videoFileInfo = (DOVideoFileInfo) fileInfo;
+		
 		if(!videoFileInfo.getName().equals("")) {
 			setName(videoFileInfo.getName());
 		}
@@ -678,6 +685,78 @@ public class DOVideoFileInfo extends DOFileInfo {
 				genres.add(genre);
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.pms.medialibrary.commons.dataobjects.DOFileInfo#copySetSystemPropertiesFrom(net.pms.medialibrary.commons.dataobjects.DOFileInfo)
+	 */
+	@Override
+	public void copySetSystemPropertiesFrom(DOFileInfo fileInfo) {
+		super.copySetConfigurablePropertiesFrom(fileInfo);
+		
+		if(!(fileInfo instanceof DOVideoFileInfo)) {
+			return;
+		}
+		
+		DOVideoFileInfo videoFileInfo = (DOVideoFileInfo) fileInfo;
+		if(!videoFileInfo.getAspectRatio().equals("")) {
+			setAspectRatio(videoFileInfo.getAspectRatio());
+		}
+		if(videoFileInfo.getBitrate() > 0) {
+			setBitrate(videoFileInfo.getBitrate());
+		}
+		if(videoFileInfo.getBitsPerPixel() > 0) {
+			setBitsPerPixel(videoFileInfo.getBitsPerPixel());
+		}
+		if(!videoFileInfo.getCodecV().equals("")) {
+			setCodecV(videoFileInfo.getCodecV());
+		}
+		if(videoFileInfo.getDurationSec() > 0) {
+			setDurationSec(videoFileInfo.getDurationSec());
+		}
+		if(!videoFileInfo.getContainer().equals("")) {
+			setContainer(videoFileInfo.getContainer());
+		}
+		if(videoFileInfo.getDvdtrack() > 0) {
+			setDvdtrack(videoFileInfo.getDvdtrack());
+		}
+		if(!videoFileInfo.getFrameRate().equals("")) {
+			setFrameRate(videoFileInfo.getFrameRate());
+		}
+		if(videoFileInfo.getH264_annexB() != null && !ArrayUtils.isEquals(videoFileInfo.getH264_annexB(), new byte[0])) {
+			setH264_annexB(videoFileInfo.getH264_annexB());
+		}
+		if(videoFileInfo.getHeight() > 0) {
+			setHeight(videoFileInfo.getHeight());
+		}
+		if(!videoFileInfo.getMimeType().equals("")) {
+			setMimeType(videoFileInfo.getMimeType());
+		}
+		if(!videoFileInfo.getModel().equals("")) {
+			setModel(videoFileInfo.getModel());
+		}
+		if(!videoFileInfo.getMuxingMode().equals("")) {
+			setMuxingMode(videoFileInfo.getMuxingMode());
+		}
+		if(!videoFileInfo.getFrameRateMode().equals("")) {
+			setFrameRateMode(videoFileInfo.getFrameRateMode());
+		}
+		
+		List<DLNAMediaAudio> audioCodes = getAudioCodes();
+		for(DLNAMediaAudio audioCode : videoFileInfo.getAudioCodes()) {
+			if(!audioCodes.contains(audioCode)) {
+				audioCodes.add(audioCode);
+			}
+		}
+		
+		List<DLNAMediaSubtitle> subtitleCodes = getSubtitlesCodes();
+		for(DLNAMediaSubtitle subtitleCode : videoFileInfo.getSubtitlesCodes()) {
+			if(!subtitleCodes.contains(subtitleCode)) {
+				subtitleCodes.add(subtitleCode);
+			}
+		}
+
+		setMuxable(videoFileInfo.isMuxable());
 	}
 
 	@Override
@@ -765,12 +844,10 @@ public class DOVideoFileInfo extends DOFileInfo {
 				&& getMuxingMode().equals(compObj.getMuxingMode())
 				&& getFrameRateMode().equals(compObj.getFrameRateMode())){
 			
-				if(getAudioCodes() != null && compObj.getAudioCodes() != null
-						&& !getAudioCodes().equals(compObj.getAudioCodes())){
+				if(!getAudioCodes().equals(compObj.getAudioCodes())){
 					return false;
 				}
-				if(getSubtitlesCodes() != null && compObj.getSubtitlesCodes() != null
-						&& !getSubtitlesCodes().equals(compObj.getSubtitlesCodes())){
+				if(!getSubtitlesCodes().equals(compObj.getSubtitlesCodes())){
 					return false;
 				}
 			return true;

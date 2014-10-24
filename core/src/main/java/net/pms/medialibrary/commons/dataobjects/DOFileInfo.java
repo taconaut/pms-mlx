@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2013  Ph.Waeber
+ * Copyright (C) 2014  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -52,6 +52,8 @@ public class DOFileInfo {
 	private boolean actif;
 	private int fileImportVersion;
 	private List<ActionListener> propertyChangeListeners = new ArrayList<ActionListener>();
+	
+	protected final Date DEFAULT_DATE = new Date(0);
 	
 	/**
 	 * Gets the file name.
@@ -247,7 +249,7 @@ public class DOFileInfo {
 	 * @return the date last updated
 	 */
 	public Date getDateLastUpdatedDb() {
-		if(dateLastUpdatedDb == null) dateLastUpdatedDb = new Date(0);
+		if(dateLastUpdatedDb == null) dateLastUpdatedDb = DEFAULT_DATE;
 	    return dateLastUpdatedDb;
     }
 
@@ -269,7 +271,7 @@ public class DOFileInfo {
 	 * @return the date inserted
 	 */
 	public Date getDateInsertedDb() {
-		if(dateInsertedDb == null) dateInsertedDb = new Date(0);
+		if(dateInsertedDb == null) dateInsertedDb = DEFAULT_DATE;
 	    return dateInsertedDb;
     }
 
@@ -291,7 +293,7 @@ public class DOFileInfo {
 	 * @return the date modified os
 	 */
 	public Date getDateModifiedOs() {
-		if(dateModifiedOs == null) dateModifiedOs = new Date(0);
+		if(dateModifiedOs == null) dateModifiedOs = DEFAULT_DATE;
 	    return dateModifiedOs;
     }
 
@@ -441,18 +443,36 @@ public class DOFileInfo {
 	public void setFileImportVersion(int fileImportVersion) {
 		this.fileImportVersion = fileImportVersion;
 	}
+	
+	/**
+	 * Copies all properties having been set.
+	 *
+	 * @param fileInfo the file info to copy properties from
+	 */
+	public void copySetPropertiesFrom(DOFileInfo fileInfo) {
+		copySetSystemPropertiesFrom(fileInfo);
+		copySetConfigurablePropertiesFrom(fileInfo);
+	}
 
 	/**
-	 * Merge properties and tags.
+	 * Copies the configurable properties having been set.
 	 *
-	 * @param fileInfo the file info
+	 * @param fileInfo the file info to copy properties from
 	 */
-	public void mergePropertiesAndTags(DOFileInfo fileInfo) {
-		if(fileInfo.getThumbnailPath() != null && !fileInfo.getThumbnailPath().equals("")) {
-			setThumbnailPath(fileInfo.getThumbnailPath());
+	public void copySetConfigurablePropertiesFrom(DOFileInfo fileInfo) {
+		if(fileInfo == null) {
+			return;
 		}
 		
-		//merge tags
+		// Copy properties
+		if(!fileInfo.getThumbnailPath().equals("")) {
+			setThumbnailPath(fileInfo.getThumbnailPath());
+		}
+		if(fileInfo.getFileImportVersion() > 0) {
+			setFileImportVersion(fileInfo.getFileImportVersion());
+		}
+		
+		// Merge tags
 		Map<String, List<String>> allTags = getTags();
 		Map<String, List<String>> newTags = fileInfo.getTags();
 		
@@ -467,6 +487,59 @@ public class DOFileInfo {
 				if (!allTagValues.contains(tagValue)) {
 					allTagValues.add(tagValue);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Copies the system properties having been set.
+	 *
+	 * @param fileInfo the file info to copy properties from
+	 */
+	public void copySetSystemPropertiesFrom(DOFileInfo fileInfo) {
+		if(fileInfo == null) {
+			return;
+		}
+		
+		// Copy properties
+		if(fileInfo.getId() > -1) {
+			setId(fileInfo.getId());
+		}
+		if(!fileInfo.getFolderPath().equals("")) {
+			setFolderPath(fileInfo.getFolderPath());
+		}
+		if(!fileInfo.getFileName().equals("")) {
+			setFolderPath(fileInfo.getFileName());
+		}
+		if(!fileInfo.getFolderPath().equals("")) {
+			setFileName(fileInfo.getFileName());
+		}
+		if(fileInfo.getType() != FileType.UNKNOWN) {
+			setType(fileInfo.getType());
+		}
+		if(!fileInfo.getDateLastUpdatedDb().equals(DEFAULT_DATE)) {
+			setDateLastUpdatedDb(fileInfo.getDateLastUpdatedDb());
+		}
+		if(!fileInfo.getDateInsertedDb().equals(DEFAULT_DATE)) {
+			setDateInsertedDb(fileInfo.getDateInsertedDb());
+		}
+		if(!fileInfo.getDateModifiedOs().equals(DEFAULT_DATE)) {
+			setDateModifiedOs(fileInfo.getDateModifiedOs());
+		}
+		if(fileInfo.getSize() > 0) {
+			setSize(fileInfo.getSize());
+		}
+		if(fileInfo.getPlayCount() > 0) {
+			setPlayCount(fileInfo.getPlayCount());
+		}
+		if(fileInfo.getFileImportVersion() > 0) {
+			setFileImportVersion(fileInfo.getFileImportVersion());
+		}
+		
+		// Merge play dates
+		for(Date playDate : fileInfo.getPlayHistory()) {
+			if(!getPlayHistory().contains(playDate)) {
+				getPlayHistory().add(playDate);
 			}
 		}
 	}
@@ -530,27 +603,6 @@ public class DOFileInfo {
 		//hashCode *= 24 + getDateLastPlayed().hashCode();
 		return hashCode;
 	}
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
-//    @Override
-//	public DOFileInfo clone() {
-//		DOFileInfo fi = new DOFileInfo();
-//		fi.setFolderPath(getFolderPath());
-//		fi.setFileName(getFileName());
-//		fi.setType(getType());
-//		fi.setDateLastUpdatedDb(getDateLastUpdatedDb());
-//		fi.setDateInsertedDb(getDateInsertedDb());
-//		fi.setDateModifiedOs(getDateModifiedOs());
-//		fi.setTags(getTags());
-//		fi.setThumbnailPath(getThumbnailPath());
-//		fi.setSize(getSize());		
-//		fi.setPlayCount(getPlayCount());
-//		fi.setActive(isActive());
-//		fi.playHistory = playHistory;
-//		return fi;
-//	}
 	
     /**
      * Fires a property changed event.

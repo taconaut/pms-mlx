@@ -26,7 +26,11 @@ import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.io.WindowsNamedPipe;
+import net.pms.medialibrary.commons.MediaLibraryConfiguration;
+import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.gui.tab.MediaLibraryTab;
+import net.pms.medialibrary.scanner.FileScanner;
+import net.pms.medialibrary.storage.MediaLibraryStorage;
 import net.pms.newgui.plugins.PluginsTab;
 import net.pms.newgui.update.AutoUpdateDialog;
 import net.pms.update.AutoUpdater;
@@ -50,6 +54,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
@@ -514,6 +520,19 @@ public class LooksFrame extends JFrame implements IFrame, Observer {
 	@Override
 	public void serverReady() {
 		nt.addRenderers();
+		
+		// Ask if files requiring an update should be updated now
+		HashMap<FileType, Integer> fileTypesRequiringUpdate = MediaLibraryStorage.getInstance().getFileCountRequiringUpdate();
+		if(fileTypesRequiringUpdate.size() > 0) {
+			String updateString = "";
+			for(final FileType fileType : fileTypesRequiringUpdate.keySet()) {
+				updateString += String.format("%s: %s\r\n", Messages.getString("ML.FileType." + fileType), fileTypesRequiringUpdate.get(fileType));
+			}
+			int dialogResult = JOptionPane.showConfirmDialog(this, String.format(Messages.getString("LooksFrame.FileTypesRequiringUpdateQuestion"), updateString));
+			if(dialogResult == JOptionPane.YES_OPTION) {
+				FileScanner.getInstance().updateFilesRequiringFileUpdate(Arrays.asList(new FileType[] { FileType.VIDEO, FileType.AUDIO, FileType.PICTURES}));
+			}
+		}
 	}
 
 	@Override

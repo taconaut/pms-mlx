@@ -1,6 +1,6 @@
 /*
  * PS3 Media Server, for streaming any medias to your PS3.
- * Copyright (C) 2012  Ph.Waeber
+ * Copyright (C) 2014  Ph.Waeber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -54,6 +55,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.PMS;
+import net.pms.formats.FLAC;
+import net.pms.formats.GIF;
+import net.pms.formats.ISO;
+import net.pms.formats.JPG;
+import net.pms.formats.M4A;
+import net.pms.formats.MKV;
+import net.pms.formats.MP3;
+import net.pms.formats.MPG;
+import net.pms.formats.OGG;
+import net.pms.formats.PNG;
+import net.pms.formats.RAW;
+import net.pms.formats.TIF;
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
 import net.pms.medialibrary.commons.dataobjects.DOAudioFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
@@ -79,6 +92,10 @@ public class FileImportHelper {
 	private static Map<String, Date> pluginsLastQueryDate = new HashMap<String, Date>(); //key=name of the plugin, value=date when the last request to this plugin started
 	
 	private static int updateThreadCounter = 0;
+
+	private static List<String> audioFileExtensions;
+	private static List<String> videoFileExtensions;
+	private static List<String> imageFileExtensions;
 	
 	/**
 	 * This method will return a map containing all prioritized engine names
@@ -1154,5 +1171,70 @@ public class FileImportHelper {
 	 */
 	public static void copyFile(String source, String dest, boolean overwrite) throws IOException {
 		copyFile(new File(source), new File(dest), overwrite);
+	}
+
+	
+	/**
+	 * Gets the file type.
+	 *
+	 * @param fileName the name of the file
+	 * @return the file type
+	 */
+	public static FileType getFileType(String fileName){
+		if(audioFileExtensions == null || videoFileExtensions == null || imageFileExtensions == null) {
+			// Lazy-initialize file extensions
+			populateFileExtensions();
+		}
+		
+		FileType retVal = FileType.UNKNOWN;
+		
+		String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+		if(videoFileExtensions.contains(extension)){
+			retVal = FileType.VIDEO;
+		}
+		else if(audioFileExtensions.contains(extension)){
+			retVal = FileType.AUDIO;
+		}
+		else if(imageFileExtensions.contains(extension)){
+			retVal = FileType.PICTURES;
+		}
+
+		return retVal;
+	}
+
+	/**
+	 * Gets the file type.
+	 *
+	 * @param file the file
+	 * @return the file type
+	 */
+	public static FileType getFileType(File file){
+		FileType retVal = FileType.UNKNOWN;
+		
+		if(file.isFile()){
+			retVal = getFileType(file.getName());
+		}
+
+		return retVal;
+	}
+
+	private static void populateFileExtensions() {
+		audioFileExtensions = new ArrayList<String>();
+		audioFileExtensions.addAll(Arrays.asList(new M4A().getSupportedExtensions()));
+		audioFileExtensions.addAll(Arrays.asList(new MP3().getSupportedExtensions()));
+		audioFileExtensions.addAll(Arrays.asList(new OGG().getSupportedExtensions()));
+		audioFileExtensions.addAll(Arrays.asList(new FLAC().getSupportedExtensions()));
+
+		videoFileExtensions = new ArrayList<String>();
+		videoFileExtensions.addAll(Arrays.asList(new MKV().getSupportedExtensions()));
+		videoFileExtensions.addAll(Arrays.asList(new ISO().getSupportedExtensions()));
+		videoFileExtensions.addAll(Arrays.asList(new MPG().getSupportedExtensions()));
+
+		imageFileExtensions = new ArrayList<String>();
+		imageFileExtensions.addAll(Arrays.asList(new JPG().getSupportedExtensions()));
+		imageFileExtensions.addAll(Arrays.asList(new PNG().getSupportedExtensions()));
+		imageFileExtensions.addAll(Arrays.asList(new GIF().getSupportedExtensions()));
+		imageFileExtensions.addAll(Arrays.asList(new TIF().getSupportedExtensions()));
+		imageFileExtensions.addAll(Arrays.asList(new RAW().getSupportedExtensions()));
 	}
 }

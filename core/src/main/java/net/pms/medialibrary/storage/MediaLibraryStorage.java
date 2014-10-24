@@ -21,7 +21,9 @@ package net.pms.medialibrary.storage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import net.pms.Messages;
 import net.pms.PMS;
+import net.pms.medialibrary.commons.VersionConstants;
 import net.pms.medialibrary.commons.dataobjects.DOAudioFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOCondition;
 import net.pms.medialibrary.commons.dataobjects.DOFileImportTemplate;
@@ -46,10 +49,11 @@ import net.pms.medialibrary.commons.dataobjects.DOTemplate;
 import net.pms.medialibrary.commons.dataobjects.DOVideoFileInfo;
 import net.pms.medialibrary.commons.enumarations.ConditionOperator;
 import net.pms.medialibrary.commons.enumarations.ConditionType;
+import net.pms.medialibrary.commons.enumarations.ConditionUnit;
 import net.pms.medialibrary.commons.enumarations.ConditionValueType;
 import net.pms.medialibrary.commons.enumarations.FileType;
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.enumarations.SortOption;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
 import net.pms.medialibrary.commons.exceptions.StorageException;
 import net.pms.medialibrary.commons.helpers.FileImportHelper;
 import net.pms.medialibrary.commons.interfaces.IMediaLibraryStorage;
@@ -407,6 +411,35 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	 *********************************************/
 
 	@Override
+	public DOFileInfo getFileInfo(String filePath) {
+		int pos = filePath.lastIndexOf(File.separatorChar) + 1;
+		String folderPath = filePath.substring(0, pos);
+		String fileName = filePath.substring(pos);
+
+		DOCondition fileNameCondition = new DOCondition(ConditionType.FILE_FILENAME, ConditionOperator.IS, fileName, "c1", ConditionValueType.STRING, ConditionUnit.UNKNOWN, null);
+		DOCondition folderPathCondition = new DOCondition(ConditionType.FILE_FOLDERPATH, ConditionOperator.IS, folderPath, "c2", ConditionValueType.STRING, ConditionUnit.UNKNOWN, null);
+		DOFilter filter = new DOFilter("c1 AND c2", Arrays.asList(new DOCondition[] {fileNameCondition, folderPathCondition }));
+		
+		DOFileInfo res = null;
+		
+		FileType fileType = FileImportHelper.getFileType(fileName);
+		switch(fileType) {
+			case VIDEO:
+				List<DOVideoFileInfo> videoFileInfos = getVideoFileInfo(filter, true, ConditionType.FILE_FILENAME, 1, SortOption.Unknown, false);
+				if(videoFileInfos.size() > 0) {
+					res = videoFileInfos.get(0);
+				}
+				break;
+			case AUDIO:
+			case PICTURES:
+			default:
+				log.error("Currently, only files of type VIDEO are supported by the method 'public DOFileInfo getFileInfo(String filePath)'");
+		}
+		
+		return res;
+	}	
+	
+	@Override
 	public void deleteAllFileInfo() {
 		int nbDeletedVideos = 0;
 //		int nbDeletedAudio = 0;
@@ -424,6 +457,15 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 		
 		//show deletion in GUI
 		PMS.get().getFrame().setStatusLine(nbDeletedVideos + " videos have been deleted from the library");
+	}
+
+	@Override
+	public void insertOrUpdateFileInfo(DOFileInfo fileInfo) {
+		if(getFileInfoLastUpdated(fileInfo.getFilePath()).equals(new Date(0))) {
+			insertFileInfo(fileInfo);
+		} else {
+			updateFileInfo(fileInfo);
+		}
 	}
 
 	@Override
@@ -559,14 +601,19 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 	}
 
 	@Override
-	public java.util.Date getFileInfoLastUpdated(String filePath) {
-		java.util.Date res = null;
+	public Date getFileInfoLastUpdated(String filePath) {
+		Date res = new Date(0);
 		try {
 			res = dbFileInfo.getFileInfoLastUpdated(filePath);
 		} catch (StorageException e) {
 			log.error("Storage error (get)", e);
 		}
 		return res;
+	}
+
+	@Override
+	public boolean isFileImported(String filePath) {
+		return !getFileInfoLastUpdated(filePath).equals(new Date(0));
 	}
 
 	@Override
@@ -615,6 +662,50 @@ public class MediaLibraryStorage implements IMediaLibraryStorage {
 		} catch (StorageException e) {
 			log.error("Storage error (update)", e);
 		}
+	}
+
+	@Override
+	public HashMap<FileType, Integer> getFileCountRequiringUpdate() {
+		int nbVideo = getFileCountRequiringUpdate(FileType.VIDEO, VersionConstants.VIDEO_FILE_VERSION);
+		int nbAudio = getFileCountRequiringUpdate(FileType.AUDIO, VersionConstants.AUDIO_FILE_VERSION);
+		int nbPictures = getFileCountRequiringUpdate(FileType.PICTURES, VersionConstants.PICTURE_FILE_VERSION);
+		
+		HashMap<FileType, Integer> res = new HashMap<FileType, Integer>();
+		if(nbVideo > 0) {
+			res.put(FileType.VIDEO, nbVideo);
+		}
+		if(nbAudio > 0) {
+			res.put(FileType.AUDIO, nbAudio);
+		}
+		if(nbPictures > 0) {
+			res.put(FileType.PICTURES, nbPictures);
+		}
+		return res;
+	}
+
+	@Override
+	public int getFileCountRequiringUpdate(FileType fileType, int currentFileVersion) {
+		int nbFiles = -1;
+		try {
+			nbFiles = dbFileInfo.getFileCountRequiringUpdate(fileType, currentFileVersion);
+			log.debug(String.format("Found %s files requiring update for type %s", nbFiles, fileType));
+		} catch (StorageException e) {
+			log.error("Storage error (get)", e);
+		}
+		return nbFiles;
+	}
+
+	@Override
+	public List<String> getFilePathsRequiringUpdate(List<FileType> fileTypesToUpdate) {
+		List<String> res;
+		try {
+			res = dbFileInfo.getFilePathsRequiringUpdate(fileTypesToUpdate);
+			log.debug(String.format("Found %s files requiring update", res.size()));
+		} catch (StorageException e) {
+			res = new ArrayList<String>();
+			log.error("Storage error (get)", e);
+		}
+		return res;
 	}
 	
 	/*********************************************

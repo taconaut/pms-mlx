@@ -53,7 +53,7 @@ import net.pms.medialibrary.commons.MediaLibraryConfiguration;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.OmitPrefixesConfiguration;
 import net.pms.medialibrary.commons.enumarations.FileType;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants.MetaDataKeys;
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.enumarations.ScanState;
 import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.exceptions.ScanStateException;
@@ -299,13 +299,9 @@ public class GeneralOptionsView extends JPanel {
 
 					d.setVisible(true);
 					if (d.isDoImport()) {
-						try {
-							File f = new File(d.getManagedFolder().getPath());
-							MediaLibraryStorage.getInstance().setMetaDataValue(MetaDataKeys.LAST_SCAN_FOLDER_PATH.toString(), f.getParent());
-							FileScanner.getInstance().scanFolder(d.getManagedFolder());
-						} catch (InitialisationException ex) {
-							log.error("Failed to get instance of FileScanner", ex);
-						}
+						File f = new File(d.getManagedFolder().getPath());
+						MediaLibraryStorage.getInstance().setMetaDataValue(MetaDataKeys.LAST_SCAN_FOLDER_PATH.toString(), f.getParent());
+						FileScanner.getInstance().scanFolder(d.getManagedFolder());
 					}
 				}
 			}

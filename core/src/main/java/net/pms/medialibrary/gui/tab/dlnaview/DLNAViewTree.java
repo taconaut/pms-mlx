@@ -71,7 +71,7 @@ import net.pms.medialibrary.commons.enumarations.AutoFolderProperty;
 import net.pms.medialibrary.commons.enumarations.AutoFolderType;
 import net.pms.medialibrary.commons.enumarations.CopyCutAction;
 import net.pms.medialibrary.commons.enumarations.FileType;
-import net.pms.medialibrary.commons.enumarations.MediaLibraryConstants;
+import net.pms.medialibrary.commons.enumarations.MetaDataKeys;
 import net.pms.medialibrary.commons.events.AutoFolderDialogActionEvent;
 import net.pms.medialibrary.commons.events.AutoFolderDialogActionListener;
 import net.pms.medialibrary.commons.events.FolderDialogFolderUpdateEvent;
@@ -373,7 +373,7 @@ public class DLNAViewTree extends JTree {
 		if(getSelectedNode() != null 
 				&& getSelectedNode().getUserObject() instanceof DOMediaLibraryFolder){
 			DOMediaLibraryFolder folder = ((DOMediaLibraryFolder)getSelectedNode().getUserObject());
-			mediaLibraryStorage.setMetaDataValue(MediaLibraryConstants.MetaDataKeys.ROOT_FOLDER_ID.toString(), String.valueOf(folder.getId()));
+			mediaLibraryStorage.setMetaDataValue(MetaDataKeys.ROOT_FOLDER_ID.toString(), String.valueOf(folder.getId()));
 		}
 	}
 

@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
+import net.pms.medialibrary.commons.VersionConstants;
 import net.pms.medialibrary.commons.dataobjects.DOCondition;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOFilter;
@@ -49,6 +50,7 @@ import net.pms.medialibrary.commons.enumarations.ConditionValueType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.SortOption;
 import net.pms.medialibrary.commons.exceptions.StorageException;
+import net.pms.medialibrary.commons.helpers.FileHelper;
 import net.pms.notifications.NotificationCenter;
 import net.pms.notifications.types.DBEvent;
 
@@ -535,7 +537,7 @@ class DBFileInfo extends DBBase {
 		//increment the play count for the file
 		try {
 			conn = cp.getConnection();
-			stmt = conn.prepareStatement("SELECT ID FROM FILE FILE WHERE FILENAME = ? AND FOLDERPATH = ?");
+			stmt = conn.prepareStatement("SELECT ID FROM FILE WHERE FILENAME = ? AND FOLDERPATH = ?");
 			stmt.setString(1, fileName);
 			stmt.setString(2, folderPath);
 			rs = stmt.executeQuery();
@@ -550,6 +552,95 @@ class DBFileInfo extends DBBase {
 		
 		return retVal;
     }
+
+	int getFileCountRequiringUpdate(FileType fileType, int currentFileVersion) throws StorageException {
+		int retVal = -1;
+
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		//increment the play count for the file
+		try {
+			conn = cp.getConnection();
+			stmt = conn.prepareStatement("SELECT COUNT(ID) FROM FILE WHERE TYPE = ? AND FILEIMPORTVERSION < ?");
+			stmt.setString(1, fileType.toString());
+			stmt.setInt(2, currentFileVersion);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				retVal = rs.getInt(1);
+			}
+		} catch (SQLException ex) {
+			throw new StorageException(String.format("Failed to get count of files requiring an update for type=%s, currentFileVersion=%s", fileType, currentFileVersion), ex);
+		} finally {
+			close(conn, stmt, rs);
+		}
+		
+		return retVal;
+	}
+
+	List<String> getFilePathsRequiringUpdate(List<FileType> fileTypesToUpdate) throws StorageException {
+		List<String> res = new ArrayList<String>();
+
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		//increment the play count for the file
+		try {
+			conn = cp.getConnection();
+			
+			// Prepare the statement
+			String query = "SELECT FILENAME, FOLDERPATH FROM FILE WHERE";
+			boolean hasPreviousClause = false;
+			if(fileTypesToUpdate.contains(FileType.VIDEO)) {
+				query += " (TYPE = ? AND FILEIMPORTVERSION < ?)";
+				hasPreviousClause = true;
+			}
+			if(fileTypesToUpdate.contains(FileType.AUDIO)) {
+				if(hasPreviousClause) {
+					query += " OR";
+				}
+				query += " (TYPE = ? AND FILEIMPORTVERSION < ?)";
+				hasPreviousClause = true;
+			}
+			if(fileTypesToUpdate.contains(FileType.PICTURES)) {
+				if(hasPreviousClause) {
+					query += " OR";
+				}
+				query += " (TYPE = ? AND FILEIMPORTVERSION < ?)";
+				hasPreviousClause = true;
+			}
+			stmt = conn.prepareStatement(query);
+			
+			// Add parameters
+			int pos = 1;
+			if(fileTypesToUpdate.contains(FileType.VIDEO)) {
+				stmt.setString(pos++, FileType.VIDEO.toString());
+				stmt.setInt(pos++, VersionConstants.VIDEO_FILE_VERSION);
+			}
+			if(fileTypesToUpdate.contains(FileType.AUDIO)) {
+				stmt.setString(pos++, FileType.AUDIO.toString());
+				stmt.setInt(pos++, VersionConstants.AUDIO_FILE_VERSION);
+			}
+			if(fileTypesToUpdate.contains(FileType.PICTURES)) {
+				stmt.setString(pos++, FileType.PICTURES.toString());
+				stmt.setInt(pos++, VersionConstants.PICTURE_FILE_VERSION);
+			}
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				String fileName = rs.getString(1);
+				String filePath = rs.getString(2);
+				res.add(FileHelper.combine(filePath, fileName));
+			}
+		} catch (SQLException ex) {
+			throw new StorageException("Failed to get file paths requiring update", ex);
+		} finally {
+			close(conn, stmt, rs);
+		}
+		
+		return res;
+	}
 	
 	/*********************************************
 	 * 

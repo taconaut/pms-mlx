@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import net.contentobjects.jnotify.JNotifyListener;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
-import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.helpers.FileHelper;
+import net.pms.medialibrary.scanner.FileImportConfiguration;
 import net.pms.medialibrary.scanner.FileScanner;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
 
@@ -79,19 +79,14 @@ public class DirectoryChangeListener implements JNotifyListener {
 			logger.warn("Failed to import file '%s' because its managed folder could not be found.");
 		}else {
 			// Create the managed file
-			DOManagedFile managedFile = new DOManagedFile(false, filePath,
-					managedFolder.isVideoEnabled(), managedFolder.isAudioEnabled(), managedFolder.isPicturesEnabled(),
-					false, managedFolder.isPluginImportEnabled(), managedFolder.getFileImportTemplate());
+			FileImportConfiguration fileImportConfiguration = new FileImportConfiguration(filePath, managedFolder.getFileImportTemplate(), true, true, 
+					managedFolder.isPluginImportEnabled(), managedFolder.isVideoEnabled(), managedFolder.isAudioEnabled(), managedFolder.isPicturesEnabled());
 			
 			// Wait for the file to be fully written to disk
 			waitForFileBeingCreated(filePath);
 			
 			// Import the file
-			try {
-				FileScanner.getInstance().scanFile(managedFile, true);
-			} catch (InitialisationException e) {
-				logger.error(String.format("The file '%s' could not be scanned because the file scanner hasn't been properly initialized.", filePath), e);
-			}
+			FileScanner.getInstance().scanFile(fileImportConfiguration);
 		}
 	}
 	
