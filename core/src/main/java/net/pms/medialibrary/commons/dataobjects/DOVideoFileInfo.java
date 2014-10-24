@@ -729,6 +729,9 @@ public class DOVideoFileInfo extends DOFileInfo {
 		if(videoFileInfo.getHeight() > 0) {
 			setHeight(videoFileInfo.getHeight());
 		}
+		if(videoFileInfo.getWidth() > 0) {
+			setWidth(videoFileInfo.getWidth());
+		}
 		if(!videoFileInfo.getMimeType().equals("")) {
 			setMimeType(videoFileInfo.getMimeType());
 		}
@@ -740,6 +743,15 @@ public class DOVideoFileInfo extends DOFileInfo {
 		}
 		if(!videoFileInfo.getFrameRateMode().equals("")) {
 			setFrameRateMode(videoFileInfo.getFrameRateMode());
+		}
+		if(!videoFileInfo.getAvcLevel().equals("")) {
+			setAvcLevel(videoFileInfo.getAvcLevel());
+		}
+		if(!videoFileInfo.getAspectRatioContainer().equals("")) {
+			setAspectRatioContainer(videoFileInfo.getAspectRatioContainer());
+		}
+		if(!videoFileInfo.getAspectRatioVideoTrack().equals("")) {
+			setAspectRatioVideoTrack(videoFileInfo.getAspectRatioVideoTrack());
 		}
 		
 		List<DLNAMediaAudio> audioCodes = getAudioCodes();
@@ -801,6 +813,10 @@ public class DOVideoFileInfo extends DOFileInfo {
 		hashCode *= 24 + getSubtitlesCodes().hashCode();
 		hashCode *= 24 + getMuxingMode().hashCode();
 		hashCode *= 24 + getFrameRateMode().hashCode();
+		hashCode *= 24 + getAvcLevel().hashCode();
+		hashCode *= 24 + getReferenceFrameCount();
+		hashCode *= 24 + getAspectRatioContainer().hashCode();
+		hashCode *= 24 + getAspectRatioVideoTrack().hashCode();
 		return hashCode;
 	}
 	
@@ -842,7 +858,11 @@ public class DOVideoFileInfo extends DOFileInfo {
 				&& isMuxable() == compObj.isMuxable()
 				&& getWidth() == compObj.getWidth()
 				&& getMuxingMode().equals(compObj.getMuxingMode())
-				&& getFrameRateMode().equals(compObj.getFrameRateMode())){
+				&& getFrameRateMode().equals(compObj.getFrameRateMode())
+				&& getAvcLevel().equals(compObj.getAvcLevel())
+				&& getReferenceFrameCount() == compObj.getReferenceFrameCount()
+				&& getAspectRatioContainer().equals(compObj.getAspectRatioContainer())
+				&& getAspectRatioVideoTrack().equals(compObj.getAspectRatioVideoTrack())){
 			
 				if(!getAudioCodes().equals(compObj.getAudioCodes())){
 					return false;
