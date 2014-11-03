@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import net.pms.Messages;
 import net.pms.medialibrary.commons.MediaLibraryConfiguration;
+import net.pms.medialibrary.commons.VersionConstants;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.OmitPrefixesConfiguration;
 import net.pms.medialibrary.commons.enumarations.FileType;
@@ -58,12 +59,13 @@ import net.pms.medialibrary.commons.enumarations.ScanState;
 import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.exceptions.ScanStateException;
 import net.pms.medialibrary.commons.helpers.GUIHelper;
-import net.pms.medialibrary.commons.interfaces.IFileScannerEventListener;
-import net.pms.medialibrary.commons.interfaces.ILibraryManagerEventListener;
 import net.pms.medialibrary.gui.dialogs.ScanFolderDialog;
 import net.pms.medialibrary.library.LibraryManager;
 import net.pms.medialibrary.scanner.FileScanner;
 import net.pms.medialibrary.storage.MediaLibraryStorage;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.NotificationSubscriber;
+import net.pms.notifications.types.DBEvent;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -78,6 +80,8 @@ public class GeneralOptionsView extends JPanel {
 	private ScanState                 scanState;
 	private JLabel                    lVideoCount;
 	private JButton                   bClearVideo;
+	private JButton                   bRefreshVideo;
+	private JLabel                    lRefreshVideo;
 	private JLabel                    lAudioCount;
 	private JButton                   bClearAudio;
 	private JLabel                    lPicturesCount;
@@ -110,12 +114,16 @@ public class GeneralOptionsView extends JPanel {
 		add(buildUseMediaLibrary(), BorderLayout.NORTH);
 		pOptions = build();
 		add(pOptions, BorderLayout.CENTER);
+		
+		refreshVideoFields();
 
 		this.scanState = libraryManager.getScanState().getScanState();
 		updateScanState();
 		pOptions.setVisible(cbEnableMediaLibrary.isSelected());
+		
+		registerNotifications();
 	}
-	
+
 	/**
 	 * Gets the managed folders as they have been configured in the GUI.
 	 *
@@ -155,56 +163,6 @@ public class GeneralOptionsView extends JPanel {
 	}
 
 	private JComponent build() {
-		this.libraryManager.addFileScannerEventListener(new IFileScannerEventListener() {
-
-			@Override
-			public void scanStateChanged(ScanState state) {
-				scanState = state;
-				updateScanState();
-			}
-
-			@Override
-			public void itemInserted(FileType type) {
-				switch (type) {
-					case VIDEO:
-						int currVal = Integer.parseInt(lVideoCount.getText());
-						lVideoCount.setText(String.valueOf(++currVal));
-						break;
-					case AUDIO:
-						currVal = Integer.parseInt(lAudioCount.getText());
-						lAudioCount.setText(String.valueOf(++currVal));
-						break;
-					case PICTURES:
-						currVal = Integer.parseInt(lPicturesCount.getText());
-						lPicturesCount.setText(String.valueOf(++currVal));
-						break;
-					default:
-						log.warn(String.format("Unhandled file type received (%s). This should never happen!", type));
-						break;
-				}
-			}
-		});
-		this.libraryManager.addLibraryManagerEventListener(new ILibraryManagerEventListener() {
-
-			@Override
-			public void itemCountChanged(int itemCount, FileType type) {
-				switch (type) {
-					case VIDEO:
-						lVideoCount.setText(String.valueOf(itemCount));
-						break;
-					case AUDIO:
-						lAudioCount.setText(String.valueOf(itemCount));
-						break;
-					case PICTURES:
-						lPicturesCount.setText(String.valueOf(itemCount));
-						break;
-					default:
-						log.warn(String.format("Unhandled file type received (%s). This should never happen!", type));
-						break;
-				}
-			}
-		});
-
 		FormLayout layout = new FormLayout("3px, 10:grow, 3px", "3px, p, 7px, p, 7px, p, 7px, fill:p:grow, 3px, p, 3px");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.opaque(true);
@@ -406,17 +364,18 @@ public class GeneralOptionsView extends JPanel {
 	}
 
 	private JComponent buildLibrary() {
-		FormLayout layout = new FormLayout("p, right:p, 5px, 40px, 3dlu, p, 3dlu, fill:0:grow, p", "p, p, p, p");
+		FormLayout layout = new FormLayout("p, right:p, 5px, 40px, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, fill:0:grow, p", 
+				"p, p, p, p");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.opaque(true);
 		CellConstraints cc = new CellConstraints();
 
-		JComponent sManageLibrary = builder.addSeparator(Messages.getString("ML.GeneralOptionsView.sManageLibrary"), cc.xyw(1, 1, 9));
+		JComponent sManageLibrary = builder.addSeparator(Messages.getString("ML.GeneralOptionsView.sManageLibrary"), cc.xyw(1, 1, 13));
 		sManageLibrary = (JComponent) sManageLibrary.getComponent(0);
 		sManageLibrary.setFont(sManageLibrary.getFont().deriveFont(Font.BOLD));
 
 		builder.addLabel(Messages.getString("ML.GeneralOptionsView.lVideos"), cc.xy(2, 2));
-		this.lVideoCount = new JLabel(String.valueOf(this.libraryManager.getVideoCount()));
+		this.lVideoCount = new JLabel();
 		builder.add(this.lVideoCount, cc.xy(4, 2));
 		this.bClearVideo = new JButton(Messages.getString("ML.GeneralOptionsView.bClear"));
 		this.bClearVideo.addMouseListener(new MouseAdapter() {
@@ -431,6 +390,19 @@ public class GeneralOptionsView extends JPanel {
 
 		});
 		builder.add(this.bClearVideo, cc.xy(6, 2));
+		
+		this.bRefreshVideo = new JButton(Messages.getString("ML.GeneralOptionsView.bRefresh"));
+		this.bRefreshVideo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				FileScanner.getInstance().updateFilesRequiringFileUpdate(Arrays.asList(new FileType[] { FileType.VIDEO }));
+			}
+
+		});
+		builder.add(this.bRefreshVideo, cc.xy(8, 2));
+		
+		this.lRefreshVideo = new JLabel();
+		builder.add(this.lRefreshVideo, cc.xy(10, 2));
 
 		JButton bResetLibrary = new JButton(Messages.getString("ML.GeneralOptionsView.bResetLibrary"));
 		bResetLibrary.addMouseListener(new MouseAdapter() {
@@ -465,7 +437,7 @@ public class GeneralOptionsView extends JPanel {
 				}
 			}
 		});
-		builder.add(bResetLibrary, cc.xy(9, 2));
+		builder.add(bResetLibrary, cc.xy(13, 2));
 
 		// TODO: uncomment audio and pictures parts, once implemented
 		// builder.addLabel(Messages.getString("ML.GeneralOptionsView.lTracks"), cc.xy(2, 3));
@@ -500,7 +472,7 @@ public class GeneralOptionsView extends JPanel {
 				}
 			}
 		});
-		builder.add(bCleanLibrary, cc.xy(9, 3));
+		builder.add(bCleanLibrary, cc.xy(13, 3));
 
 		// builder.addLabel(Messages.getString("ML.GeneralOptionsView.lPictures"), cc.xy(2, 4));
 		this.lPicturesCount = new JLabel(String.valueOf(this.libraryManager.getPictureCount()));
@@ -520,6 +492,36 @@ public class GeneralOptionsView extends JPanel {
 		// builder.add(this.bClearPictures, cc.xy(6, 4));
 
 		return builder.getPanel();
+	}
+	
+	private void registerNotifications() {
+		NotificationCenter.getInstance(DBEvent.class).subscribe(new NotificationSubscriber<DBEvent>() {
+			
+			@Override
+			public void onMessage(DBEvent obj) {
+				switch(obj.getType()) {
+				case VideoInserted:
+				case VideoUpdated:
+				case VideoDeleted:
+					refreshVideoFields();
+					break;
+				default:
+					// Do nothing
+					break;
+				}
+			}
+		});
+	}
+	
+	private void refreshVideoFields() {
+		this.lVideoCount.setText(String.valueOf(this.libraryManager.getVideoCount()));
+
+		int nbItemsRequiringUpdate = MediaLibraryStorage.getInstance().getFileCountRequiringUpdate(FileType.VIDEO, VersionConstants.VIDEO_FILE_VERSION);
+		if(nbItemsRequiringUpdate > 0) {
+			this.lRefreshVideo.setText(String.format(Messages.getString("ML.GeneralOptionsView.lRefresh"), nbItemsRequiringUpdate));
+		}
+		this.bRefreshVideo.setVisible(nbItemsRequiringUpdate > 0);
+		this.lRefreshVideo.setVisible(nbItemsRequiringUpdate > 0);
 	}
 
 	private void updateScanState() {

@@ -26,7 +26,6 @@ import net.pms.Messages;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.io.WindowsNamedPipe;
-import net.pms.medialibrary.commons.MediaLibraryConfiguration;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.gui.tab.MediaLibraryTab;
 import net.pms.medialibrary.scanner.FileScanner;

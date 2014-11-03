@@ -3,12 +3,19 @@ Changelog:
 
 pms-mlx 1.2 - ???
 
-  GUI:
-    - In the library view a column can now be added for all existing tags
+	GUI:
+    	- In the library view a column can now be added for all each existing tags
+    	- Added notification message on application start asking if files should be rescanned (shown if required)
+    	- Added refresh button and message to rescan files in general view (shown if required)
 
 	Plugins:
 		- Web folder:
 			- Reload folders on renderer when the configured web.conf file has changed
+	
+	Misc:
+		- Added refresh mechanism to rescan file properties with ffmpeg or mediainfo
+		- Use reference frame count and avc level properties (which had been added to pms)
+		- Modified mechanism to update video count in general view
       
 pms-mlx 1.1 - 2014-09-23
 

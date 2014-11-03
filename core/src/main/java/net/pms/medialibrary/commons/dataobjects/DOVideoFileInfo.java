@@ -753,6 +753,9 @@ public class DOVideoFileInfo extends DOFileInfo {
 		if(!videoFileInfo.getAspectRatioVideoTrack().equals("")) {
 			setAspectRatioVideoTrack(videoFileInfo.getAspectRatioVideoTrack());
 		}
+		if(videoFileInfo.getReferenceFrameCount() > 0) {
+			setReferenceFrameCount(videoFileInfo.getReferenceFrameCount());
+		}
 		
 		List<DLNAMediaAudio> audioCodes = getAudioCodes();
 		for(DLNAMediaAudio audioCode : videoFileInfo.getAudioCodes()) {

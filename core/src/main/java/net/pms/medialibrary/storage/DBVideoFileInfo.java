@@ -46,6 +46,9 @@ import net.pms.medialibrary.commons.enumarations.ConditionType;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.SortOption;
 import net.pms.medialibrary.commons.exceptions.StorageException;
+import net.pms.notifications.NotificationCenter;
+import net.pms.notifications.types.DBEvent;
+import net.pms.notifications.types.DBEvent.Type;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.slf4j.Logger;
@@ -100,6 +103,8 @@ class DBVideoFileInfo extends DBFileInfo {
 				}
 			}
 			conn.commit();
+			
+			NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.VideoInserted));
         } catch (SQLException e) {
 			try {
 				conn.rollback(savePoint);
@@ -155,6 +160,8 @@ class DBVideoFileInfo extends DBFileInfo {
 
 			conn.commit();
 			res = nbDeletedVideos;
+			
+			NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.VideoDeleted));
         } catch (SQLException e) {
 			try {
 				conn.rollback(savePoint);
@@ -183,6 +190,8 @@ class DBVideoFileInfo extends DBFileInfo {
 			
 			deleteVideo(fileId, conn, stmt);
 			conn.commit();
+			
+			NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.VideoDeleted));
         } catch (SQLException e) {
 			try {
 				conn.rollback(savePoint);
@@ -672,6 +681,8 @@ class DBVideoFileInfo extends DBFileInfo {
 			insertOrUpdateVideoPropertyLists(fileInfo, stmt, conn);
 			
 			conn.commit();
+			
+			NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.VideoInserted));
 		} catch (Exception e) {
 			try {
 				conn.rollback(savePoint);
@@ -750,6 +761,8 @@ class DBVideoFileInfo extends DBFileInfo {
     		insertOrUpdateVideoPropertyLists(fileInfo, stmt, conn);
 			
 			conn.commit();
+			
+			NotificationCenter.getInstance(DBEvent.class).post(new DBEvent(Type.VideoUpdated));
 		} catch (Exception e) {
 			try {
 				conn.rollback(savePoint);
