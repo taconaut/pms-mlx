@@ -99,7 +99,7 @@ class DBVideoFileInfo extends DBFileInfo {
 					deleteVideo(fileId, conn, stmt);
 					res++;
 					
-					log.debug("Removed video from library while cleaning: " + filePath);
+					log.info("Removed video from library while cleaning: " + filePath);
 				}
 			}
 			conn.commit();
