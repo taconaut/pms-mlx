@@ -33,6 +33,7 @@ import net.pms.Messages;
 import net.pms.medialibrary.commons.dataobjects.DOFileInfo;
 import net.pms.medialibrary.commons.dataobjects.DOManagedFile;
 import net.pms.medialibrary.commons.dataobjects.DOScanReport;
+import net.pms.medialibrary.commons.enumarations.FileImportResult;
 import net.pms.medialibrary.commons.enumarations.FileType;
 import net.pms.medialibrary.commons.enumarations.ScanState;
 import net.pms.medialibrary.commons.exceptions.ScanStateException;
@@ -123,8 +124,8 @@ public class FileScanner implements Runnable{
 		}
 	}
 	
-	public boolean scanFile(FileImportConfiguration importFile) {
-		boolean fileImported = false;
+	public FileImportResult scanFile(FileImportConfiguration importFile) {
+		FileImportResult fileImportResult = FileImportResult.Unknown;
 
 		File f = new File(importFile.getPath());
 		if (f.isFile()) {
@@ -150,22 +151,23 @@ public class FileScanner implements Runnable{
 						currentFileInfo.copySetSystemPropertiesFrom(fileInfo);
 						
 						mediaLibraryStorage.updateFileInfo(currentFileInfo);
+						fileImportResult = FileImportResult.Updated;
 					} else {
 						mediaLibraryStorage.insertFileInfo(fileInfo);
+						fileImportResult = FileImportResult.Imported;
 					}
 
-					fileImported = true;
 					for (IFileScannerEventListener l : fileScannerEventListeners) {
 						l.itemInserted(FileType.VIDEO);
 					}
 				} else {
-					if (log.isDebugEnabled())
-						log.debug("Couldn't read " + f);
+					log.debug("Couldn't read " + f);
+					fileImportResult = FileImportResult.Failed;
 				}
 			}
 		}
 
-		return fileImported;
+		return fileImportResult;
 	}
 	
 	public void updateFilesRequiringFileUpdate(List<FileType> fileTypesToUpdate) {
@@ -228,6 +230,7 @@ public class FileScanner implements Runnable{
 		// Handle each directory in the list
 		FileImportConfiguration importFile;
 		int nbFilesAdded = 0;
+		int nbFilesUpdated = 0;
 		//Calendar lastGetDate = Calendar.getInstance();
 		while ((importFile = dequeueImportFile()) != null) {
 			// check if we have to pause or stop the thread
@@ -256,14 +259,22 @@ public class FileScanner implements Runnable{
 			}
 			
 			// Scan the file
-			if(scanFile(importFile)) {
+			switch(scanFile(importFile)) {
+			case Imported:
 				nbFilesAdded++;
+				break;
+			case Updated:
+				nbFilesUpdated++;
+				break;
+			default:
+				log.warn(String.format("Failed to scan file '%s'", importFile.getPath()));
+				break;
 			}
 		}
 
-		net.pms.PMS.get().getFrame().setStatusLine(String.format(Messages.getString("ML.Messages.ScanFinished"), String.valueOf(nbFilesAdded)));
+		net.pms.PMS.get().getFrame().setStatusLine(String.format(Messages.getString("ML.Messages.ScanFinished"), String.valueOf(nbFilesAdded), String.valueOf(nbFilesUpdated)));
 
-		if(log.isInfoEnabled()) log.info("Finished scanning " + nbFilesAdded + " files");
+		log.info(String.format("Scanning finished. Result: %s added, %s updated", nbFilesAdded, nbFilesUpdated));
 		changeScanState(ScanState.IDLE);
 	}
 

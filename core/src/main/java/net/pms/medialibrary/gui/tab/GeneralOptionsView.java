@@ -59,6 +59,7 @@ import net.pms.medialibrary.commons.enumarations.ScanState;
 import net.pms.medialibrary.commons.exceptions.InitialisationException;
 import net.pms.medialibrary.commons.exceptions.ScanStateException;
 import net.pms.medialibrary.commons.helpers.GUIHelper;
+import net.pms.medialibrary.commons.interfaces.IFileScannerEventListener;
 import net.pms.medialibrary.gui.dialogs.ScanFolderDialog;
 import net.pms.medialibrary.library.LibraryManager;
 import net.pms.medialibrary.scanner.FileScanner;
@@ -510,6 +511,20 @@ public class GeneralOptionsView extends JPanel {
 					break;
 				}
 			}
+		});
+		
+		this.libraryManager.addFileScannerEventListener(new IFileScannerEventListener() {
+
+			@Override
+			public void scanStateChanged(ScanState state) {
+				scanState = state;
+				updateScanState();
+			}
+
+			@Override
+			public void itemInserted(FileType type) {
+				// Don't do anything as those notifications are being handled through the notification center
+			}			
 		});
 	}
 	
