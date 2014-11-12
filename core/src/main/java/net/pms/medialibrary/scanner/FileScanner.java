@@ -57,7 +57,7 @@ public class FileScanner implements Runnable{
 	private Object scanThreadPause;
 	private List<IFileScannerEventListener> fileScannerEventListeners;
 	
-	public int updateIntervalDays = 50000;
+	public int updateIntervalDays = 5000;
 	
 	private FileScanner() {
 		directoryPaths = new ConcurrentLinkedQueue<FileImportConfiguration>();
@@ -106,7 +106,7 @@ public class FileScanner implements Runnable{
 					
 					if (currentFile.isFile()) {
 						// Enqueue the file
-						FileImportConfiguration fileImportConfiguration = new FileImportConfiguration(mFolder.getPath(), mFolder.getFileImportTemplate(), false, true,
+						FileImportConfiguration fileImportConfiguration = new FileImportConfiguration(currentFile.getAbsolutePath(), mFolder.getFileImportTemplate(), false, true,
 								mFolder.isPluginImportEnabled(), mFolder.isVideoEnabled(), mFolder.isAudioEnabled(), mFolder.isPicturesEnabled());
 						enqueueManagedFile(fileImportConfiguration);
 						startScan();
