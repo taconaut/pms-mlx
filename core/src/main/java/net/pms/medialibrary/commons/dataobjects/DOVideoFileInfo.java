@@ -824,8 +824,14 @@ public class DOVideoFileInfo extends DOFileInfo {
 	}
 	
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(Object obj) {
+		// If the object type isn't the same, the objects are not equal
 		if(!(obj instanceof DOVideoFileInfo)){
+			return false;
+		}
+
+		// If the base class properties aren't the same, the objects aren't equal
+		if(!super.equals(obj)) {
 			return false;
 		}
 		
