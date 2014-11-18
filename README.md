@@ -104,3 +104,5 @@ Copyright 2009-2013 shagrath.
 PS3 Media Server is free software: you can redistribute it and/or modify it under the terms of the
 [GNU General Public License](https://github.com/ps3mediaserver/ps3mediaserver/blob/master/LICENSE.txt)
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/taconaut/pms-mlx/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
