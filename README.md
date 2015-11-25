@@ -1,3 +1,5 @@
+**NOTE:** This project won't be further developed as it has been replaced by [ums-mlx](https://github.com/taconaut/ums-mlx).
+
 # PS3 Media Server MLX
 
 by shagrath
