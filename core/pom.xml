@@ -43,7 +43,7 @@
 		<logback-version>1.0.13</logback-version>
 		<bsh-core-version>2.0b4</bsh-core-version>
 		<commons-codec-version>1.8</commons-codec-version>
-		<commons-collections-version>3.2.1</commons-collections-version>
+		<commons-collections-version>3.2.2</commons-collections-version>
 		<commons-configuration-version>1.9</commons-configuration-version>
 		<commons-httpclient-version>3.1</commons-httpclient-version>
 		<commons-io-version>2.4</commons-io-version>
